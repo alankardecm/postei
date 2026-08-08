@@ -1,0 +1,124 @@
+import mostra from "../../public/mostra/indice.json";
+
+/**
+ * Conteudo da landing. Numeros e precos vem do plano de negocio, nao de
+ * estimativa: qualquer mudanca de preco se ajusta aqui e em lugar nenhum mais.
+ */
+
+export type Criativo = {
+  arquivo: string;
+  nicho: string;
+  nichoId: string;
+  formato: string;
+  titulo: string;
+  comFoto: boolean;
+};
+
+export const criativos = mostra as Criativo[];
+
+/**
+ * Os nichos existentes hoje. O produto e MULTI-NICHO -- essa lista e a prova
+ * disso na pagina, e cada um tem paleta e tom proprios.
+ */
+export const nichos = [
+  {
+    id: "receitas",
+    nome: "Receitas e culinária",
+    publico: "Quem cozinha em casa e quer praticidade",
+    cor: "#C6D64B",
+    fundo: "#1F2410",
+  },
+  {
+    id: "financas-pessoais",
+    nome: "Finanças pessoais",
+    publico: "Quem quer sair do vermelho e se organizar",
+    cor: "#4ADE80",
+    fundo: "#0E1B2A",
+  },
+  {
+    id: "nutricao-estudante",
+    nome: "Nutrição",
+    publico: "Alimentação do dia a dia, esportiva e infantil",
+    cor: "#7ED957",
+    fundo: "#14251C",
+  },
+];
+
+export const passos = [
+  {
+    titulo: "Você diz o seu ramo",
+    texto:
+      "Escolhe o nicho e o nome do seu perfil. Só isso. Nada de briefing, planilha ou reunião de alinhamento.",
+  },
+  {
+    titulo: "O Postei monta o mês",
+    texto:
+      "Em poucos minutos ele escreve os textos, escolhe as fotos e monta as artes — todas com a sua assinatura.",
+  },
+  {
+    titulo: "Você revisa e publica",
+    texto:
+      "Recebe as imagens e as legendas prontas para copiar e colar. Você aprova o que gostou e descarta o resto.",
+  },
+];
+
+export const planos = [
+  {
+    nome: "Essencial",
+    preco: "39,90",
+    resumo: "Para quem está começando a postar com constância.",
+    itens: ["30 posts por mês", "1 marca", "Artes com foto e tipográficas", "Legendas e hashtags prontas"],
+    destaque: false,
+  },
+  {
+    nome: "Profissional",
+    preco: "89,90",
+    resumo: "Para quem vive de aparecer e não pode sumir do feed.",
+    itens: [
+      "90 posts por mês",
+      "Até 3 marcas",
+      "30 imagens geradas por IA",
+      "Link de captação de contatos",
+    ],
+    destaque: true,
+  },
+  {
+    nome: "Estúdio",
+    preco: "199,90",
+    resumo: "Para agências e quem cuida do conteúdo de vários clientes.",
+    // "Marca branca" saiu: o criativo NUNCA leva marca do Postei, em plano
+    // nenhum -- vender isso como diferencial do Estúdio seria vender o que
+    // todo mundo já tem. No lugar entrou o nicho sob medida, que é real:
+    // criar um nicho é um arquivo de configuração, não desenvolvimento.
+    itens: [
+      "300 posts por mês",
+      "Até 10 marcas",
+      "100 imagens por IA",
+      "Nicho sob medida para cada cliente",
+    ],
+    destaque: false,
+  },
+];
+
+export const perguntas = [
+  {
+    p: "Os posts saem repetidos?",
+    r: "Não. Cada post do pacote trata de um assunto diferente, e o sistema compara os títulos entre si para descartar qualquer repetição antes de você receber.",
+  },
+  {
+    p: "Preciso saber design?",
+    r: "Não. As artes já saem prontas no formato do feed, com a sua assinatura. Você recebe as imagens e o texto de cada uma para colar direto no Instagram.",
+  },
+  {
+    p: "O conteúdo é meu?",
+    r: "É. Os textos e as artes geradas são seus, para usar como quiser, inclusive comercialmente. As fotos vêm de um banco com licença livre para uso comercial.",
+  },
+  {
+    p: "E se um post não ficar bom?",
+    r: "Você descarta. O pacote é um mês de opções, não uma obrigação — a ideia é você nunca começar de uma tela em branco, não publicar tudo cegamente.",
+  },
+  {
+    p: "Meu ramo não está na lista.",
+    r: "Fale com a gente. Adicionar um nicho novo não exige desenvolvimento: é uma configuração de tom de voz, público e temas.",
+  },
+];

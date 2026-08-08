@@ -1,0 +1,35 @@
+# Dependencias e caches
+node_modules/
+.npm/
+__pycache__/
+*.py[cod]
+
+# Segredos e configuracoes locais
+.env
+.env.*
+!.env.example
+
+# Artefatos gerados e entregas de clientes
+saida/
+validacao/
+entregas/
+*.zip
+
+# Logs e arquivos temporarios
+*.log
+*.pid
+tmp/
+.tmp/
+
+# Backups e bancos
+*.bak
+*.bak-*
+*.sql
+*.sql.gz
+
+# Sistema operacional e editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

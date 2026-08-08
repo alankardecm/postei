@@ -1,0 +1,24 @@
+{
+  "id": "receitas",
+  "nome": "Receitas & Culinária",
+  "publico": "Pessoas de 25 a 55 anos que cozinham em casa no dia a dia, querem praticidade e fogem de receita complicada ou ingrediente caro.",
+  "tomDeVoz": "Caseiro, direto e acolhedor. Fala como quem já queimou o arroz. Sem jargão de chef, sem 'gastronomia autoral'. Frases curtas.",
+  "temas": [
+    "receita de 15 minutos para o jantar",
+    "aproveitamento de sobras da geladeira",
+    "erro comum que estraga o prato",
+    "substituição de ingrediente caro",
+    "marmita da semana",
+    "massa/bolo simples de 5 ingredientes",
+    "tempero que muda o sabor",
+    "receita econômica de fim de mês"
+  ],
+  "formatosCriativo": ["citacao", "lista", "destaque"],
+  "produtoFim": "E-book de receitas rápidas para o dia a dia",
+  "paleta": {
+    "fundo": "#1F2410",
+    "texto": "#F7F3E8",
+    "destaque": "#C6D64B"
+  },
+  "observacoes": "Nicho saturado — o diferencial precisa estar na especificidade (ingrediente, tempo, situação), nunca em 'receita deliciosa'."
+}

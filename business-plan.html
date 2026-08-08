@@ -1,0 +1,1005 @@
+<title>Esteira IA — Plano de Negócio | AM Consultoria</title>
+
+<style>
+  :root {
+    --ink:        #0E100D;
+    --ink-soft:   #3A3F36;
+    --ink-mute:   #6B7166;
+    --paper:      #F6F7F4;
+    --paper-2:    #ECEEE8;
+    --line:       #D5D9CE;
+    --accent:     #3F6B12;
+    --accent-bg:  #9FE870;
+    --sand:       #8A6D2B;
+    --sand-bg:    #E9D8A6;
+    --pos:        #2E6B2A;
+    --warn:       #8A5A12;
+    --crit:       #9A3412;
+
+    --display: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --body: Charter, "Bitstream Charter", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --data: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+    --measure: 66ch;
+    --wide: 1080px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #F2F4EE; --ink-soft: #C3C8BC; --ink-mute: #8A9083;
+      --paper: #0E100D; --paper-2: #191C17; --line: #2E332B;
+      --accent: #9FE870; --accent-bg: #9FE870;
+      --sand: #E9D8A6; --sand-bg: #E9D8A6;
+      --pos: #9FE870; --warn: #E9C46A; --crit: #F08C69;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ink: #F2F4EE; --ink-soft: #C3C8BC; --ink-mute: #8A9083;
+    --paper: #0E100D; --paper-2: #191C17; --line: #2E332B;
+    --accent: #9FE870; --accent-bg: #9FE870;
+    --sand: #E9D8A6; --sand-bg: #E9D8A6;
+    --pos: #9FE870; --warn: #E9C46A; --crit: #F08C69;
+  }
+
+  :root[data-theme="light"] {
+    --ink: #0E100D; --ink-soft: #3A3F36; --ink-mute: #6B7166;
+    --paper: #F6F7F4; --paper-2: #ECEEE8; --line: #D5D9CE;
+    --accent: #3F6B12; --accent-bg: #9FE870;
+    --sand: #8A6D2B; --sand-bg: #E9D8A6;
+    --pos: #2E6B2A; --warn: #8A5A12; --crit: #9A3412;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--wide);
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .col { max-width: var(--measure); }
+
+  /* ---------- capa ---------- */
+
+  .cover {
+    border-bottom: 1px solid var(--line);
+    padding: 72px 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .brandmark { display: flex; align-items: center; gap: 12px; font-family: var(--display); }
+
+  .brandmark .glyph {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    background: var(--accent-bg);
+    color: #0E100D;
+    font-weight: 700; font-size: 14px; letter-spacing: -0.03em;
+  }
+
+  .brandmark .name {
+    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-soft); font-weight: 600;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;
+    text-wrap: balance; margin: 0; max-width: 16ch;
+  }
+
+  .deck { font-size: 1.2rem; color: var(--ink-soft); max-width: 54ch; text-wrap: pretty; }
+
+  .cover-meta { display: flex; flex-wrap: wrap; gap: 40px; padding-top: 12px; font-family: var(--data); }
+  .cover-meta div { display: flex; flex-direction: column; gap: 3px; }
+
+  .cover-meta dt, .eyebrow {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600; font-family: var(--display);
+  }
+
+  .cover-meta dd { margin: 0; font-size: 15px; font-weight: 600; }
+  .cover-meta .role { font-size: 13px; color: var(--ink-soft); font-weight: 400; }
+
+  /* ---------- seções ---------- */
+
+  section { display: flex; flex-direction: column; gap: 22px; }
+
+  .sec-head {
+    display: flex; align-items: baseline; gap: 14px;
+    border-top: 2px solid var(--ink); padding-top: 14px;
+  }
+
+  .sec-num {
+    font-family: var(--data); font-size: 13px; font-weight: 700;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    letter-spacing: -0.025em; font-weight: 700;
+    margin: 0; line-height: 1.15; text-wrap: balance;
+  }
+
+  h3 {
+    font-family: var(--display); font-size: 1.12rem; font-weight: 700;
+    letter-spacing: -0.01em; margin: 0 0 -8px;
+  }
+
+  p { margin: 0; text-wrap: pretty; }
+  .col > p + p { margin-top: 14px; }
+
+  strong { font-weight: 700; }
+  em { font-style: italic; color: var(--ink-soft); }
+
+  ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 9px; }
+  li::marker { color: var(--accent); }
+
+  a { color: var(--accent); }
+
+  /* ---------- tabelas ---------- */
+
+  .table-scroll { overflow-x: auto; }
+
+  table {
+    border-collapse: collapse; width: 100%;
+    font-family: var(--data); font-size: 14.5px;
+    font-variant-numeric: tabular-nums; min-width: 480px;
+  }
+
+  th {
+    text-align: left; font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-mute); font-weight: 700;
+    padding: 0 0 9px 18px; border-bottom: 1px solid var(--ink); white-space: nowrap;
+  }
+
+  td { padding: 11px 0 11px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th:first-child, td:first-child { padding-left: 0; }
+  td.num, th.num { text-align: right; }
+  tr.total td { border-bottom: none; border-top: 2px solid var(--ink); font-weight: 700; }
+  .pos { color: var(--pos); font-weight: 700; }
+
+  /* ---------- planos (cartões) ---------- */
+
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .plan {
+    background: var(--paper);
+    padding: 24px 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .plan.featured { background: color-mix(in srgb, var(--accent-bg) 14%, var(--paper)); }
+
+  .plan-top { display: flex; flex-direction: column; gap: 3px; }
+
+  .plan-name {
+    font-family: var(--display); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
+  }
+
+  .plan-price {
+    font-family: var(--data); font-size: 2.15rem; font-weight: 700;
+    letter-spacing: -0.035em; line-height: 1.05; font-variant-numeric: tabular-nums;
+  }
+
+  .plan-price .cents { font-size: 1.15rem; letter-spacing: -0.02em; }
+  .plan-price .per { font-size: 0.85rem; font-weight: 400; color: var(--ink-mute); letter-spacing: 0; }
+
+  .plan-for { font-size: 13.5px; color: var(--ink-soft); font-family: var(--data); line-height: 1.45; }
+
+  .plan-volume {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+
+  .plan-volume .big {
+    font-family: var(--data); font-size: 1.5rem; font-weight: 700;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1;
+  }
+
+  .plan-volume .unit {
+    font-family: var(--display); font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-mute); font-weight: 600;
+  }
+
+  .plan ul { font-family: var(--data); font-size: 13.5px; gap: 8px; padding-left: 1.05em; line-height: 1.45; }
+
+  /* ---------- fluxo ---------- */
+
+  .flow { display: flex; flex-direction: column; border: 1px solid var(--line); background: var(--paper-2); }
+
+  .flow-stage {
+    display: grid; grid-template-columns: 116px 1fr; gap: 20px;
+    padding: 18px 20px; border-bottom: 1px solid var(--line);
+  }
+
+  .flow-stage:last-child { border-bottom: none; }
+
+  .flow-tag {
+    font-family: var(--display); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); padding-top: 3px;
+  }
+
+  .flow-body { display: flex; flex-direction: column; gap: 6px; }
+  .flow-title { font-family: var(--display); font-weight: 700; font-size: 15px; }
+  .flow-desc { font-size: 14.5px; color: var(--ink-soft); line-height: 1.5; }
+
+  .flow-tech {
+    font-family: var(--data); font-size: 11.5px; color: var(--ink-mute);
+    letter-spacing: 0.02em; margin-top: 2px;
+  }
+
+  .flow-tech b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ---------- funil ---------- */
+
+  .funnel { display: flex; flex-direction: column; gap: 3px; }
+
+  .fstep {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px;
+    padding: 13px 18px;
+    background: color-mix(in srgb, var(--accent-bg) var(--fill), transparent);
+    border-left: 3px solid var(--accent);
+  }
+
+  .fstep .lbl { font-family: var(--display); font-weight: 600; font-size: 14.5px; }
+  .fstep .lbl small { display: block; font-weight: 400; font-size: 12.5px; color: var(--ink-mute); }
+
+  .fstep .val {
+    font-family: var(--data); font-variant-numeric: tabular-nums;
+    font-weight: 700; font-size: 20px; white-space: nowrap;
+  }
+
+  .fstep .rate { font-size: 12px; color: var(--ink-mute); font-weight: 600; }
+
+  /* ---------- destaques ---------- */
+
+  .kpis {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    gap: 1px; background: var(--line); border: 1px solid var(--line);
+  }
+
+  .kpi { background: var(--paper); padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 5px; }
+
+  .kpi .k {
+    font-family: var(--data); font-size: clamp(1.5rem, 3.4vw, 2rem);
+    font-weight: 700; letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+
+  .kpi .cap { font-size: 12.5px; color: var(--ink-soft); font-family: var(--data); line-height: 1.35; }
+
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--paper-2);
+    padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;
+    max-width: var(--measure);
+  }
+
+  .callout.risk { border-left-color: var(--crit); }
+  .callout .eyebrow { color: var(--ink-mute); }
+
+  /* ---------- responsáveis ---------- */
+
+  .owners {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px; background: var(--line); border: 1px solid var(--line);
+  }
+
+  .owner { background: var(--paper); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .owner .who { font-family: var(--display); font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
+
+  .owner .role-tag {
+    font-family: var(--display); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; font-weight: 700;
+    color: #0E100D; background: var(--accent-bg);
+    padding: 4px 9px; align-self: flex-start;
+  }
+
+  .owner ul { font-size: 14.5px; font-family: var(--data); gap: 7px; }
+
+  /* ---------- fases ---------- */
+
+  .phases { display: flex; flex-direction: column; }
+
+  .phase {
+    display: grid; grid-template-columns: 92px 1fr 130px; gap: 20px;
+    padding: 16px 0; border-bottom: 1px solid var(--line); align-items: baseline;
+  }
+
+  .phase:last-child { border-bottom: none; }
+
+  .phase .pnum {
+    font-family: var(--data); font-weight: 700; font-size: 12px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+  }
+
+  .phase .pwhat { display: flex; flex-direction: column; gap: 4px; }
+  .phase .pwhat b { font-family: var(--display); font-size: 15px; }
+  .phase .pwhat span { font-size: 14.5px; color: var(--ink-soft); }
+  .phase .pwhen { font-family: var(--data); font-size: 13px; color: var(--ink-mute); text-align: right; }
+
+  /* ---------- decisões ---------- */
+
+  .decisions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    counter-reset: d;
+    margin: 0; padding: 0; list-style: none;
+  }
+
+  .decisions li {
+    counter-increment: d;
+    background: var(--paper);
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 7px;
+  }
+
+  .decisions li::before {
+    content: counter(d, decimal-leading-zero);
+    font-family: var(--data); font-weight: 700; font-size: 12px;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+  }
+
+  .decisions .dq { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+  .decisions .da { font-size: 14px; color: var(--ink-soft); font-family: var(--data); line-height: 1.5; }
+
+  .decisions .owner-chip {
+    font-family: var(--display); font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 700; color: var(--ink-mute);
+    margin-top: auto; padding-top: 8px;
+  }
+
+  footer {
+    border-top: 1px solid var(--line); padding-top: 24px;
+    font-family: var(--data); font-size: 13px; color: var(--ink-mute);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  @media (max-width: 620px) {
+    body { font-size: 16px; }
+    .flow-stage { grid-template-columns: 1fr; gap: 8px; }
+    .phase { grid-template-columns: 1fr; gap: 6px; }
+    .phase .pwhen { text-align: left; }
+    .cover { padding-top: 44px; }
+  }
+
+  /* ---------- impressão / PDF ---------- */
+
+  @media print {
+    :root {
+      --ink: #0E100D; --ink-soft: #3A3F36; --ink-mute: #5E645A;
+      --paper: #FFFFFF; --paper-2: #F2F4EE; --line: #C8CDC0;
+      --accent: #3F6B12; --accent-bg: #9FE870;
+      --pos: #2E6B2A; --warn: #8A5A12; --crit: #9A3412;
+    }
+    body { font-size: 11pt; background: #fff; }
+    .wrap { max-width: none; padding: 0; gap: 30px; }
+    section { break-inside: avoid; page-break-inside: avoid; }
+    .cover { padding-top: 0; break-after: page; }
+    .sec-head { break-after: avoid; page-break-after: avoid; }
+    h2, h3 { break-after: avoid; page-break-after: avoid; }
+    .flow, .funnel, .plans, .owners, .decisions, .kpis, table, .callout { break-inside: avoid; page-break-inside: avoid; }
+    .table-scroll { overflow: visible; }
+    table { min-width: 0; font-size: 9.5pt; }
+    .plan-price { font-size: 1.7rem; }
+    tr { break-inside: avoid; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="cover">
+    <div class="brandmark">
+      <span class="glyph">AM</span>
+      <span class="name">AM Consultoria</span>
+    </div>
+
+    <h1>Esteira de Conteúdo com IA</h1>
+
+    <p class="deck">Plano de negócio para um serviço que produz o conteúdo de redes sociais de pequenos negócios, por assinatura mensal. Documento de decisão — nada foi construído ainda.</p>
+
+    <dl class="cover-meta">
+      <div>
+        <dt>Responsável técnico</dt>
+        <dd>Alan Moreira</dd>
+        <dd class="role">Produto, arquitetura, infraestrutura</dd>
+      </div>
+      <div>
+        <dt>Responsável comercial</dt>
+        <dd>Junior Martins</dd>
+        <dd class="role">Aquisição, vendas, relacionamento</dd>
+      </div>
+      <div>
+        <dt>Data</dt>
+        <dd>04 de agosto de 2026</dd>
+        <dd class="role">Versão 1.1 — rascunho</dd>
+      </div>
+    </dl>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Resumo executivo</h2></div>
+
+    <div class="col">
+      <p>Vamos construir e vender um serviço que resolve uma dor diária de qualquer negócio pequeno: <strong>ter post para publicar todo dia</strong>. O cliente diz de que ramo é e qual o tom da marca; a ferramenta entrega o mês inteiro de conteúdo pronto — imagem, legenda, hashtags e chamada — direto no WhatsApp dele.</p>
+      <p>O que vendemos é <strong>produção de conteúdo em escala</strong>, cobrada como assinatura mensal recorrente. Sem taxa de entrada, sem comissão de revenda, sem níveis. O cliente paga o plano enquanto usa; se parar, cancela.</p>
+      <p>O diferencial de partida é raro: <strong>a infraestrutura já existe e já está paga.</strong> Servidor, banco de dados, autenticação, gateway de IA, integração com WhatsApp, HTTPS e automação já rodam há semanas na VPS da AM Consultoria. O investimento em dinheiro para começar é de aproximadamente <strong>R$ 100</strong>.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><span class="k">R$ 100</span><span class="cap">Investimento inicial em caixa</span></div>
+      <div class="kpi"><span class="k">2</span><span class="cap">Assinantes para o ponto de equilíbrio</span></div>
+      <div class="kpi"><span class="k">88%</span><span class="cap">Margem bruta média por assinante</span></div>
+      <div class="kpi"><span class="k">~6</span><span class="cap">Semanas até o produto vendável</span></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>A ideia</h2></div>
+
+    <div class="col">
+      <h3>O problema</h3>
+      <p>Todo negócio pequeno sabe que precisa postar. Quase nenhum consegue manter o ritmo. Falta repertório para inventar assunto, falta tempo no meio do expediente e falta mão para fazer arte que não pareça amadora. O resultado é sempre o mesmo: o perfil anima duas semanas e morre.</p>
+      <p>As alternativas de hoje não servem para esse público. Agência cobra de R$ 800 a R$ 2.000 por mês — caro demais para um salão ou uma clínica pequena. Contratar um social media dá o mesmo problema. E as ferramentas genéricas de IA entregam uma tela em branco: quem não sabe o que pedir continua sem saber o que postar.</p>
+
+      <h3>A nossa entrega</h3>
+      <p>Nós não vendemos acesso a uma IA. Vendemos <strong>o conteúdo pronto, entregue toda semana</strong>, sem o cliente precisar pedir. Ele não abre um chat nem escreve comando: recebe o pacote no WhatsApp, aprova o que gostou, pede outro no que não gostou e publica.</p>
+      <p>Esse é o produto e é dele que vem a receita. É uma entrega recorrente por natureza — o cliente precisa de conteúdo novo todo mês, o que casa exatamente com um modelo de assinatura.</p>
+
+      <h3>Sobre o e-book</h3>
+      <p>A versão inicial desta ideia girava em torno de vender e-books gerados por IA. <strong>Isso saiu do centro do plano</strong> — e-book de nicho saturado hoje vende pouco, tem vida curta e não sustenta uma assinatura. O que sustenta é a esteira de conteúdo, que o cliente consome todo mês.</p>
+      <p>O e-book continua no produto, mas no papel certo: como <strong>isca de captação</strong> para quem quer trocar conteúdo por contato ("baixe o guia, deixe seu WhatsApp"), disponível como recurso dos planos maiores. É ferramenta de marketing do cliente, não a nossa fonte de receita.</p>
+    </div>
+
+    <div class="callout">
+      <span class="eyebrow">Evidência de mercado</span>
+      <p>Já existem produtos ativos vendendo exatamente esse tipo de esteira, criados por produtores com centenas de milhares de seguidores — e eles vendem. Isso é a confirmação de que a dor é real e o preço é aceito. <strong>Não vamos revender nem copiar nenhum deles:</strong> construímos o nosso, com nosso código, na nossa infraestrutura e com nossa base de clientes.</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Para quem vendemos</h2></div>
+
+    <div class="col">
+      <p>Três perfis, em ordem de facilidade de conversão.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:22%">Perfil</th>
+            <th>Quem é</th>
+            <th>Por que compra</th>
+            <th class="num" style="width:15%">Plano provável</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Negócio local</strong></td>
+            <td>Salão, clínica, loja de bairro, personal, nutricionista, pet shop. Tem cliente, não tem tempo.</td>
+            <td>Precisa manter o Instagram vivo e não tem R$ 800/mês para agência. Dor imediata, decisão rápida.</td>
+            <td class="num">Essencial</td>
+          </tr>
+          <tr>
+            <td><strong>Negócio com marca</strong></td>
+            <td>Já vende bem, tem duas ou três frentes (unidades, produtos, marcas) e leva as redes a sério.</td>
+            <td>Quer volume e constância em vários perfis, com agendamento e captação de contato.</td>
+            <td class="num">Profissional</td>
+          </tr>
+          <tr>
+            <td><strong>Social media autônomo</strong></td>
+            <td>Atende de 3 a 10 clientes pequenos sozinho, faz tudo na mão.</td>
+            <td>Ganha escala: atende o dobro de clientes no mesmo dia de trabalho. É o cliente que menos cancela.</td>
+            <td class="num">Estúdio</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="eyebrow">Foco recomendado</span>
+      <p>Começar pelo <strong>negócio local</strong>. Tem dinheiro em caixa, dor imediata, decisão rápida e — decisivo — está ao alcance do Junior pessoalmente, porta a porta, sem depender de audiência nas redes. O social media autônomo é o alvo mais lucrativo, mas exige que o produto já esteja redondo: ele é exigente e testa tudo.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Como o produto funciona</h2></div>
+
+    <div class="col">
+      <p>O caminho completo, do cadastro do cliente até a renovação da assinatura. Cada etapa mostra a peça de tecnologia que vai executá-la — e quase todas já estão instaladas e rodando.</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-stage">
+        <span class="flow-tag">Entrada</span>
+        <div class="flow-body">
+          <span class="flow-title">O cliente descreve o negócio</span>
+          <span class="flow-desc">Ramo, público, tom de voz, o que quer vender e o que não quer que apareça. Uma vez só, na ativação — cinco minutos de conversa no WhatsApp.</span>
+          <span class="flow-tech"><b>Painel web</b> ou conversa guiada no WhatsApp · perfil da marca salvo e reutilizado em todo post</span>
+        </div>
+      </div>
+
+      <div class="flow-stage">
+        <span class="flow-tag">Pauta</span>
+        <div class="flow-body">
+          <span class="flow-title">A IA monta o calendário do mês</span>
+          <span class="flow-desc">Distribui os assuntos ao longo das semanas, misturando os tipos que funcionam: dica, bastidor, prova social, oferta, data comemorativa do setor. O cliente não precisa ter ideia nenhuma.</span>
+          <span class="flow-tech">Biblioteca de pautas por ramo · <b>SearXNG</b> para checar datas e tendências do setor</span>
+        </div>
+      </div>
+
+      <div class="flow-stage">
+        <span class="flow-tag">Produção</span>
+        <div class="flow-body">
+          <span class="flow-title">Cada post é gerado por inteiro</span>
+          <span class="flow-desc">Imagem, legenda, hashtags e chamada para ação — no padrão visual da marca do cliente. É este item que ele está comprando, e é por volume dele que cobramos.</span>
+          <span class="flow-tech"><b>LiteLLM</b> como gateway único, com teto de gasto por assinante · <b>Langfuse</b> registra o custo real de cada cliente</span>
+        </div>
+      </div>
+
+      <div class="flow-stage">
+        <span class="flow-tag">Aprovação</span>
+        <div class="flow-body">
+          <span class="flow-title">O cliente aprova, edita ou troca</span>
+          <span class="flow-desc">Vê o mês inteiro de uma vez. Aprova o lote, ajusta uma legenda ou manda refazer o que não ficou bom. Refação é ilimitada dentro da cota do plano.</span>
+          <span class="flow-tech">Painel do cliente sobre <b>Supabase</b> · aprovação também por resposta no WhatsApp</span>
+        </div>
+      </div>
+
+      <div class="flow-stage">
+        <span class="flow-tag">Publicação</span>
+        <div class="flow-body">
+          <span class="flow-title">O conteúdo vai para o ar</span>
+          <span class="flow-desc">Na primeira versão entregamos pronto, com legenda copiável, e o cliente publica em um toque. Na versão seguinte publicamos por ele, no horário agendado.</span>
+          <span class="flow-tech"><b>n8n</b> agenda e dispara · Instagram Graph API na fase 5 (exige conta Business)</span>
+        </div>
+      </div>
+
+      <div class="flow-stage">
+        <span class="flow-tag">Captação</span>
+        <div class="flow-body">
+          <span class="flow-title">O seguidor vira contato</span>
+          <span class="flow-desc">Post com link rastreável, página de captura e — quando faz sentido para o ramo — um material de isca para troca pelo WhatsApp. O cliente para de só ganhar curtida e passa a ganhar contato.</span>
+          <span class="flow-tech">Encurtador próprio · <b>Supabase</b> guarda contato, origem e clique · geração do material de isca</span>
+        </div>
+      </div>
+
+      <div class="flow-stage">
+        <span class="flow-tag">Retenção</span>
+        <div class="flow-body">
+          <span class="flow-title">Toda segunda, o pacote chega sozinho</span>
+          <span class="flow-desc">Não esperamos o cliente lembrar de entrar. O conteúdo da semana é empurrado no WhatsApp dele, junto com o número de contatos captados. Esta etapa não é enfeite: é o que segura a receita recorrente.</span>
+          <span class="flow-tech"><b>n8n</b> agendado + <b>Evolution API</b> · painel mostra o acervo já produzido</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Funil de vendas</h2></div>
+
+    <div class="col">
+      <p>Funil de aquisição do <em>nosso</em> assinante — o território do Junior. Os números abaixo são a meta de um mês de operação com prospecção ativa, sem investimento em anúncios.</p>
+    </div>
+
+    <div class="funnel">
+      <div class="fstep" style="--fill: 34%">
+        <span class="lbl">Alcance<small>Visita porta a porta, indicação, conteúdo próprio no Instagram</small></span>
+        <span class="val">1.000 <span class="rate">pessoas</span></span>
+      </div>
+      <div class="fstep" style="--fill: 27%">
+        <span class="lbl">Interesse<small>Viu a demonstração ou respondeu a mensagem</small></span>
+        <span class="val">150 <span class="rate">15%</span></span>
+      </div>
+      <div class="fstep" style="--fill: 21%">
+        <span class="lbl">Contato qualificado<small>Deixou WhatsApp e descreveu o negócio</small></span>
+        <span class="val">45 <span class="rate">30%</span></span>
+      </div>
+      <div class="fstep" style="--fill: 15%">
+        <span class="lbl">Teste grátis<small>Ativou a conta e recebeu a primeira semana de posts</small></span>
+        <span class="val">18 <span class="rate">40%</span></span>
+      </div>
+      <div class="fstep" style="--fill: 10%">
+        <span class="lbl">Assinante pagante<small>Converteu ao fim do teste e passou o cartão</small></span>
+        <span class="val">7 <span class="rate">39%</span></span>
+      </div>
+      <div class="fstep" style="--fill: 6%">
+        <span class="lbl">Assinante retido<small>Continua pagando no terceiro mês — o número que sustenta o negócio</small></span>
+        <span class="val">5 <span class="rate">71%</span></span>
+      </div>
+    </div>
+
+    <div class="col">
+      <p>A conversão mais frágil é a passagem do teste grátis para o pagamento. É onde o produto precisa provar que economizou tempo de verdade. Por isso o teste entrega conteúdo real do negócio dele já no primeiro dia: o cliente precisa <em>ver os posts do salão dele</em> prontos antes de decidir.</p>
+    </div>
+
+    <div class="callout risk">
+      <span class="eyebrow">Premissa a validar</span>
+      <p>Estes percentuais são estimativa de trabalho, não histórico. O piloto da Fase 4 existe justamente para substituí-los por números reais. Se a conversão do teste para pago ficar abaixo de 25%, o problema é o produto — não o esforço de vendas.</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Planos e preços</h2></div>
+
+    <div class="col">
+      <p>O preço acompanha o <strong>volume de posts entregues por mês</strong> — que é o que o cliente consome, o que custa dinheiro para nós e o que ele consegue comparar com o orçamento da agência. Marcas e recursos vêm junto, mas não são o eixo da cobrança.</p>
+    </div>
+
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-top">
+          <span class="plan-name">Essencial</span>
+          <span class="plan-price">R$ 39<span class="cents">,90</span> <span class="per">/ mês</span></span>
+        </div>
+        <p class="plan-for">Para o negócio local que só precisa não sumir do feed.</p>
+        <div class="plan-volume">
+          <span class="big">30</span>
+          <span class="unit">posts por mês · 1 por dia</span>
+        </div>
+        <ul>
+          <li>1 marca</li>
+          <li>Imagem em template da marca</li>
+          <li>Legenda, hashtags e chamada</li>
+          <li>Entrega semanal no WhatsApp</li>
+          <li>Refação ilimitada dentro da cota</li>
+        </ul>
+      </div>
+
+      <div class="plan featured">
+        <div class="plan-top">
+          <span class="plan-name">Profissional</span>
+          <span class="plan-price">R$ 89<span class="cents">,90</span> <span class="per">/ mês</span></span>
+        </div>
+        <p class="plan-for">Para quem leva as redes a sério e quer contato, não só curtida.</p>
+        <div class="plan-volume">
+          <span class="big">90</span>
+          <span class="unit">posts por mês · 3 por dia</span>
+        </div>
+        <ul>
+          <li>Até 3 marcas</li>
+          <li><strong>30 imagens geradas por IA</strong> inclusas</li>
+          <li>Agendamento das publicações</li>
+          <li>Link rastreável e captação de contato</li>
+          <li>Material de isca para troca por WhatsApp</li>
+          <li>Relatório mensal de contatos captados</li>
+        </ul>
+      </div>
+
+      <div class="plan">
+        <div class="plan-top">
+          <span class="plan-name">Estúdio</span>
+          <span class="plan-price">R$ 199<span class="cents">,90</span> <span class="per">/ mês</span></span>
+        </div>
+        <p class="plan-for">Para quem atende vários clientes e vende o nosso trabalho como dele.</p>
+        <div class="plan-volume">
+          <span class="big">300</span>
+          <span class="unit">posts por mês · 10 por dia</span>
+        </div>
+        <ul>
+          <li>Até 10 marcas</li>
+          <li><strong>100 imagens geradas por IA</strong> inclusas</li>
+          <li>Publicação automática</li>
+          <li>Entrega sem nossa marca <em>(whitelabel)</em></li>
+          <li>Material de isca personalizado por marca</li>
+          <li>Suporte prioritário</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <p>A régua triplica o volume a cada degrau enquanto o preço pouco mais que dobra — o cliente que cresce sempre enxerga vantagem em subir, e cada degrau acima tem margem melhor para nós. Excedente de posts é vendido em pacote avulso, sem forçar troca de plano.</p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Custos</h2></div>
+
+    <h3>Para começar</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Item</th><th>Situação</th><th class="num">Custo</th></tr></thead>
+        <tbody>
+          <tr><td>Servidor (VPS)</td><td>Já contratada e em operação</td><td class="num">R$ 0</td></tr>
+          <tr><td>Banco, login, storage, IA, WhatsApp, HTTPS</td><td>Já instalados e rodando</td><td class="num">R$ 0</td></tr>
+          <tr><td>Domínio próprio</td><td>A comprar</td><td class="num">R$ 40 / ano</td></tr>
+          <tr><td>Chip e número de WhatsApp dedicado</td><td>A contratar</td><td class="num">R$ 20 / mês</td></tr>
+          <tr><td>Ampliação de memória do servidor</td><td>Provável, ver seção 9</td><td class="num">R$ 35–60 / mês</td></tr>
+          <tr><td>Desenvolvimento</td><td>Trabalho do Alan</td><td class="num">R$ 0</td></tr>
+          <tr class="total"><td>Caixa necessário para começar</td><td></td><td class="num">≈ R$ 100</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Custo mensal por assinante</h3>
+    <div class="col">
+      <p>O texto das legendas custa quase nada. Praticamente todo o custo variável está na <strong>imagem gerada por IA</strong> — por isso ela entra como cota fechada em cada plano, e não como recurso ilimitado.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th class="num">Essencial</th>
+            <th class="num">Profissional</th>
+            <th class="num">Estúdio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Texto — pauta, legendas e hashtags</td><td class="num">R$ 0,10</td><td class="num">R$ 0,30</td><td class="num">R$ 1,00</td></tr>
+          <tr><td>Imagem gerada por IA (cota do plano)</td><td class="num">R$ 0,00</td><td class="num">R$ 6,50</td><td class="num">R$ 22,00</td></tr>
+          <tr><td>Infraestrutura rateada (até ~100 assinantes)</td><td class="num">R$ 1,00</td><td class="num">R$ 1,50</td><td class="num">R$ 3,00</td></tr>
+          <tr><td>Gateway de pagamento (≈5% + fixo)</td><td class="num">R$ 2,50</td><td class="num">R$ 4,90</td><td class="num">R$ 10,40</td></tr>
+          <tr class="total"><td>Custo por assinante</td><td class="num">R$ 3,60</td><td class="num">R$ 13,20</td><td class="num">R$ 36,40</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="eyebrow">Trava de segurança</span>
+      <p>O teto de gasto de cada assinante fica travado no código, dentro do gateway de IA — não na confiança nem no bom senso do cliente. Ninguém consegue consumir além da cota que pagou.</p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Margem e projeção</h2></div>
+
+    <h3>Margem por plano</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Plano</th><th class="num">Receita</th><th class="num">Custo</th><th class="num">Margem</th><th class="num">%</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Essencial</strong></td><td class="num">R$ 39,90</td><td class="num">R$ 3,60</td><td class="num pos">R$ 36,30</td><td class="num pos">91%</td></tr>
+          <tr><td><strong>Profissional</strong></td><td class="num">R$ 89,90</td><td class="num">R$ 13,20</td><td class="num pos">R$ 76,70</td><td class="num pos">85%</td></tr>
+          <tr><td><strong>Estúdio</strong></td><td class="num">R$ 199,90</td><td class="num">R$ 36,40</td><td class="num pos">R$ 163,50</td><td class="num pos">82%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Projeção por número de assinantes</h3>
+    <div class="col">
+      <p>Sobre uma composição conservadora — 60% Essencial, 32% Profissional, 8% Estúdio — o ticket médio fica em torno de <strong>R$ 69</strong> e o custo médio em <strong>R$ 9</strong> por assinante.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="num">Assinantes</th>
+            <th class="num">Receita/mês</th>
+            <th class="num">Custo/mês</th>
+            <th class="num">Lucro/mês</th>
+            <th class="num">Lucro/ano</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">10</td><td class="num">R$ 690</td><td class="num">R$ 110</td><td class="num pos">R$ 580</td><td class="num pos">R$ 6.960</td></tr>
+          <tr><td class="num">50</td><td class="num">R$ 3.450</td><td class="num">R$ 480</td><td class="num pos">R$ 2.970</td><td class="num pos">R$ 35.640</td></tr>
+          <tr><td class="num">100</td><td class="num">R$ 6.900</td><td class="num">R$ 950</td><td class="num pos">R$ 5.950</td><td class="num pos">R$ 71.400</td></tr>
+          <tr><td class="num">300</td><td class="num">R$ 20.700</td><td class="num">R$ 3.100</td><td class="num pos">R$ 17.600</td><td class="num pos">R$ 211.200</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col">
+      <p>O ponto de equilíbrio acontece no <strong>segundo assinante</strong>. A partir dali cada novo cliente é lucro quase integral: servir um assinante Essencial a mais custa R$ 3,60. Este é um negócio em que o risco financeiro é desprezível e o risco de execução é tudo.</p>
+      <p><em>Ressalva honesta:</em> preços de serviços de IA mudam com frequência e as tarifas de gateway variam por contrato. Os números acima são ordem de grandeza para decidir, não cotação fechada. Todos serão revalidados antes de fixarmos o preço de venda.</p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">09</span><h2>Riscos</h2></div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:23%">Risco</th><th>Situação</th><th style="width:32%">Como tratamos</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Aquisição</strong><br><span style="color:var(--crit);font-size:12px;font-weight:700">CRÍTICO</span></td>
+            <td>Construir é a parte fácil. Vender é o problema. Os produtos concorrentes vendem porque seus donos têm audiência — nós não temos.</td>
+            <td>É a responsabilidade central do Junior e a Fase 0 do plano. O primeiro cliente é o nosso próprio perfil: a esteira gera o conteúdo que divulga a esteira, e isso vira a melhor prova social possível.</td>
+          </tr>
+          <tr>
+            <td><strong>Cancelamento</strong><br><span style="color:var(--crit);font-size:12px;font-weight:700">CRÍTICO</span></td>
+            <td>Serviço de conteúdo tem evasão alta: o cliente assina animado, usa duas semanas e some. Como a receita é toda recorrente, reter pesa mais que vender.</td>
+            <td>O pacote é empurrado no WhatsApp toda segunda, sem depender de o cliente lembrar. O relatório mostra contatos captados — resultado concreto, não vaidade. O painel guarda o acervo: quanto mais ele tem lá, mais caro sair.</td>
+          </tr>
+          <tr>
+            <td><strong>Qualidade do criativo</strong><br><span style="color:var(--warn);font-size:12px;font-weight:700">ATENÇÃO</span></td>
+            <td>Post com cara de robô queima a marca do cliente e ele cancela no primeiro mês. É o risco de produto mais provável.</td>
+            <td>Templates desenhados por ramo, com a identidade do cliente aplicada. Refação ilimitada dentro da cota. No piloto, revisão manual antes de enviar até o padrão firmar.</td>
+          </tr>
+          <tr>
+            <td><strong>Memória do servidor</strong><br><span style="color:var(--warn);font-size:12px;font-weight:700">ATENÇÃO</span></td>
+            <td>A VPS opera com 3,9 GB de 7,8 GB em uso e a memória de troca já em 62%. Subir um serviço novo pode derrubar aplicações que já estão no ar.</td>
+            <td>Auditar e desligar serviços ociosos antes de qualquer instalação. Se não houver folga, ampliar o plano — custo previsto de R$ 35 a 60 por mês.</td>
+          </tr>
+          <tr>
+            <td><strong>Publicação automática</strong><br><span style="color:var(--warn);font-size:12px;font-weight:700">ATENÇÃO</span></td>
+            <td>Publicar no Instagram pelo caminho oficial exige conta Business e aprovação do aplicativo pela Meta. Automatizar por fora derruba a conta do cliente.</td>
+            <td>Na primeira versão entregamos o post pronto e o cliente publica. Automação oficial só na fase 5, depois do piloto.</td>
+          </tr>
+          <tr>
+            <td><strong>Separação da NetTurbo</strong><br><span style="color:var(--warn);font-size:12px;font-weight:700">ATENÇÃO</span></td>
+            <td>O Alan é funcionário da NetTurbo. Qualquer mistura de recurso corporativo com este produto é problema sério.</td>
+            <td>Separação absoluta: servidor pessoal, chaves novas e próprias, repositório pessoal, fora do horário de trabalho. Nada da empresa entra aqui.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">10</span><h2>Quem faz o quê</h2></div>
+
+    <div class="owners">
+      <div class="owner">
+        <span class="role-tag">Responsável técnico</span>
+        <span class="who">Alan Moreira</span>
+        <ul>
+          <li>Arquitetura, desenvolvimento e manutenção do aplicativo</li>
+          <li>Infraestrutura, servidor, segurança e custo de operação</li>
+          <li>Integrações de IA, pagamento e WhatsApp</li>
+          <li>Qualidade do criativo e dos templates por ramo</li>
+          <li>Controle de gasto por assinante e margem unitária</li>
+          <li>Prazo das entregas das fases 1 a 3</li>
+        </ul>
+      </div>
+      <div class="owner">
+        <span class="role-tag">Responsável comercial</span>
+        <span class="who">Junior Martins</span>
+        <ul>
+          <li>Definição do público e escolha dos dois primeiros ramos</li>
+          <li>Prospecção e fechamento dos primeiros assinantes</li>
+          <li>Discurso de venda, objeções e tabela de preços na rua</li>
+          <li>Relacionamento e acompanhamento do cliente no teste grátis</li>
+          <li>Retorno do cliente sobre o que agradou e o que não agradou</li>
+          <li>Meta do piloto: <strong>5 assinantes pagantes</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="eyebrow">A definir por escrito, antes do código</span>
+      <p>A forma da sociedade — percentual de cada um, o que acontece se um dos dois quiser sair, e como se divide o lucro. Combinar isso agora, enquanto não há dinheiro na mesa, é o que preserva a amizade quando houver.</p>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">11</span><h2>Plano de execução</h2></div>
+
+    <div class="phases">
+      <div class="phase">
+        <span class="pnum">Fase 0</span>
+        <span class="pwhat"><b>Decidir</b><span>Responder de onde vêm os primeiros vinte assinantes e escolher os dois primeiros ramos. Nenhuma linha de código antes disso.</span></span>
+        <span class="pwhen">1 conversa</span>
+      </div>
+      <div class="phase">
+        <span class="pnum">Fase 1</span>
+        <span class="pwhat"><b>Motor de posts</b><span>Perfil da marca, calendário do mês e o post completo — imagem, legenda e chamada — entregue no WhatsApp.</span></span>
+        <span class="pwhen">1 fim de semana</span>
+      </div>
+      <div class="phase">
+        <span class="pnum">Fase 2</span>
+        <span class="pwhat"><b>Aprovação e captação</b><span>Painel para aprovar, editar e refazer. Link rastreável, página de captura e material de isca.</span></span>
+        <span class="pwhen">1 fim de semana</span>
+      </div>
+      <div class="phase">
+        <span class="pnum">Fase 3</span>
+        <span class="pwhat"><b>Assinatura</b><span>Login, painel do cliente e cobrança recorrente nos três planos, com troca de plano e cancelamento.</span></span>
+        <span class="pwhen">1 fim de semana</span>
+      </div>
+      <div class="phase">
+        <span class="pnum">Fase 4</span>
+        <span class="pwhat"><b>Piloto</b><span>Cinco clientes reais com 30 dias grátis. Medir conversão do teste, posts publicados e cancelamento no segundo mês.</span></span>
+        <span class="pwhen">30 a 60 dias</span>
+      </div>
+      <div class="phase">
+        <span class="pnum">Fase 5</span>
+        <span class="pwhat"><b>Escala</b><span>Publicação automática, entrega sem marca para o plano Estúdio e novos ramos. Só depois que o piloto provar o valor.</span></span>
+        <span class="pwhen">após o piloto</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <p>Nada da fase 5 acontece antes da fase 4. O piloto é o que separa um produto com valor real de uma esteira bonita que ninguém renova.</p>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">12</span><h2>Decisões pendentes</h2></div>
+
+    <div class="col">
+      <p>Sete pontos a fechar entre Alan e Junior antes do início da Fase 1.</p>
+    </div>
+
+    <ol class="decisions">
+      <li>
+        <span class="dq">Sociedade</span>
+        <span class="da">Percentual de cada um, divisão do lucro e regra de saída — registrado por escrito antes de qualquer linha de código.</span>
+        <span class="owner-chip">Alan e Junior</span>
+      </li>
+      <li>
+        <span class="dq">Aquisição</span>
+        <span class="da">De onde saem os primeiros vinte assinantes, com nome e canal. É a pergunta que trava a Fase 0.</span>
+        <span class="owner-chip">Junior</span>
+      </li>
+      <li>
+        <span class="dq">Ramos iniciais</span>
+        <span class="da">Quais dois entram primeiro. Sugestão: os que o Junior já conhece de perto e consegue visitar esta semana.</span>
+        <span class="owner-chip">Junior</span>
+      </li>
+      <li>
+        <span class="dq">Preços</span>
+        <span class="da">Confirmar a régua de R$ 39,90 / R$ 89,90 / R$ 199,90 ou entrar mais barato para ganhar volume no começo.</span>
+        <span class="owner-chip">Alan e Junior</span>
+      </li>
+      <li>
+        <span class="dq">Teste grátis</span>
+        <span class="da">Sete ou trinta dias, e se pedimos cartão na entrada. Com cartão converte muito mais; sem cartão entra mais gente e mais curioso.</span>
+        <span class="owner-chip">Alan e Junior</span>
+      </li>
+      <li>
+        <span class="dq">Cota de imagem por IA</span>
+        <span class="da">Confirmar 30 imagens no Profissional e 100 no Estúdio, ou começar mais enxuto até medirmos o consumo real.</span>
+        <span class="owner-chip">Alan</span>
+      </li>
+      <li>
+        <span class="dq">Marca</span>
+        <span class="da">Nome do produto e domínio. Precisa estar definido antes da página de vendas.</span>
+        <span class="owner-chip">Alan e Junior</span>
+      </li>
+    </ol>
+  </section>
+
+  <footer>
+    <span><strong>AM Consultoria</strong> — Esteira de Conteúdo com IA · Plano de negócio v1.1</span>
+    <span>Alan Moreira, responsável técnico · Junior Martins, responsável comercial</span>
+    <span>04 de agosto de 2026 · Documento interno de decisão. Valores de custo e conversão são estimativas de trabalho, sujeitas a validação no piloto.</span>
+  </footer>
+
+</div>

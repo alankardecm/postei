@@ -1,0 +1,32 @@
+# ---- Segredos. NADA aqui pode ser versionado. -------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# ---- Dependências e build ---------------------------------------------------
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+
+# ---- Saída gerada -----------------------------------------------------------
+# Pacotes, galerias de validação e entregas são RESULTADO, não código. Somam
+# dezenas de MB e mudam a cada geração.
+postei/saida/
+postei/validacao/
+postei/entregas/
+postei/assets/fontes/
+output/
+tmp/
+
+# A demonstração da landing (public/mostra) FICA no repo: o build da página
+# depende dela e são ~1,4 MB, aceitável.
+
+# ---- Sistema ----------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*

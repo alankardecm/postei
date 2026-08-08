@@ -1,0 +1,241 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+/* ==========================================================================
+   Postei — identidade
+   Cores da AM Consultoria (grafite, off-white, verde-limao, areia).
+   A pagina e CLARA de proposito: o limao entra como bloco de cor chapada,
+   nunca como texto neon sobre fundo escuro.
+   ========================================================================== */
+:root {
+  --tinta:   #101010;  /* grafite AM */
+  --papel:   #F3F2ED;  /* off-white, levemente quente */
+  --limao:   #9FE870;  /* verde-limao AM — preenchimento */
+  --folha:   #38661A;  /* verde escuro — texto e CTA sobre fundo claro */
+  --areia:   #E9D8A6;  /* areia AM — segundo preenchimento */
+  --cinza:   #6E6E68;
+  --linha:   #DEDDD5;
+  --branco:  #FFFFFF;
+}
+
+@theme inline {
+  --color-tinta:  var(--tinta);
+  --color-papel:  var(--papel);
+  --color-limao:  var(--limao);
+  --color-folha:  var(--folha);
+  --color-areia:  var(--areia);
+  --color-cinza:  var(--cinza);
+  --color-linha:  var(--linha);
+  --font-display: var(--font-bricolage);
+  --font-corpo:   var(--font-instrument);
+}
+
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--font-instrument), system-ui, sans-serif;
+}
+
+.fonte-display { font-family: var(--font-bricolage), system-ui, sans-serif; }
+
+/* Rotulo tipografico reutilizado em todas as secoes. */
+.rotulo {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: .72rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--cinza);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Esteira de criativos
+   A trilha contem a lista DUAS vezes e desliza -50%: no fim do ciclo a
+   segunda copia esta exatamente onde a primeira comecou, entao o laco nao
+   tem salto. Nao depende de rolagem — anda sozinha, sempre no mesmo sentido.
+   -------------------------------------------------------------------------- */
+.esteira {
+  overflow: hidden;
+  /* Esmaece as pontas para a faixa nao "cortar" nas bordas da tela. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.esteira-trilha {
+  display: flex;
+  width: max-content;
+  /* --vao e o espaco entre itens; --emenda vale metade dele e corrige o
+     ponto exato do laco (ver @keyframes abaixo). */
+  --vao: 14px;
+  --emenda: 7px;
+  gap: var(--vao);
+  animation-name: esteira-correr;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.esteira-trilha--invertida { animation-direction: reverse; }
+
+.esteira-item {
+  margin: 0;
+  width: 168px;
+  flex: none;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgb(16 16 16 / 0.10);
+  background: var(--branco);
+  box-shadow: 0 1px 2px rgb(16 16 16 / .05);
+}
+
+@media (min-width: 640px) {
+  .esteira-trilha { --vao: 18px; --emenda: 9px; }
+  .esteira-item { width: 212px; }
+}
+
+/* A trilha guarda a lista DUAS vezes. Uma volta completa = 6 itens + 6 vaos,
+   mas -50% da largura equivale a 6 itens + 5,5 vaos (ha 11 vaos entre 12
+   itens, nao 12). Da o meio vao de diferenca -- por isso o "- var(--emenda)".
+   Sem essa correcao a emenda do laco pula meio vao a cada volta. */
+@keyframes esteira-correr {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(calc(-50% - var(--emenda)), 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esteira-trilha { animation: none; }
+  .esteira { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
+}

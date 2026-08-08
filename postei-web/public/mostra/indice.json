@@ -1,0 +1,98 @@
+[
+  {
+    "arquivo": "01-receitas.jpg",
+    "nicho": "Receitas & Culinária",
+    "nichoId": "receitas",
+    "formato": "foto",
+    "titulo": "Jantar em 15 minutos: macarrão alho e óleo",
+    "comFoto": true
+  },
+  {
+    "arquivo": "02-receitas.jpg",
+    "nicho": "Receitas & Culinária",
+    "nichoId": "receitas",
+    "formato": "foto",
+    "titulo": "Feijão Preguiçoso para Salvar o Jantar",
+    "comFoto": true
+  },
+  {
+    "arquivo": "03-receitas.png",
+    "nicho": "Receitas & Culinária",
+    "nichoId": "receitas",
+    "formato": "lista",
+    "titulo": "Jantar pronto em 15 minutos",
+    "comFoto": false
+  },
+  {
+    "arquivo": "04-receitas.jpg",
+    "nicho": "Receitas & Culinária",
+    "nichoId": "receitas",
+    "formato": "foto",
+    "titulo": "O segredo do tempero perfeito",
+    "comFoto": true
+  },
+  {
+    "arquivo": "05-financas-pessoais.jpg",
+    "nicho": "Finanças Pessoais",
+    "nichoId": "financas-pessoais",
+    "formato": "foto",
+    "titulo": "Cheque especial: a bola de neve que você pode parar",
+    "comFoto": true
+  },
+  {
+    "arquivo": "06-financas-pessoais.jpg",
+    "nicho": "Finanças Pessoais",
+    "nichoId": "financas-pessoais",
+    "formato": "foto",
+    "titulo": "A reserva de emergência cabe no seu bolso",
+    "comFoto": true
+  },
+  {
+    "arquivo": "07-financas-pessoais.png",
+    "nicho": "Finanças Pessoais",
+    "nichoId": "financas-pessoais",
+    "formato": "lista",
+    "titulo": "Seu salário some antes do dia 20? Evite este erro",
+    "comFoto": false
+  },
+  {
+    "arquivo": "08-financas-pessoais.jpg",
+    "nicho": "Finanças Pessoais",
+    "nichoId": "financas-pessoais",
+    "formato": "foto",
+    "titulo": "Planilha de gastos: o mapa para seu dinheiro",
+    "comFoto": true
+  },
+  {
+    "arquivo": "09-nutricao-estudante.jpg",
+    "nicho": "Nutrição — recém-formada (pré-CRN)",
+    "nichoId": "nutricao-estudante",
+    "formato": "foto",
+    "titulo": "Pós-treino sem segredo",
+    "comFoto": true
+  },
+  {
+    "arquivo": "10-nutricao-estudante.jpg",
+    "nicho": "Nutrição — recém-formada (pré-CRN)",
+    "nichoId": "nutricao-estudante",
+    "formato": "foto",
+    "titulo": "Prato equilibrado: como montar sem neura",
+    "comFoto": true
+  },
+  {
+    "arquivo": "11-nutricao-estudante.png",
+    "nicho": "Nutrição — recém-formada (pré-CRN)",
+    "nichoId": "nutricao-estudante",
+    "formato": "lista",
+    "titulo": "Lanches rápidos para a sua bolsa",
+    "comFoto": false
+  },
+  {
+    "arquivo": "12-nutricao-estudante.jpg",
+    "nicho": "Nutrição — recém-formada (pré-CRN)",
+    "nichoId": "nutricao-estudante",
+    "formato": "foto",
+    "titulo": "Fibras: o que comer para se sentir saciada?",
+    "comFoto": true
+  }
+]
