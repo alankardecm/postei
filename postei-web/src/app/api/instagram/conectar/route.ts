@@ -20,9 +20,8 @@ export async function GET(request: Request) {
   // sessão (CSRF), e o painel passaria a publicar no perfil do atacante.
   const estado = randomBytes(16).toString("hex");
 
-  const resposta = NextResponse.redirect(
-    urlDeAutorizacao({ redirect: `${base}${RETORNO}`, estado }),
-  );
+  const redirect = `${base}${RETORNO}`;
+  const resposta = NextResponse.redirect(urlDeAutorizacao({ redirect, estado }));
   resposta.cookies.set("ig_estado", estado, {
     httpOnly: true,
     secure: true,

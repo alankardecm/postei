@@ -1,0 +1,41 @@
+{
+  "id": "ia-para-empresas",
+  "nome": "IA para empresas (consultoria)",
+  "publico": "Donos e gestores de pequenas e médias empresas brasileiras que ouvem falar de IA todo dia, desconfiam do exagero e querem saber o que dá para usar de verdade no negócio deles — sem equipe técnica e sem orçamento de multinacional.",
+  "tomDeVoz": "Direto, sóbrio e sem hype. Fala de coisa concreta e de custo real, com exemplo de empresa pequena. Admite o que a IA NÃO resolve. Nunca usa 'revolucionário', 'game changer', 'o futuro chegou' nem promete substituir equipe. Escreve como consultor que já implantou e já viu dar errado.",
+  "temas": [
+    "por onde começar com IA numa empresa pequena",
+    "tarefa repetitiva que a IA resolve hoje no escritório",
+    "quanto custa de verdade usar IA por mês",
+    "erro comum: comprar ferramenta antes de entender o problema",
+    "IA no atendimento ao cliente: o que funciona e o que irrita",
+    "onde a IA ainda erra e precisa de revisão humana",
+    "o que fazer com os dados que a empresa já tem e não usa",
+    "automatizar relatório que alguém monta na mão toda semana",
+    "IA para escrever: onde ajuda e onde estraga",
+    "por que copiar o caso da multinacional não funciona na PME",
+    "LGPD e IA: o que não pode ir para a ferramenta",
+    "medir resultado de um projeto de IA sem enrolação",
+    "IA não substitui processo ruim, só acelera a bagunça",
+    "quando NÃO vale usar IA",
+    "ferramenta paga versus gratuita: quando faz diferença",
+    "treinar a equipe é mais barato que trocar de sistema",
+    "assistente interno que responde dúvida de processo",
+    "extrair informação de nota, contrato e planilha",
+    "previsão de demanda com o histórico que a empresa já tem",
+    "IA na rotina do comercial: o que dá para automatizar",
+    "por que projeto de IA morre na empresa",
+    "começar pequeno: um processo, trinta dias, um número",
+    "o papel de quem implanta versus quem vende ferramenta",
+    "segurança: o que perguntar antes de contratar uma solução",
+    "bastidor: um problema real que resolvi essa semana"
+  ],
+  "formatosCriativo": ["destaque", "lista", "citacao"],
+  "produtoFim": "Diagnóstico de IA para o seu negócio",
+  "paleta": {
+    "fundo": "#101010",
+    "texto": "#F5F5F5",
+    "destaque": "#9FE870"
+  },
+  "observacoes": "TOM ANTI-HYPE É A REGRA PRINCIPAL. Nunca prometer resultado, faturamento, percentual de economia ou prazo ('reduza 40% dos custos', 'automatize tudo em 7 dias'). Nunca afirmar que IA substitui funcionário — o enquadramento é sempre liberar a pessoa de tarefa repetitiva. Não citar nome de ferramenta específica como recomendação. Não inventar estatística de mercado nem citar estudo. Falar do que é possível hoje, com limitação explícita. Público desconfiado: exagero derruba a credibilidade, que é o ativo de quem vende consultoria."
+}

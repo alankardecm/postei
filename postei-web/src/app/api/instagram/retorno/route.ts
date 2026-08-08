@@ -22,7 +22,9 @@ export async function GET(request: Request) {
   if (!codigo || !estado || estado !== esperado) return painel("estado_invalido");
 
   try {
-    const curto = await trocarCodigo({ codigo, redirect: `${base}/api/instagram/retorno` });
+    const redirect = `${base}/api/instagram/retorno`;
+
+    const curto = await trocarCodigo({ codigo, redirect });
     const longo = await tokenLongo(curto.access_token);
     const dados = await perfil(longo.access_token);
 
