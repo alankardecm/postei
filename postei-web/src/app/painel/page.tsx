@@ -5,11 +5,12 @@ import { Gerador } from "@/components/painel/Gerador";
 import { motor, usuarioAtual, type Lote, type Nicho } from "@/lib/motor";
 import { Captacao, type LinkResumo } from "@/components/painel/Captacao";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { Instagram, type ContaIg } from "@/components/painel/Instagram";
 
 export const metadata = { title: "Painel — Postei" };
 export const dynamic = "force-dynamic";
 
-export default async function Painel() {
+export default async function Painel({ searchParams }: PageProps<"/painel">) {
   const user = await usuarioAtual();
   // O proxy.ts ja barra quem nao entrou; esta e a segunda tranca.
   if (!user) redirect("/entrar?de=/painel");
@@ -44,6 +45,15 @@ export default async function Painel() {
     cliques: (l.cliques as { count: number }[])?.[0]?.count ?? 0,
     contatos: (l.contatos as { count: number }[])?.[0]?.count ?? 0,
   }));
+
+  // O token NUNCA entra neste select: ele existe só para o servidor usar.
+  const { data: conta } = await admin
+    .from("contas_instagram")
+    .select("username, expira_em")
+    .eq("usuario_id", user.id)
+    .maybeSingle();
+
+  const { ig } = await searchParams;
 
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -127,6 +137,8 @@ export default async function Painel() {
               </ul>
             )}
           </section>
+
+          <Instagram conta={conta as ContaIg} aviso={typeof ig === "string" ? ig : undefined} />
 
           <Captacao links={links} base={base} />
         </div>
