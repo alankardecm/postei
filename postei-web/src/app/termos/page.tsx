@@ -14,8 +14,9 @@ export default function Termos() {
       <Cabecalho />
       <Documento titulo="Termos de Uso" atualizado={ATUALIZADO_EM}>
         <p>
-          Ao criar uma conta no Postei você concorda com estas regras. Elas são curtas de
-          propósito.
+          O Postei é um produto da <strong>{CONTROLADOR.nome}</strong>, nome fantasia de{" "}
+          {CONTROLADOR.razaoSocial}, CNPJ {CONTROLADOR.cnpj}. Ao criar uma conta você concorda
+          com estas regras. Elas são curtas de propósito.
         </p>
 
         <Secao titulo="O que o Postei faz">

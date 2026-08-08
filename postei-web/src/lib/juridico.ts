@@ -5,13 +5,14 @@
  * é comissionada. A LGPD exige identificar o controlador com clareza e o App
  * Review da Meta exige empresa verificada, então aqui vai a pessoa jurídica.
  *
- * ⚠️ FALTA a razão social exata e o CNPJ. Enquanto forem nulos, as páginas
- * mostram só o nome fantasia — válido, mas incompleto para cobrar de
- * assinante.
+ * "AM Consultoria" é o nome fantasia; a pessoa jurídica é o empresário
+ * individual, cujo nome empresarial é o do próprio titular. Os documentos
+ * mostram os dois para não haver dúvida sobre quem responde.
  */
 export const CONTROLADOR = {
   nome: "AM Consultoria",
-  cnpj: null as string | null,
+  razaoSocial: "Alan Kardec Moreira",
+  cnpj: "43.947.919/0001-08",
   email: "contato@postei.com.br",
 };
 

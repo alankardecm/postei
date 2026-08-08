@@ -21,9 +21,10 @@ export default function Privacidade() {
 
         <Secao titulo="Quem trata os seus dados">
           <p>
-            O controlador é <strong>{CONTROLADOR.nome}</strong>
-            {CONTROLADOR.cnpj && <>, inscrito no CNPJ {CONTROLADOR.cnpj}</>}. Para qualquer
-            assunto de privacidade, incluindo pedidos de acesso ou exclusão, escreva para{" "}
+            O Postei é um produto da <strong>{CONTROLADOR.nome}</strong>, nome fantasia de{" "}
+            {CONTROLADOR.razaoSocial}, inscrita no CNPJ {CONTROLADOR.cnpj}, que é a
+            controladora dos dados tratados aqui. Para qualquer assunto de privacidade,
+            incluindo pedidos de acesso ou exclusão, escreva para{" "}
             <a href={`mailto:${CONTROLADOR.email}`}>{CONTROLADOR.email}</a>.
           </p>
         </Secao>
