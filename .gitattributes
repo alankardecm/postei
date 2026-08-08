@@ -1,0 +1,16 @@
+# Script de shell com CRLF nao executa ("bad interpreter"). Forca LF sempre,
+# mesmo com o git configurado para converter no Windows.
+*.sh    text eol=lf
+*.mjs   text eol=lf
+*.cjs   text eol=lf
+*.js    text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.py    text eol=lf
+
+*.png   binary
+*.jpg   binary
+*.pdf   binary
+*.ttf   binary
