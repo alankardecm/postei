@@ -139,6 +139,24 @@ app.get('/lotes/:loteId/imagem/:arquivo', exigirChave, exigirAssinante, async (r
   });
 });
 
+/**
+ * Apaga TODOS os pacotes do assinante.
+ *
+ * Existe para a exclusao de conta valer de verdade: sem isto, apagar o
+ * cadastro deixaria as imagens e os textos no disco, e a LGPD trata isso
+ * como dado ainda em tratamento.
+ */
+app.delete('/assinante', exigirChave, exigirAssinante, async (req, res) => {
+  const base = path.join(config.saida, req.assinante);
+  try {
+    const pastas = await fs.readdir(base).catch(() => []);
+    await fs.rm(base, { recursive: true, force: true });
+    res.json({ ok: true, lotesRemovidos: pastas.length });
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
 app.listen(config.porta, '127.0.0.1', () => {
   console.log(`[postei] motor no ar em http://127.0.0.1:${config.porta}`);
   console.log(`[postei] chave de API: ${config.chaveApi ? 'configurada' : 'AUSENTE'}`);

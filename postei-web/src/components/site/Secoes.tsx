@@ -244,7 +244,20 @@ export function Rodape() {
           <span className="h-4 w-1.5 rounded-full bg-limao" aria-hidden="true" />
           <span className="fonte-display font-bold text-tinta">Postei</span>
         </div>
-        <p>Fotos por Pexels. Conteúdo gerado com IA e revisado por você.</p>
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <Link href="/privacidade" className="transition-colors hover:text-tinta">
+            Privacidade
+          </Link>
+          <Link href="/termos" className="transition-colors hover:text-tinta">
+            Termos de uso
+          </Link>
+          <Link href="/exclusao-de-dados" className="transition-colors hover:text-tinta">
+            Excluir meus dados
+          </Link>
+        </nav>
+        <p className="max-w-md">
+          Fotos por Pexels. Conteúdo gerado com IA e revisado por você.
+        </p>
       </div>
     </footer>
   );
