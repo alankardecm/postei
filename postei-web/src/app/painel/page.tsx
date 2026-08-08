@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Cabecalho } from "@/components/site/Cabecalho";
 import { Gerador } from "@/components/painel/Gerador";
@@ -102,10 +103,11 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
             ) : (
               <ul className="grid gap-4 sm:grid-cols-2">
                 {lotes.map((lote) => (
-                  <li
-                    key={lote.loteId}
-                    className="flex gap-4 overflow-hidden rounded-2xl border border-linha bg-branco p-4"
-                  >
+                  <li key={lote.loteId}>
+                    <Link
+                      href={`/painel/lote/${encodeURIComponent(lote.loteId)}`}
+                      className="flex gap-4 overflow-hidden rounded-2xl border border-linha bg-branco p-4 transition-colors hover:border-tinta/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+                    >
                     {lote.capa && (
                       <Image
                         src={`/api/lotes/${encodeURIComponent(lote.loteId)}/imagem/${encodeURIComponent(lote.capa)}`}
@@ -132,6 +134,7 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
                         </p>
                       )}
                     </div>
+                    </Link>
                   </li>
                 ))}
               </ul>

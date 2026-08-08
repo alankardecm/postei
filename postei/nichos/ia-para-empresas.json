@@ -28,7 +28,7 @@
     "começar pequeno: um processo, trinta dias, um número",
     "o papel de quem implanta versus quem vende ferramenta",
     "segurança: o que perguntar antes de contratar uma solução",
-    "bastidor: um problema real que resolvi essa semana"
+    "um erro que vejo com frequência em quem começa com IA"
   ],
   "formatosCriativo": ["destaque", "lista", "citacao"],
   "produtoFim": "Diagnóstico de IA para o seu negócio",
@@ -37,5 +37,5 @@
     "texto": "#F5F5F5",
     "destaque": "#9FE870"
   },
-  "observacoes": "TOM ANTI-HYPE É A REGRA PRINCIPAL. Nunca prometer resultado, faturamento, percentual de economia ou prazo ('reduza 40% dos custos', 'automatize tudo em 7 dias'). Nunca afirmar que IA substitui funcionário — o enquadramento é sempre liberar a pessoa de tarefa repetitiva. Não citar nome de ferramenta específica como recomendação. Não inventar estatística de mercado nem citar estudo. Falar do que é possível hoje, com limitação explícita. Público desconfiado: exagero derruba a credibilidade, que é o ativo de quem vende consultoria."
+  "observacoes": "NUNCA INVENTAR CASO DE CLIENTE. Nada de 'essa semana um cliente me procurou', 'atendi uma empresa que', 'vi um caso de'. Sem relato de experiência, sem número de projeto, sem depoimento — quem escreve o post não viveu nada disso, e um caso inventado desmorona no primeiro comentário perguntando detalhes. Fale de padrão geral ('é comum ver', 'costuma acontecer'), que é observação e não fato verificável. TOM ANTI-HYPE É A OUTRA REGRA PRINCIPAL. Nunca prometer resultado, faturamento, percentual de economia ou prazo ('reduza 40% dos custos', 'automatize tudo em 7 dias'). Nunca afirmar que IA substitui funcionário — o enquadramento é sempre liberar a pessoa de tarefa repetitiva. Não citar nome de ferramenta específica como recomendação. Não inventar estatística de mercado nem citar estudo. Falar do que é possível hoje, com limitação explícita. Público desconfiado: exagero derruba a credibilidade, que é o ativo de quem vende consultoria."
 }

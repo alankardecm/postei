@@ -220,15 +220,16 @@ export async function gerarCriativo({ post, nicho, marca, foto = null }) {
     .render()
     .asPng();
 
-  // PNG e otimo para arte de cor chapada (48 KB) e pessimo para fotografia
-  // (1,7 MB no mesmo tamanho). Reencodar as com foto em JPEG corta ~89% --
-  // o que importa na hora de empurrar o pacote pelo WhatsApp.
-  if (usaFoto) {
-    const jpeg = await (await import('sharp')).default(png)
-      .jpeg({ quality: 88, mozjpeg: true })
-      .toBuffer();
-    return { imagem: jpeg, extensao: 'jpg', formato };
-  }
+  // TUDO sai em JPEG: a API do Instagram so aceita esse formato, e um post
+  // que nao pode ser publicado nao serve para nada. O PNG era melhor para
+  // arte de cor chapada, mas nao vale perder a publicacao automatica.
+  //
+  // Qualidade maior no tipografico: JPEG cria franjas em volta de letra
+  // sobre cor chapada, e 95 deixa isso imperceptivel a 1080px. Foto tolera
+  // 88 sem diferenca visivel e pesa bem menos.
+  const jpeg = await (await import('sharp')).default(png)
+    .jpeg({ quality: usaFoto ? 88 : 95, mozjpeg: true, chromaSubsampling: '4:4:4' })
+    .toBuffer();
 
-  return { imagem: png, extensao: 'png', formato };
+  return { imagem: jpeg, extensao: 'jpg', formato };
 }
