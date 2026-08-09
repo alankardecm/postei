@@ -205,7 +205,26 @@ de login, cada post ganha uma **URL assinada** (`lib/imagem-publica.ts`): HMAC d
 conjunto assinante + lote + arquivo + prazo, válida 15 minutos.
 
 Depois é o fluxo de dois passos da Meta: cria o container, espera o processamento
-terminar, publica.
+terminar, publica. **Carrossel são três passos**: cada imagem vira container filho,
+um container agrupa os filhos, e só então publica.
+
+### Rotinas automáticas
+
+| Quando | O quê |
+|---|---|
+| a cada 5 min | `/api/cron/publicar` — publica o que venceu na fila |
+| diário 04h17 | `renovar-tokens.mjs` — renova o token antes dos 60 dias |
+
+A publicação vive em `lib/publicacao.ts` e é usada pelos **dois** caminhos: o botão do
+painel e o agendador. O item é marcado `publicando` com update condicional antes de
+começar — se a rotina rodar de novo durante uma publicação demorada, não pega o mesmo
+item e o assinante não posta duplicado.
+
+### Evidência científica
+
+Nichos com `evidencia: true` buscam no PubMed **antes** de escrever: os temas viram
+consulta técnica, os resumos entram no prompt, e o post nasce ancorado. Escrever
+primeiro e procurar estudo depois produzia fonte real de outro assunto.
 
 ---
 
@@ -269,11 +288,9 @@ trocar a foto.
 ## O que falta
 
 **Curto prazo**
-- Fontes científicas reais (PubMed) para embasar legenda de nicho regulado
-- Agendar publicação (a tabela `publicacoes` já prevê data e situação)
-- Renovar o token do Instagram antes dos 60 dias — vence **07/10/2026**
-- Trocar a foto que não casou
+- Trocar a foto que não casou com o tema
 - Baixar o zip do pacote pelo painel
+- Reels
 
 **Antes de cobrar**
 - Domínio próprio (`contato@postei.com.br` está publicado e não existe)

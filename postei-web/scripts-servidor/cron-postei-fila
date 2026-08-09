@@ -1,0 +1,4 @@
+# Publica o que esta vencido na fila do Postei. De 5 em 5 minutos.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+*/5 * * * * root curl -sS -m 300 -X POST -H "x-postei-chave: <CHAVE>" ...
