@@ -105,6 +105,14 @@ export function FormularioAcesso({ modo, destino }: { modo: Modo; destino?: stri
         {ocupado ? "Um instante…" : criando ? "Criar conta" : "Entrar"}
       </button>
 
+      {!criando && (
+        <p className="text-center text-sm">
+          <a href="/esqueci-senha" className="text-cinza underline underline-offset-4 hover:text-tinta">
+            Esqueci minha senha
+          </a>
+        </p>
+      )}
+
       <p className="text-center text-sm text-cinza">
         {criando ? "Já tem conta? " : "Ainda não tem conta? "}
         <Link
