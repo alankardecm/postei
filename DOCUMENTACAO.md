@@ -9,6 +9,10 @@ do painel, no Instagram conectado.
 
 ---
 
+> ⚠️ **O piloto ainda não validou o produto.** A primeira usuária revisou os 30 posts,
+> deu retorno detalhado e **não publicou nenhum**. Tudo o que está descrito abaixo funciona
+> tecnicamente; nada disso prova que alguém quer o produto.
+
 ## Sumário
 
 1. [Como está montado](#como-está-montado)
@@ -158,7 +162,7 @@ Componentes animados do **React Bits** (MIT + Commons Clause).
 | `/` | landing |
 | `/entrar` · `/criar-conta` | acesso (Supabase) |
 | `/painel` | gerar, histórico, Instagram, captação |
-| `/painel/lote/[id]` | os posts do pacote, com botão de publicar |
+| `/painel/lote/[id]` | os posts do pacote: editar texto, publicar agora ou agendar |
 | `/l/[codigo]` | página pública do link de captação |
 | `/privacidade` · `/termos` · `/exclusao-de-dados` | documentos legais |
 
@@ -291,6 +295,11 @@ trocar a foto.
 - Trocar a foto que não casou com o tema
 - Baixar o zip do pacote pelo painel
 - Reels
+
+**O que o piloto revelou**
+- A primeira usuária não publicou nenhum post. Ela apontou conteúdo vago e falta de gancho;
+  as correções foram feitas mas **ela ainda não viu a versão nova**. Entregar e perguntar
+  diretamente por que não postou vale mais que qualquer recurso novo.
 
 **Antes de cobrar**
 - Domínio próprio (`contato@postei.com.br` está publicado e não existe)
