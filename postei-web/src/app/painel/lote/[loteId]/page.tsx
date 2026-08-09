@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 type Post = {
   formato: string;
+  fonte: { titulo: string; revista: string; ano: string; url: string } | null;
   imagens: string[] | null;
   titulo: string;
   subtitulo: string | null;
@@ -123,6 +124,18 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
 
                   <p className="text-sm leading-relaxed text-cinza">{post.legenda}</p>
                   {post.cta && <p className="text-sm font-medium text-folha">{post.cta}</p>}
+
+                  {post.fonte && (
+                    <a
+                      href={post.fonte.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg border border-linha bg-papel px-3 py-2 text-xs leading-snug text-cinza transition-colors hover:border-folha"
+                    >
+                      <span className="rotulo">Fonte</span>{" "}
+                      {post.fonte.titulo} ({post.fonte.revista}, {post.fonte.ano}) ↗
+                    </a>
+                  )}
 
                   <p className="font-mono text-xs leading-relaxed text-cinza">
                     {post.hashtags.map((h) => `#${h}`).join(" ")}

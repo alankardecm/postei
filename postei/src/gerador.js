@@ -5,6 +5,7 @@ import { chamarLLM, extrairJSON } from './llm.js';
 import { carregarNicho } from './nichos.js';
 import { gerarCriativo, gerarCarrossel } from './criativo.js';
 import { buscarFoto } from './foto.js';
+import { buscarEvidencia } from './ciencia.js';
 
 /**
  * M1 - Nucleo de geracao.
@@ -61,6 +62,9 @@ REGRAS INEGOCIAVEIS:
 - Nunca prometa ganho financeiro, resultado garantido, cura ou emagrecimento.
 - Nunca use "link na bio" como unico CTA, nem clickbait vazio.
 - Nada de emoji em excesso: no maximo 2 por legenda.
+- NAO abrevie termo do nicho por iniciais ("IA" para introducao alimentar,
+  "AF" para atividade fisica). Escreva por extenso: a sigla confunde com
+  outra coisa e o leitor nao tem contexto.
 - Cada post trata de UM assunto especifico. "Dicas de sucesso" nao e assunto.
 - Nao repita a estrutura de frase entre os posts do mesmo lote.`;
 
@@ -138,13 +142,14 @@ Responda APENAS um objeto JSON, sem texto em volta, neste formato:
   "posts": [
     {
       "formato": "citacao" | "destaque" | "lista" | "carrossel",
-      "titulo": "O GANCHO, que vai na imagem. Maximo 10 palavras. Faz parar de rolar, nao descreve o assunto. Sem ponto final.",
+      "titulo": "O GANCHO, que vai na imagem. Maximo 10 palavras. Faz parar de rolar, nao descreve o assunto. Sem ponto final. ACENTUACAO OBRIGATORIA tambem aqui: 'alimentação', 'criança', 'você' -- o titulo vai impresso na arte, sem acento fica visivelmente errado.",
       "subtitulo": "1 linha de apoio na imagem, max 12 palavras. Use so no formato destaque.",
       "itens": ["usado SO no formato lista: 3 a 4 itens, max 8 palavras cada"],
       "slides": [{"titulo": "max 6 palavras", "texto": "1 a 2 frases curtas, com a ancora concreta"}],
       "legenda": "NO MAXIMO 4 FRASES. Conte antes de responder: mais de 4 esta errado. A primeira completa o gancho (nao repete o titulo). As outras entregam a ancora concreta - o alimento, a medida, o momento ou o passo. Legenda longa nao e lida: corte tudo que nao ensina.",
       "hashtags": ["7 a 10 hashtags em minusculo, sem #, misturando amplas e especificas"],
       "cta": "1 frase curta de chamada para acao, natural, sem 'link na bio'",
+      "buscaCientifica": "OBRIGATORIO neste nicho -- nunca deixe nulo. 3 a 6 palavras EM INGLES para achar o estudo no PubMed. Termos tecnicos, nao coloquiais. Bom: 'added sugar infants complementary feeding'. Ruim: 'is sugar bad for babies'.",
       "buscaImagem": "UMA unica busca de 2 a 4 palavras EM INGLES, sem virgula e sem alternativas. Descreva o OBJETO concreto, nunca o conceito. Bom: 'school lunchbox fruit'. Ruim: 'healthy lifestyle' ou 'eggs, lentils, sardines'."
     }
   ]
@@ -255,6 +260,8 @@ function validarPost(p, indice) {
     hashtags,
     cta: p.cta?.trim() || null,
     buscaImagem: normalizarBusca(p.buscaImagem),
+    buscaCientifica: p.buscaCientifica?.trim() || null,
+    fonte: null,
   };
 }
 
@@ -353,6 +360,14 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
   // o corte tem que ser no codigo, nao no prompt.
   const posts = bruto.slice(0, qtd).map(validarPost);
 
+  // Evidencia real, so nos nichos que pedem. Roda depois da geracao porque
+  // a consulta ao PubMed depende do assunto que o modelo escolheu.
+  if (nicho.evidencia) {
+    for (let i = 0; i < posts.length; i += TAM_BLOCO) {
+      await enriquecerComEvidencia(posts.slice(i, i + TAM_BLOCO), nicho, assinanteId);
+    }
+  }
+
   // Pasta por lote: o assinante recebe o mes inteiro de uma vez e precisa
   // conseguir achar o que e de quando.
   const loteId = `${nicho.id}_${marca.toLowerCase().replace(/[^a-z0-9]+/gi, '-')}_${Date.now()}`;
@@ -406,9 +421,16 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
       // Lista de slides do carrossel; nulo nos demais formatos.
       imagens,
       imagem: arquivo,
-      textoParaColar: `${post.legenda}\n\n${post.cta || ''}\n\n${post.hashtags
-        .map((h) => `#${h}`)
-        .join(' ')}`.trim(),
+      textoParaColar: [
+        post.legenda,
+        post.cta,
+        // A fonte vai ANTES das hashtags: depois delas ninguem le.
+        post.fonte &&
+          `Fonte: ${post.fonte.titulo} (${post.fonte.revista}, ${post.fonte.ano}) - ${post.fonte.url}`,
+        post.hashtags.map((h) => `#${h}`).join(' '),
+      ]
+        .filter(Boolean)
+        .join('\n\n'),
     });
   }
 
@@ -435,4 +457,92 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
   );
 
   return { ...pacote, diretorio: dirLote };
+}
+
+/**
+ * Reescreve as legendas com base em evidência REAL do PubMed.
+ *
+ * Só roda em nichos marcados com `evidencia: true`. A ordem importa: a busca
+ * acontece ANTES da reescrita, e o modelo só pode falar sobre o resumo que
+ * recebeu. Pedir a ele que "cite um estudo" produziria referência inventada
+ * -- que num perfil de saúde é pior que não ter fonte nenhuma.
+ *
+ * Uma chamada por bloco, não por post: 30 posts dariam 30 chamadas e
+ * estourariam a cota do provedor.
+ */
+async function enriquecerComEvidencia(posts, nicho, assinanteId) {
+  const comBusca = posts.filter((p) => p.buscaCientifica);
+  if (comBusca.length === 0) return;
+
+  const achados = new Map();
+  for (const post of comBusca) {
+    const artigos = await buscarEvidencia(post.buscaCientifica, 2);
+    if (artigos.length) achados.set(post, artigos);
+  }
+  if (achados.size === 0) return;
+
+  const lista = [...achados.entries()];
+
+  const prompt = `Reescreva a legenda de cada post abaixo com base APENAS nos resumos de
+artigos fornecidos. Os artigos sao reais e verificaveis.
+
+REGRAS:
+- Diga somente o que esta no resumo. Se o resumo nao sustenta a afirmacao,
+  reescreva a legenda para o que ele sustenta.
+- NAO invente autor, ano, revista, percentual nem numero de participantes.
+- Continue com NO MAXIMO 4 frases, mesma linguagem simples de antes.
+- Nao vire prescricao: e explicacao geral, nao conduta individual.
+- Mantenha a ancora concreta (alimento, medida, momento).
+- SE NENHUM DOS ARTIGOS TRATAR DO ASSUNTO DO POST, responda "artigo": 0 e
+  devolva a legenda original sem mudanca. Anexar fonte real porem de outro
+  tema e PIOR que nao ter fonte: parece rigoroso e quem clicar descobre que
+  nao sustenta nada. Na duvida, use 0.
+
+${lista
+  .map(
+    ([post, artigos], i) => `
+POST ${i + 1}
+Titulo: ${post.titulo}
+Legenda atual: ${post.legenda}
+Artigos:
+${artigos.map((a, j) => `  [${j + 1}] ${a.titulo} (${a.revista}, ${a.ano})\n      ${a.resumo}`).join('\n')}`,
+  )
+  .join('\n')}
+
+Responda APENAS este JSON:
+{"posts": [{"indice": 1, "legenda": "...", "artigo": 1}]}
+O campo "artigo" indica qual dos artigos sustenta a legenda, ou 0 se nenhum
+tratar do assunto.`;
+
+  try {
+    const { conteudo } = await chamarLLM({
+      sistema: SISTEMA,
+      prompt,
+      assinanteId,
+      json: true,
+    });
+
+    const dados = extrairJSON(conteudo);
+    for (const item of dados.posts ?? []) {
+      const [post, artigos] = lista[Number(item.indice) - 1] ?? [];
+      if (!post || !item.legenda) continue;
+
+      // O modelo pode declarar que nenhum artigo serve. Nesse caso a legenda
+      // original fica, e o post sai sem fonte -- que e o certo.
+      const escolhido = Number(item.artigo);
+      if (!escolhido || escolhido < 1 || escolhido > artigos.length) continue;
+
+      post.legenda = String(item.legenda).trim();
+      const artigo = artigos[escolhido - 1];
+      post.fonte = {
+        titulo: artigo.titulo,
+        revista: artigo.revista,
+        ano: artigo.ano,
+        url: artigo.url,
+      };
+    }
+  } catch (erro) {
+    // Enriquecimento e opcional: sem ele o pacote sai com a legenda original.
+    console.warn(`[postei] enriquecimento científico falhou: ${erro.message}`);
+  }
 }

@@ -6,6 +6,7 @@ import { publicarImagem, publicarCarrossel } from "@/lib/instagram";
 
 type Post = {
   imagem: string;
+  fonte: { titulo: string; revista: string; ano: string; url: string } | null;
   imagens: string[] | null;
   formato: string;
   legenda: string;
