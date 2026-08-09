@@ -70,6 +70,7 @@ export function Gerador({ nichos }: { nichos: Nicho[] }) {
 
     if (!resposta.ok) {
       setSituacao("erro");
+      // 402 é cota esgotada: a mensagem do servidor já explica o limite.
       setMensagem(dados.erro || "Não consegui iniciar a geração.");
       return;
     }

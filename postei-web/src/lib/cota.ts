@@ -1,0 +1,124 @@
+import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { PLANOS, PLANO_PADRAO, type Plano } from "@/lib/planos";
+
+/**
+ * Cota mensal por assinante.
+ *
+ * Sem isto, um usuário gera sem parar e **queima a cota do provedor de todos
+ * os outros** — o problema aparece com o terceiro cliente, não com o décimo.
+ *
+ * A reserva acontece no banco, numa função só: entre "ler o consumo" e
+ * "gravar o novo" cabem duas requisições simultâneas, e as duas passariam.
+ */
+
+/** Ciclo em que a data cai, respeitando o dia de virada do assinante. */
+export function cicloDe(data: Date, diaCiclo: number) {
+  const d = new Date(data);
+  if (d.getDate() < diaCiclo) d.setMonth(d.getMonth() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export async function assinaturaDe(usuarioId: string) {
+  const admin = criarClienteAdmin();
+
+  const { data } = await admin
+    .from("assinaturas")
+    .select("plano, ativa, dia_ciclo")
+    .eq("usuario_id", usuarioId)
+    .maybeSingle();
+
+  if (data) return data as { plano: Plano; ativa: boolean; dia_ciclo: number };
+
+  // Primeiro acesso: cria o plano de teste, com o ciclo virando no dia do
+  // cadastro. Assim a renovação acompanha a data de pagamento, não o dia 1º.
+  const dia = Math.min(new Date().getDate(), 28);
+  await admin
+    .from("assinaturas")
+    .insert({ usuario_id: usuarioId, plano: PLANO_PADRAO, dia_ciclo: dia });
+
+  return { plano: PLANO_PADRAO, ativa: true, dia_ciclo: dia };
+}
+
+export async function consumoDe(usuarioId: string) {
+  const assinatura = await assinaturaDe(usuarioId);
+  const limites = PLANOS[assinatura.plano];
+  const ciclo = cicloDe(new Date(), assinatura.dia_ciclo);
+
+  const admin = criarClienteAdmin();
+  const { data } = await admin
+    .from("consumo")
+    .select("posts, marcas")
+    .eq("usuario_id", usuarioId)
+    .eq("ciclo", ciclo)
+    .maybeSingle();
+
+  return {
+    plano: assinatura.plano,
+    ativa: assinatura.ativa,
+    ciclo,
+    limites,
+    usados: data?.posts ?? 0,
+    marcas: (data?.marcas ?? []) as string[],
+    restantes: Math.max(0, limites.posts - (data?.posts ?? 0)),
+  };
+}
+
+export class SemCota extends Error {
+  constructor(mensagem: string) {
+    super(mensagem);
+  }
+}
+
+/** Reserva antes de gerar. Lança `SemCota` com mensagem pronta para a tela. */
+export async function reservar({
+  usuarioId,
+  posts,
+  marca,
+}: {
+  usuarioId: string;
+  posts: number;
+  marca: string;
+}) {
+  const assinatura = await assinaturaDe(usuarioId);
+  if (!assinatura.ativa) {
+    throw new SemCota("Sua assinatura está inativa. Fale com a gente para reativar.");
+  }
+
+  const limites = PLANOS[assinatura.plano];
+  const ciclo = cicloDe(new Date(), assinatura.dia_ciclo);
+
+  const admin = criarClienteAdmin();
+  const { data, error } = await admin.rpc("reservar_cota", {
+    p_usuario: usuarioId,
+    p_ciclo: ciclo,
+    p_posts: posts,
+    p_marca: marca,
+    p_limite_posts: limites.posts,
+    p_limite_marcas: limites.marcas,
+  });
+
+  if (error) throw new SemCota("Não consegui verificar sua cota.");
+
+  if (data === -1) {
+    const uso = await consumoDe(usuarioId);
+    throw new SemCota(
+      `Seu plano ${limites.nome} permite ${limites.posts} posts por mês e ` +
+        `você já usou ${uso.usados}. Restam ${uso.restantes}.`,
+    );
+  }
+  if (data === -2) {
+    throw new SemCota(
+      `Seu plano ${limites.nome} permite ${limites.marcas} ` +
+        `${limites.marcas === 1 ? "marca" : "marcas"} por mês.`,
+    );
+  }
+
+  return { ciclo, restantes: data as number };
+}
+
+/** Devolve o que não foi usado quando o lote sai menor que o pedido. */
+export async function devolver(usuarioId: string, ciclo: string, posts: number) {
+  if (posts <= 0) return;
+  const admin = criarClienteAdmin();
+  await admin.rpc("devolver_cota", { p_usuario: usuarioId, p_ciclo: ciclo, p_posts: posts });
+}

@@ -6,6 +6,7 @@ import { Gerador } from "@/components/painel/Gerador";
 import { motor, usuarioAtual, type Lote, type Nicho } from "@/lib/motor";
 import { Captacao, type LinkResumo } from "@/components/painel/Captacao";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { consumoDe } from "@/lib/cota";
 import { Instagram, type ContaIg } from "@/components/painel/Instagram";
 import { Agendados, type Agendado } from "@/components/painel/Agendados";
 
@@ -65,6 +66,8 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
     .order("agendada_para", { ascending: true })
     .limit(20);
 
+  const cota = await consumoDe(user.id);
+
   const { ig } = await searchParams;
 
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -81,6 +84,14 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
                 Seus pacotes
               </h1>
               <p className="mt-2 text-sm text-cinza">{user.email}</p>
+              <p className="mt-1 text-sm tabular-nums text-cinza">
+                Plano {cota.limites.nome} ·{" "}
+                <span className={cota.restantes === 0 ? "text-tinta" : "text-folha"}>
+                  {cota.restantes} de {cota.limites.posts} posts
+                </span>{" "}
+                neste ciclo · {cota.marcas.length}/{cota.limites.marcas}{" "}
+                {cota.limites.marcas === 1 ? "marca" : "marcas"}
+              </p>
             </div>
             <form action="/sair" method="post">
               <button

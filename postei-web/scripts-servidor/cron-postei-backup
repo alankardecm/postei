@@ -1,0 +1,4 @@
+# Backup diario do Postei: banco, auth e pacotes. Mantem 14 dias.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+41 3 * * * root /opt/postei-web/scripts-servidor/backup.sh >> /var/log/postei-backup.log 2>&1
