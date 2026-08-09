@@ -19,6 +19,13 @@ export const config = {
   // quem chama e o painel, e nao alguem que achou a porta aberta.
   chaveApi: process.env.POSTEI_API_KEY || null,
 
+  // O motor grava a fila de geracao no banco: sem isso, um restart do pm2
+  // no meio de um pacote deixaria o assinante olhando "gerando" para sempre.
+  banco: {
+    url: process.env.SUPABASE_URL || null,
+    chave: process.env.SUPABASE_SERVICE_KEY || null,
+  },
+
   llm: {
     // Gateway LiteLLM: e ele que aplica o teto de gasto por assinante.
     // O app NUNCA fala direto com o provedor - se falar, o budget deixa de existir.

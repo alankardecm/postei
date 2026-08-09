@@ -94,7 +94,7 @@ export const motor = {
 
   criarTarefa: (
     assinanteId: string,
-    pedido: { nicho: string; marca: string; quantidade: number },
+    pedido: { nicho: string; marca: string; quantidade: number; ciclo?: string },
   ) =>
     chamar<{ id: string; situacao: string }>("/tarefas", assinanteId, {
       method: "POST",

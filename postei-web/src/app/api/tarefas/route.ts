@@ -34,7 +34,12 @@ export async function POST(request: Request) {
 
   try {
     // O assinante vem da SESSÃO, nunca do corpo da requisição.
-    const tarefa = await motor.criarTarefa(user.id, { nicho, marca, quantidade });
+    const tarefa = await motor.criarTarefa(user.id, {
+      nicho,
+      marca,
+      quantidade,
+      ciclo: reserva.ciclo,
+    });
     return NextResponse.json({ ...tarefa, restantes: reserva.restantes }, { status: 202 });
   } catch (erro) {
     // A geração não começou: devolver o que foi reservado, senão o assinante

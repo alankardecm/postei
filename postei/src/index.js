@@ -4,7 +4,7 @@ import path from 'node:path';
 import { config } from './config.js';
 import { listarNichos } from './nichos.js';
 import { pastaDoAssinante } from './gerador.js';
-import { criarTarefa, verTarefa } from './tarefas.js';
+import { criarTarefa, verTarefa, retomarPendentes, encerrarInsistentes } from './tarefas.js';
 
 const app = express();
 app.use(express.json());
@@ -50,16 +50,17 @@ app.get('/nichos', async (_req, res) => {
 });
 
 // Enfileira a geracao e devolve o id na hora. Nao espera os ~3 minutos.
-app.post('/tarefas', exigirChave, exigirAssinante, (req, res) => {
-  const { nicho, marca, quantidade } = req.body || {};
+app.post('/tarefas', exigirChave, exigirAssinante, async (req, res) => {
+  const { nicho, marca, quantidade, ciclo } = req.body || {};
   if (!nicho || !marca) {
     return res.status(400).json({ erro: "Campos obrigatórios: 'nicho' e 'marca'." });
   }
   try {
-    const tarefa = criarTarefa({
+    const tarefa = await criarTarefa({
       nichoId: nicho,
       marca,
       quantidade,
+      ciclo,
       assinanteId: req.assinante,
     });
     res.status(202).json({ id: tarefa.id, situacao: tarefa.situacao });
@@ -68,16 +69,14 @@ app.post('/tarefas', exigirChave, exigirAssinante, (req, res) => {
   }
 });
 
-app.get('/tarefas/:id', exigirChave, exigirAssinante, (req, res) => {
-  const tarefa = verTarefa(req.params.id, req.assinante);
-  if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada.' });
-  res.json({
-    id: tarefa.id,
-    situacao: tarefa.situacao,
-    resultado: tarefa.resultado,
-    erro: tarefa.erro,
-    criadaEm: tarefa.criadaEm,
-  });
+app.get('/tarefas/:id', exigirChave, exigirAssinante, async (req, res) => {
+  try {
+    const tarefa = await verTarefa(req.params.id, req.assinante);
+    if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada.' });
+    res.json(tarefa);
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
 });
 
 // Lotes do assinante, lidos do disco.
@@ -213,7 +212,17 @@ app.patch('/lotes/:loteId/posts/:indice', exigirChave, exigirAssinante, async (r
   }
 });
 
-app.listen(config.porta, '127.0.0.1', () => {
+app.listen(config.porta, '127.0.0.1', async () => {
   console.log(`[postei] motor no ar em http://127.0.0.1:${config.porta}`);
   console.log(`[postei] chave de API: ${config.chaveApi ? 'configurada' : 'AUSENTE'}`);
+
+  // Retoma o que ficou pelo caminho num reinício. Vem depois do listen para
+  // o motor já estar respondendo enquanto recupera.
+  if (config.banco.url) {
+    await encerrarInsistentes();
+    const retomadas = await retomarPendentes();
+    if (retomadas) console.log(`[postei] ${retomadas} geração(ões) retomada(s)`);
+  } else {
+    console.warn('[postei] SEM banco configurado: a fila não sobrevive a reinício.');
+  }
 });
