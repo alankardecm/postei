@@ -80,6 +80,9 @@ export const planos = [
       "30 imagens geradas por IA",
       "Link de captação de contatos",
     ],
+    // Marcado como recomendado, NAO como "mais escolhido": nao existe venda
+    // nenhuma que comprove popularidade, e prova social inventada e o mesmo
+    // problema que travamos no prompt dos posts.
     destaque: true,
   },
   {

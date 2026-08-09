@@ -138,7 +138,7 @@ export function Planos() {
                 <h3 className="fonte-display text-lg font-bold tracking-tight">{plano.nome}</h3>
                 {plano.destaque && (
                   <span className="rounded-full bg-limao px-2.5 py-1 text-[.68rem] font-semibold uppercase tracking-wider text-tinta">
-                    Mais escolhido
+                    Recomendado
                   </span>
                 )}
               </div>

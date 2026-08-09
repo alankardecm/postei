@@ -23,8 +23,13 @@ export default function Termos() {
           <p>
             O Postei gera pacotes de conteúdo para redes sociais — textos e imagens — a partir
             do ramo e do nome de perfil que você informa. A entrega é o material pronto para
-            você revisar e publicar. <strong>Não publicamos nada por você</strong> e não temos
-            acesso às suas redes sociais.
+            você revisar e publicar.
+          </p>
+          <p>
+            Se você conectar sua conta do Instagram, o Postei pode publicar nela{" "}
+            <strong>a seu pedido, post a post</strong>. A autorização acontece no próprio
+            Instagram, nunca pedimos sua senha, e você pode desconectar quando quiser — o que
+            revoga nosso acesso na hora. <strong>Nada é publicado sem você mandar.</strong>
           </p>
         </Secao>
 
