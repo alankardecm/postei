@@ -32,6 +32,17 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   git status --short | head -8 | sed 's/^/     /'
 fi
 
+# O deploy envia só o que o git rastreia. Arquivo NOVO e não adicionado fica
+# para trás -- e o build quebra no servidor com "module not found", depois
+# de já ter reiniciado o serviço. Melhor parar aqui.
+NOVOS=$(git ls-files --others --exclude-standard postei postei-web)
+if [ -n "$NOVOS" ]; then
+  printf '   [0;31m✗ há arquivos NOVOS fora do git — eles não seriam enviados:[0m
+'
+  echo "$NOVOS" | sed 's/^/     /'
+  morrer "rode: git add <arquivos> — ou o servidor vai buscar código que não existe lá"
+fi
+
 ssh -o ConnectTimeout=10 "$SERVIDOR" 'true' 2>/dev/null || morrer "não consegui conectar em $SERVIDOR"
 ok "servidor acessível"
 
