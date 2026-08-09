@@ -1,0 +1,6 @@
+# Renova os tokens do Instagram do Postei antes de vencerem.
+# Diario as 04h17: horario morto, e o minuto quebrado evita competir com
+# todo o resto que roda em hora cheia.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+17 4 * * * root /usr/bin/node /opt/postei-web/scripts-servidor/renovar-tokens.mjs >> /var/log/postei-tokens.log 2>&1
