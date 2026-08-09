@@ -3,7 +3,7 @@ import path from 'node:path';
 import { config } from './config.js';
 import { chamarLLM, extrairJSON } from './llm.js';
 import { carregarNicho } from './nichos.js';
-import { gerarCriativo } from './criativo.js';
+import { gerarCriativo, gerarCarrossel } from './criativo.js';
 import { buscarFoto } from './foto.js';
 
 /**
@@ -137,10 +137,11 @@ Responda APENAS um objeto JSON, sem texto em volta, neste formato:
 {
   "posts": [
     {
-      "formato": "citacao" | "destaque" | "lista",
+      "formato": "citacao" | "destaque" | "lista" | "carrossel",
       "titulo": "O GANCHO, que vai na imagem. Maximo 10 palavras. Faz parar de rolar, nao descreve o assunto. Sem ponto final.",
       "subtitulo": "1 linha de apoio na imagem, max 12 palavras. Use so no formato destaque.",
       "itens": ["usado SO no formato lista: 3 a 4 itens, max 8 palavras cada"],
+      "slides": [{"titulo": "max 6 palavras", "texto": "1 a 2 frases curtas, com a ancora concreta"}],
       "legenda": "NO MAXIMO 4 FRASES. Conte antes de responder: mais de 4 esta errado. A primeira completa o gancho (nao repete o titulo). As outras entregam a ancora concreta - o alimento, a medida, o momento ou o passo. Legenda longa nao e lida: corte tudo que nao ensina.",
       "hashtags": ["7 a 10 hashtags em minusculo, sem #, misturando amplas e especificas"],
       "cta": "1 frase curta de chamada para acao, natural, sem 'link na bio'",
@@ -149,7 +150,12 @@ Responda APENAS um objeto JSON, sem texto em volta, neste formato:
   ]
 }
 
-Distribua os formatos: use os tres tipos ao longo do lote.${
+O campo "slides" e usado SO no formato carrossel: 3 a 4 slides de miolo, um
+por ideia, em ordem que faca sentido lido em sequencia. A capa e o fechamento
+sao montados automaticamente a partir do titulo e do cta -- NAO os inclua.
+
+Distribua os formatos ao longo do lote. Use "carrossel" em cerca de 1 a cada 4
+posts: ele da mais alcance, mas exige assunto que se desdobre em etapas.${
     jaGerados.length
       ? `\n\nJA FORAM GERADOS os titulos abaixo neste mesmo pacote. NAO repita o
 assunto nem a estrutura de frase de nenhum deles:
@@ -227,11 +233,24 @@ function validarPost(p, indice) {
     throw new Error(`Post ${indice + 1}: nenhuma hashtag sobreviveu a normalizacao.`);
   }
 
+  // Carrossel sem miolo nao e carrossel. Melhor virar post unico do que
+  // gerar uma sequencia de capa + fechamento sem conteudo no meio.
+  const formato =
+    p.formato === 'carrossel' && !(Array.isArray(p.slides) && p.slides.length >= 2)
+      ? 'destaque'
+      : p.formato || 'destaque';
+
   return {
-    formato: p.formato || 'destaque',
+    formato,
     titulo: p.titulo.trim(),
     subtitulo: p.subtitulo?.trim() || null,
     itens: Array.isArray(p.itens) ? p.itens.filter(Boolean) : [],
+    slides: Array.isArray(p.slides)
+      ? p.slides
+          .filter((s) => s?.titulo && s?.texto)
+          .slice(0, 5)
+          .map((s) => ({ titulo: String(s.titulo).trim(), texto: String(s.texto).trim() }))
+      : [],
     legenda: p.legenda.trim(),
     hashtags,
     cta: p.cta?.trim() || null,
@@ -350,18 +369,42 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
     // O formato lista nao usa foto (precisa dos itens legiveis), entao nem
     // buscamos -- evita chamada inutil a API e credito de fotografo em arte
     // que nao tem fotografia nenhuma.
-    const usaraFoto = comFoto && post.formato !== 'lista';
+    const usaraFoto = comFoto && post.formato !== 'lista';  // carrossel usa foto so na capa
     const foto = usaraFoto ? await buscarFoto({ consulta: post.buscaImagem }) : null;
 
-    const { imagem, extensao, formato } = await gerarCriativo({ post, nicho, marca, foto });
-    const arquivo = `post-${String(i + 1).padStart(2, '0')}.${extensao}`;
-    await fs.writeFile(path.join(dirLote, arquivo), imagem);
+    const numero = String(i + 1).padStart(2, '0');
+    let arquivo;
+    let imagens = null;
+    let formato;
+
+    if (post.formato === 'carrossel') {
+      const r = await gerarCarrossel({ post, nicho, marca, foto });
+      formato = r.formato;
+      // Um arquivo por slide, numerado na ordem de exibicao. O primeiro
+      // tambem e a "capa" usada nas listagens.
+      imagens = [];
+      for (const [s, img] of r.imagens.entries()) {
+        const nome = `post-${numero}-${String(s + 1).padStart(2, '0')}.${r.extensao}`;
+        await fs.writeFile(path.join(dirLote, nome), img);
+        imagens.push(nome);
+      }
+      arquivo = imagens[0];
+    } else {
+      const r = await gerarCriativo({ post, nicho, marca, foto });
+      formato = r.formato;
+      arquivo = `post-${numero}.${r.extensao}`;
+      await fs.writeFile(path.join(dirLote, arquivo), r.imagem);
+    }
 
     resultado.push({
       ...post,
       formato,
       // So registra a foto se o layout realmente a usou.
-      foto: formato === 'foto' && foto ? { autor: foto.autor, origem: foto.origem } : null,
+      foto: (formato === 'foto' || formato === 'carrossel') && foto
+        ? { autor: foto.autor, origem: foto.origem }
+        : null,
+      // Lista de slides do carrossel; nulo nos demais formatos.
+      imagens,
       imagem: arquivo,
       textoParaColar: `${post.legenda}\n\n${post.cta || ''}\n\n${post.hashtags
         .map((h) => `#${h}`)

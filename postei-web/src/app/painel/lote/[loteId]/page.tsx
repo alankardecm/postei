@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 type Post = {
   formato: string;
+  imagens: string[] | null;
   titulo: string;
   subtitulo: string | null;
   legenda: string;
@@ -71,22 +72,48 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                 key={post.imagem}
                 className="grid gap-5 rounded-2xl border border-linha bg-branco p-5 sm:grid-cols-[190px_1fr]"
               >
-                <Image
-                  src={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(post.imagem)}`}
-                  alt={post.titulo}
-                  width={1080}
-                  height={1350}
-                  className="h-auto w-full rounded-lg border border-linha"
-                  unoptimized
-                />
+                <div className="flex flex-col gap-2">
+                  <Image
+                    src={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(post.imagem)}`}
+                    alt={post.titulo}
+                    width={1080}
+                    height={1350}
+                    className="h-auto w-full rounded-lg border border-linha"
+                    unoptimized
+                  />
+                  {post.imagens && post.imagens.length > 1 && (
+                    // Miniaturas dos demais slides: sem isso o assinante
+                    // aprova um carrossel vendo só a capa.
+                    <div className="flex gap-1.5 overflow-x-auto">
+                      {post.imagens.slice(1).map((arquivo) => (
+                        <Image
+                          key={arquivo}
+                          src={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(arquivo)}`}
+                          alt=""
+                          width={1080}
+                          height={1350}
+                          className="h-auto w-12 shrink-0 rounded border border-linha"
+                          unoptimized
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex min-w-0 flex-col gap-3">
                   <div className="flex items-center gap-2">
                     <span className="rotulo tabular-nums">
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <span className="rounded-full border border-linha px-2.5 py-0.5 text-[.68rem] uppercase tracking-wider text-cinza">
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[.68rem] uppercase tracking-wider ${
+                        post.formato === "carrossel"
+                          ? "bg-limao text-tinta"
+                          : "border border-linha text-cinza"
+                      }`}
+                    >
                       {post.formato}
+                      {post.imagens && post.imagens.length > 1 && ` · ${post.imagens.length}`}
                     </span>
                   </div>
 

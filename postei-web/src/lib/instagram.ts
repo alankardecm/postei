@@ -137,10 +137,82 @@ export async function publicarImagem({
 }
 
 /**
+ * Publicação de carrossel — fluxo de TRÊS passos, diferente do post único:
+ * cada imagem vira um container "filho", depois um container do carrossel
+ * agrupa os filhos, e só então publica.
+ *
+ * A legenda vai apenas no container do carrossel; filho com legenda é
+ * ignorado. O Instagram aceita de 2 a 10 imagens.
+ */
+export async function publicarCarrossel({
+  igUserId,
+  token,
+  urlsImagens,
+  legenda,
+}: {
+  igUserId: string;
+  token: string;
+  urlsImagens: string[];
+  legenda: string;
+}) {
+  if (urlsImagens.length < 2) throw new Error("carrossel precisa de pelo menos 2 imagens.");
+  const urls = urlsImagens.slice(0, 10);
+
+  const filhos: string[] = [];
+  for (const url of urls) {
+    const criar = new URL(`${GRAFO}/${igUserId}/media`);
+    criar.searchParams.set("image_url", url);
+    criar.searchParams.set("is_carousel_item", "true");
+    criar.searchParams.set("access_token", token);
+
+    const { id } = await json<{ id: string }>(
+      await fetch(criar, { method: "POST" }),
+      `container do slide ${filhos.length + 1}`,
+    );
+    filhos.push(id);
+  }
+
+  // Espera todos ficarem prontos antes de agrupar: agrupar filho ainda em
+  // processamento faz o carrossel inteiro falhar sem dizer qual slide.
+  for (const [i, filho] of filhos.entries()) {
+    await esperarProcessamento(filho, token, 12, `slide ${i + 1}`);
+  }
+
+  const agrupar = new URL(`${GRAFO}/${igUserId}/media`);
+  agrupar.searchParams.set("media_type", "CAROUSEL");
+  agrupar.searchParams.set("children", filhos.join(","));
+  agrupar.searchParams.set("caption", legenda);
+  agrupar.searchParams.set("access_token", token);
+
+  const { id: containerId } = await json<{ id: string }>(
+    await fetch(agrupar, { method: "POST" }),
+    "container do carrossel",
+  );
+
+  await esperarProcessamento(containerId, token);
+
+  const publicar = new URL(`${GRAFO}/${igUserId}/media_publish`);
+  publicar.searchParams.set("creation_id", containerId);
+  publicar.searchParams.set("access_token", token);
+
+  const { id } = await json<{ id: string }>(
+    await fetch(publicar, { method: "POST" }),
+    "publicação do carrossel",
+  );
+
+  return { mediaId: id, containerId, slides: filhos.length };
+}
+
+/**
  * O container não fica pronto na hora. Publicar antes da hora devolve erro
  * genérico ("media not ready"), então consultamos até FINISHED.
  */
-async function esperarProcessamento(containerId: string, token: string, tentativas = 12) {
+async function esperarProcessamento(
+  containerId: string,
+  token: string,
+  tentativas = 12,
+  rotulo = "a imagem",
+) {
   for (let i = 0; i < tentativas; i += 1) {
     await new Promise((r) => setTimeout(r, 3000));
 
@@ -155,8 +227,8 @@ async function esperarProcessamento(containerId: string, token: string, tentativ
 
     if (status_code === "FINISHED") return;
     if (status_code === "ERROR" || status_code === "EXPIRED") {
-      throw new Error(`o Instagram recusou a imagem: ${status || status_code}`);
+      throw new Error(`o Instagram recusou ${rotulo}: ${status || status_code}`);
     }
   }
-  throw new Error("o Instagram não terminou de processar a imagem a tempo.");
+  throw new Error(`o Instagram não terminou de processar ${rotulo} a tempo.`);
 }

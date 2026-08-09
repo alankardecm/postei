@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { usuarioAtual, motor } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { gerarUrlPublica } from "@/lib/imagem-publica";
-import { publicarImagem } from "@/lib/instagram";
+import { publicarImagem, publicarCarrossel } from "@/lib/instagram";
 
 type Post = {
   imagem: string;
+  imagens: string[] | null;
+  formato: string;
   legenda: string;
   cta: string | null;
   hashtags: string[];
@@ -52,12 +54,14 @@ export async function POST(request: Request) {
     .join("\n\n");
 
   const base = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
-  const urlImagem = gerarUrlPublica({
-    base,
-    assinanteId: user.id,
-    loteId,
-    arquivo: post.imagem,
-  });
+
+  // Carrossel tem uma URL assinada por slide; post único, uma só.
+  const arquivos =
+    post.formato === "carrossel" && post.imagens?.length ? post.imagens : [post.imagem];
+
+  const urls = arquivos.map((arquivo) =>
+    gerarUrlPublica({ base, assinanteId: user.id, loteId, arquivo }),
+  );
 
   const { data: registro } = await admin
     .from("publicacoes")
@@ -74,12 +78,20 @@ export async function POST(request: Request) {
     .single();
 
   try {
-    const { mediaId } = await publicarImagem({
-      igUserId: conta.ig_user_id,
-      token: conta.token,
-      urlImagem,
-      legenda,
-    });
+    const { mediaId } =
+      urls.length > 1
+        ? await publicarCarrossel({
+            igUserId: conta.ig_user_id,
+            token: conta.token,
+            urlsImagens: urls,
+            legenda,
+          })
+        : await publicarImagem({
+            igUserId: conta.ig_user_id,
+            token: conta.token,
+            urlImagem: urls[0],
+            legenda,
+          });
 
     await admin
       .from("publicacoes")
