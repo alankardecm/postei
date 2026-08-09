@@ -7,6 +7,7 @@ import { motor, usuarioAtual, type Lote, type Nicho } from "@/lib/motor";
 import { Captacao, type LinkResumo } from "@/components/painel/Captacao";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { Instagram, type ContaIg } from "@/components/painel/Instagram";
+import { Agendados, type Agendado } from "@/components/painel/Agendados";
 
 export const metadata = { title: "Painel — Postei" };
 export const dynamic = "force-dynamic";
@@ -53,6 +54,16 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
     .select("username, expira_em")
     .eq("usuario_id", user.id)
     .maybeSingle();
+
+  // Fila: o que está esperando o horário, mais as falhas recentes — sem
+  // mostrar a falha, o assinante acha que publicou.
+  const { data: fila } = await admin
+    .from("publicacoes")
+    .select("id, lote_id, indice, agendada_para, situacao, erro")
+    .eq("usuario_id", user.id)
+    .in("situacao", ["agendada", "publicando", "falhou"])
+    .order("agendada_para", { ascending: true })
+    .limit(20);
 
   const { ig } = await searchParams;
 
@@ -140,6 +151,8 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
               </ul>
             )}
           </section>
+
+          <Agendados itens={(fila ?? []) as Agendado[]} />
 
           <Instagram conta={conta as ContaIg} aviso={typeof ig === "string" ? ig : undefined} />
 

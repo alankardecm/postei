@@ -1,0 +1,124 @@
+import { motor } from "@/lib/motor";
+import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { gerarUrlPublica } from "@/lib/imagem-publica";
+import { publicarImagem, publicarCarrossel } from "@/lib/instagram";
+
+/**
+ * Publicação de um post no Instagram.
+ *
+ * Vive aqui, e não dentro de uma rota, porque DOIS caminhos precisam dela:
+ * o botão do painel e o agendador. Duplicar essa lógica é o tipo de dívida
+ * que se paga quando um lado é corrigido e o outro segue errado por meses.
+ */
+
+type Post = {
+  imagem: string;
+  imagens: string[] | null;
+  formato: string;
+  legenda: string;
+  cta: string | null;
+  hashtags: string[];
+  fonte: { titulo: string; revista: string; ano: string; url: string } | null;
+};
+
+export class ErroPublicacao extends Error {
+  status: number;
+  constructor(mensagem: string, status = 400) {
+    super(mensagem);
+    this.status = status;
+  }
+}
+
+/** Monta a legenda final. A fonte vai antes das hashtags: depois ninguém lê. */
+export function montarLegenda(post: Post) {
+  return [
+    post.legenda,
+    post.cta,
+    post.fonte &&
+      `Fonte: ${post.fonte.titulo} (${post.fonte.revista}, ${post.fonte.ano}) — ${post.fonte.url}`,
+    post.hashtags.map((h) => `#${h}`).join(" "),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+export async function contaConectada(usuarioId: string) {
+  const admin = criarClienteAdmin();
+  const { data } = await admin
+    .from("contas_instagram")
+    .select("id, ig_user_id, token, expira_em")
+    .eq("usuario_id", usuarioId)
+    .maybeSingle();
+  return data;
+}
+
+/**
+ * Publica de fato. Já espera receber o registro em `publicacoes` criado,
+ * para que uma falha fique gravada e visível em vez de sumir.
+ */
+export async function publicarAgora({
+  usuarioId,
+  loteId,
+  indice,
+  registroId,
+  base,
+}: {
+  usuarioId: string;
+  loteId: string;
+  indice: number;
+  registroId: string;
+  base: string;
+}) {
+  const admin = criarClienteAdmin();
+
+  const marcar = (campos: Record<string, unknown>) =>
+    admin
+      .from("publicacoes")
+      .update({ ...campos, atualizado_em: new Date().toISOString() })
+      .eq("id", registroId);
+
+  try {
+    const conta = await contaConectada(usuarioId);
+    if (!conta) throw new ErroPublicacao("Nenhuma conta do Instagram conectada.");
+    if (new Date(conta.expira_em) < new Date()) {
+      throw new ErroPublicacao("A conexão com o Instagram expirou. Conecte novamente.");
+    }
+
+    // O conteúdo vem do motor, sempre: assim a edição feita pelo assinante
+    // depois do agendamento é respeitada na hora de publicar.
+    const pacote = (await motor.lote(usuarioId, loteId)) as { posts?: Post[] };
+    const post = pacote.posts?.[indice];
+    if (!post) throw new ErroPublicacao("Post não encontrado.", 404);
+
+    const arquivos =
+      post.formato === "carrossel" && post.imagens?.length ? post.imagens : [post.imagem];
+
+    const urls = arquivos.map((arquivo) =>
+      gerarUrlPublica({ base, assinanteId: usuarioId, loteId, arquivo }),
+    );
+
+    const legenda = montarLegenda(post);
+
+    const { mediaId } =
+      urls.length > 1
+        ? await publicarCarrossel({
+            igUserId: conta.ig_user_id,
+            token: conta.token,
+            urlsImagens: urls,
+            legenda,
+          })
+        : await publicarImagem({
+            igUserId: conta.ig_user_id,
+            token: conta.token,
+            urlImagem: urls[0],
+            legenda,
+          });
+
+    await marcar({ situacao: "publicada", ig_media_id: mediaId, erro: null });
+    return { mediaId };
+  } catch (erro) {
+    const mensagem = (erro as Error).message;
+    await marcar({ situacao: "falhou", erro: mensagem });
+    throw erro;
+  }
+}
