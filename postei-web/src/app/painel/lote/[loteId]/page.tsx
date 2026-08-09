@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Cabecalho } from "@/components/site/Cabecalho";
-import { Publicar } from "@/components/painel/Publicar";
+import { EditarPost } from "@/components/painel/EditarPost";
 import { motor, usuarioAtual, ErroMotor } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 
@@ -142,7 +142,14 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                   </p>
 
                   <div className="mt-1">
-                    <Publicar loteId={loteId} indice={i} conectado={Boolean(conta)} />
+                    <EditarPost
+                      loteId={loteId}
+                      indice={i}
+                      conectado={Boolean(conta)}
+                      legenda={post.legenda}
+                      cta={post.cta}
+                      hashtags={post.hashtags}
+                    />
                   </div>
                 </div>
               </li>

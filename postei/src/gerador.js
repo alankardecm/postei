@@ -128,13 +128,22 @@ function chaveTitulo(titulo) {
   return palavras.length ? [...new Set(palavras)].sort().join('-') : null;
 }
 
-function montarPrompt({ nicho, marca, quantidade, jaGerados = [], temas = [] }) {
+function montarPrompt({ nicho, marca, quantidade, jaGerados = [], temas = [], evidencias = null }) {
   return `Gere ${quantidade} posts de Instagram para a marca "${marca}", no nicho "${nicho.nome}".
 
 PUBLICO: ${nicho.publico}
 TOM DE VOZ: ${nicho.tomDeVoz}
 TEMAS DESTE BLOCO - use EXATAMENTE um post por tema, na ordem abaixo:
-${temas.map((t, i) => `${i + 1}. ${t}`).join('\n')}
+${temas
+  .map((t, i) => {
+    const artigos = evidencias?.get(t);
+    if (!artigos?.length) return `${i + 1}. ${t}`;
+    return `${i + 1}. ${t}
+   ESTUDOS DISPONIVEIS para este tema. Escreva o post a partir do que eles
+   dizem e informe em "artigo" qual usou, ou 0 se nenhum tratar do assunto:
+${artigos.map((a, j) => `   [${j + 1}] ${a.titulo} (${a.revista}, ${a.ano})\n       ${a.resumo}`).join('\n')}`;
+  })
+  .join('\\n')}
 ${nicho.observacoes ? `\nATENCAO ESPECIFICA DESTE NICHO: ${nicho.observacoes}` : ''}
 
 Responda APENAS um objeto JSON, sem texto em volta, neste formato:
@@ -150,7 +159,8 @@ Responda APENAS um objeto JSON, sem texto em volta, neste formato:
       "hashtags": ["7 a 10 hashtags em minusculo, sem #, misturando amplas e especificas"],
       "cta": "1 frase curta de chamada para acao, natural, sem 'link na bio'",
       "buscaCientifica": "OBRIGATORIO neste nicho -- nunca deixe nulo. 3 a 6 palavras EM INGLES para achar o estudo no PubMed. Termos tecnicos, nao coloquiais. Bom: 'added sugar infants complementary feeding'. Ruim: 'is sugar bad for babies'.",
-      "buscaImagem": "UMA unica busca de 2 a 4 palavras EM INGLES, sem virgula e sem alternativas. Descreva o OBJETO concreto, nunca o conceito. Bom: 'school lunchbox fruit'. Ruim: 'healthy lifestyle' ou 'eggs, lentils, sardines'."
+      "buscaImagem": "UMA unica busca de 2 a 4 palavras EM INGLES, sem virgula e sem alternativas. Descreva o OBJETO concreto, nunca o conceito. Bom: 'school lunchbox fruit'. Ruim: 'healthy lifestyle' ou 'eggs, lentils, sardines'.",
+      "artigo": "SO quando o tema trouxer ESTUDOS DISPONIVEIS: o numero do estudo em que baseou o post, ou 0 se nenhum servir. Diga apenas o que esta no resumo."
     }
   ]
 }
@@ -261,7 +271,7 @@ function validarPost(p, indice) {
     cta: p.cta?.trim() || null,
     buscaImagem: normalizarBusca(p.buscaImagem),
     buscaCientifica: p.buscaCientifica?.trim() || null,
-    fonte: null,
+    fonte: p._fonte ?? null,
   };
 }
 
@@ -294,6 +304,13 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
   while (bruto.length < qtd && tentativas < MAX_TENTATIVAS) {
     tentativas += 1;
     const pedir = Math.min(TAM_BLOCO, qtd - bruto.length);
+    const temasDoBloco = sortearTemas(nicho.temas, pedir, temasUsados);
+
+    // A evidencia vem ANTES da escrita nos nichos que pedem.
+    const evidencias = nicho.evidencia
+      ? await evidenciaDosTemas(temasDoBloco, assinanteId)
+      : null;
+
     try {
       const { conteudo, uso } = await chamarLLM({
         sistema: SISTEMA,
@@ -302,7 +319,8 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
           marca,
           quantidade: pedir,
           jaGerados: bruto,
-          temas: sortearTemas(nicho.temas, pedir, temasUsados),
+          temas: temasDoBloco,
+          evidencias,
         }),
         assinanteId,
         json: true,
@@ -317,11 +335,21 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
       const lista = Array.isArray(dados) ? dados : dados.posts;
       if (!Array.isArray(lista)) continue;
 
-      for (const p of lista) {
+      for (const [j, p] of lista.entries()) {
         if (bruto.length >= qtd) break;
         const chave = chaveTitulo(p?.titulo);
         if (!chave || vistos.has(chave)) continue;
         vistos.add(chave);
+
+        // Amarra o post ao artigo que o sustenta. O indice vem do modelo,
+        // mas a referencia em si vem da busca -- ele nao inventa nada.
+        const artigos = evidencias?.get(temasDoBloco[j]);
+        const escolhido = Number(p?.artigo);
+        if (artigos?.length && escolhido >= 1 && escolhido <= artigos.length) {
+          const a = artigos[escolhido - 1];
+          p._fonte = { titulo: a.titulo, revista: a.revista, ano: a.ano, url: a.url };
+        }
+
         bruto.push(p);
       }
       seguidasCom429 = 0;
@@ -360,13 +388,6 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
   // o corte tem que ser no codigo, nao no prompt.
   const posts = bruto.slice(0, qtd).map(validarPost);
 
-  // Evidencia real, so nos nichos que pedem. Roda depois da geracao porque
-  // a consulta ao PubMed depende do assunto que o modelo escolheu.
-  if (nicho.evidencia) {
-    for (let i = 0; i < posts.length; i += TAM_BLOCO) {
-      await enriquecerComEvidencia(posts.slice(i, i + TAM_BLOCO), nicho, assinanteId);
-    }
-  }
 
   // Pasta por lote: o assinante recebe o mes inteiro de uma vez e precisa
   // conseguir achar o que e de quando.
@@ -460,89 +481,46 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
 }
 
 /**
- * Reescreve as legendas com base em evidência REAL do PubMed.
+ * Traduz temas em consultas de busca no PubMed.
  *
- * Só roda em nichos marcados com `evidencia: true`. A ordem importa: a busca
- * acontece ANTES da reescrita, e o modelo só pode falar sobre o resumo que
- * recebeu. Pedir a ele que "cite um estudo" produziria referência inventada
- * -- que num perfil de saúde é pior que não ter fonte nenhuma.
- *
- * Uma chamada por bloco, não por post: 30 posts dariam 30 chamadas e
- * estourariam a cota do provedor.
+ * Uma chamada curta por bloco. Os temas sao nossos e estao em portugues
+ * coloquial ("por que dieta restritiva nao dura"); o PubMed indexa termo
+ * tecnico em ingles.
  */
-async function enriquecerComEvidencia(posts, nicho, assinanteId) {
-  const comBusca = posts.filter((p) => p.buscaCientifica);
-  if (comBusca.length === 0) return;
+async function consultasParaTemas(temas, assinanteId) {
+  const prompt = `Para cada tema abaixo, escreva UMA consulta de busca no PubMed.
+Termo tecnico em ingles, 3 a 6 palavras, sem operadores nem aspas.
 
-  const achados = new Map();
-  for (const post of comBusca) {
-    const artigos = await buscarEvidencia(post.buscaCientifica, 2);
-    if (artigos.length) achados.set(post, artigos);
-  }
-  if (achados.size === 0) return;
+${temas.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
-  const lista = [...achados.entries()];
-
-  const prompt = `Reescreva a legenda de cada post abaixo com base APENAS nos resumos de
-artigos fornecidos. Os artigos sao reais e verificaveis.
-
-REGRAS:
-- Diga somente o que esta no resumo. Se o resumo nao sustenta a afirmacao,
-  reescreva a legenda para o que ele sustenta.
-- NAO invente autor, ano, revista, percentual nem numero de participantes.
-- Continue com NO MAXIMO 4 frases, mesma linguagem simples de antes.
-- Nao vire prescricao: e explicacao geral, nao conduta individual.
-- Mantenha a ancora concreta (alimento, medida, momento).
-- SE NENHUM DOS ARTIGOS TRATAR DO ASSUNTO DO POST, responda "artigo": 0 e
-  devolva a legenda original sem mudanca. Anexar fonte real porem de outro
-  tema e PIOR que nao ter fonte: parece rigoroso e quem clicar descobre que
-  nao sustenta nada. Na duvida, use 0.
-
-${lista
-  .map(
-    ([post, artigos], i) => `
-POST ${i + 1}
-Titulo: ${post.titulo}
-Legenda atual: ${post.legenda}
-Artigos:
-${artigos.map((a, j) => `  [${j + 1}] ${a.titulo} (${a.revista}, ${a.ano})\n      ${a.resumo}`).join('\n')}`,
-  )
-  .join('\n')}
-
-Responda APENAS este JSON:
-{"posts": [{"indice": 1, "legenda": "...", "artigo": 1}]}
-O campo "artigo" indica qual dos artigos sustenta a legenda, ou 0 se nenhum
-tratar do assunto.`;
+Responda APENAS: {"consultas": ["...", "..."]} na mesma ordem.`;
 
   try {
-    const { conteudo } = await chamarLLM({
-      sistema: SISTEMA,
-      prompt,
-      assinanteId,
-      json: true,
-    });
-
-    const dados = extrairJSON(conteudo);
-    for (const item of dados.posts ?? []) {
-      const [post, artigos] = lista[Number(item.indice) - 1] ?? [];
-      if (!post || !item.legenda) continue;
-
-      // O modelo pode declarar que nenhum artigo serve. Nesse caso a legenda
-      // original fica, e o post sai sem fonte -- que e o certo.
-      const escolhido = Number(item.artigo);
-      if (!escolhido || escolhido < 1 || escolhido > artigos.length) continue;
-
-      post.legenda = String(item.legenda).trim();
-      const artigo = artigos[escolhido - 1];
-      post.fonte = {
-        titulo: artigo.titulo,
-        revista: artigo.revista,
-        ano: artigo.ano,
-        url: artigo.url,
-      };
-    }
+    const { conteudo } = await chamarLLM({ prompt, assinanteId, json: true });
+    const lista = extrairJSON(conteudo)?.consultas;
+    return Array.isArray(lista) ? lista.map((c) => String(c).trim()) : [];
   } catch (erro) {
-    // Enriquecimento e opcional: sem ele o pacote sai com a legenda original.
-    console.warn(`[postei] enriquecimento científico falhou: ${erro.message}`);
+    console.warn(`[postei] tradução dos temas falhou: ${erro.message}`);
+    return [];
   }
+}
+
+/**
+ * Busca a evidencia ANTES de escrever o post.
+ *
+ * Esta ordem e o ponto todo. Escrever primeiro e procurar estudo depois e
+ * buscar respaldo para uma conclusao pronta -- o PubMed devolve o artigo
+ * mais parecido, nao o que sustenta, e sai fonte real de outro assunto.
+ * Buscando antes, o post nasce ancorado no que o resumo realmente diz.
+ */
+async function evidenciaDosTemas(temas, assinanteId) {
+  const consultas = await consultasParaTemas(temas, assinanteId);
+  if (consultas.length === 0) return new Map();
+
+  const porTema = new Map();
+  for (const [i, tema] of temas.entries()) {
+    const artigos = await buscarEvidencia(consultas[i], 2);
+    if (artigos.length) porTema.set(tema, artigos);
+  }
+  return porTema;
 }

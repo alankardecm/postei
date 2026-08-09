@@ -157,6 +157,62 @@ app.delete('/assinante', exigirChave, exigirAssinante, async (req, res) => {
   }
 });
 
+/**
+ * Edita o texto de um post do pacote.
+ *
+ * So o texto: legenda, chamada e hashtags. O TITULO nao entra porque ele
+ * esta impresso na arte -- mudar exigiria renderizar de novo, e num
+ * carrossel seriam todos os slides.
+ */
+app.patch('/lotes/:loteId/posts/:indice', exigirChave, exigirAssinante, async (req, res) => {
+  const loteId = String(req.params.loteId).replace(/[^a-zA-Z0-9._-]/g, '');
+  const indice = Number(req.params.indice);
+  const alvo = path.join(config.saida, req.assinante, loteId, 'pacote.json');
+
+  try {
+    const pacote = JSON.parse(await fs.readFile(alvo, 'utf8'));
+    const post = pacote.posts?.[indice];
+    if (!post) return res.status(404).json({ erro: 'Post não encontrado.' });
+
+    const { legenda, cta, hashtags } = req.body || {};
+
+    if (typeof legenda === 'string') {
+      if (legenda.trim().length < 10) {
+        return res.status(400).json({ erro: 'A legenda ficou curta demais.' });
+      }
+      // O Instagram corta a legenda em 2.200 caracteres.
+      post.legenda = legenda.trim().slice(0, 2000);
+    }
+    if (typeof cta === 'string') post.cta = cta.trim().slice(0, 200) || null;
+
+    if (Array.isArray(hashtags)) {
+      post.hashtags = hashtags
+        .map((h) => String(h).replace(/^#/, '').replace(/[^a-zA-Z0-9À-ÿ]/g, '').toLowerCase())
+        .filter((h) => h.length >= 3)
+        .slice(0, 30);
+    }
+
+    // O texto pronto para colar precisa refletir a edicao.
+    post.textoParaColar = [
+      post.legenda,
+      post.cta,
+      post.fonte &&
+        `Fonte: ${post.fonte.titulo} (${post.fonte.revista}, ${post.fonte.ano}) - ${post.fonte.url}`,
+      post.hashtags.map((h) => `#${h}`).join(' '),
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+
+    post.editadoEm = new Date().toISOString();
+
+    await fs.writeFile(alvo, JSON.stringify(pacote, null, 2), 'utf8');
+    res.json({ ok: true, post });
+  } catch (erro) {
+    if (erro.code === 'ENOENT') return res.status(404).json({ erro: 'Lote não encontrado.' });
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
 app.listen(config.porta, '127.0.0.1', () => {
   console.log(`[postei] motor no ar em http://127.0.0.1:${config.porta}`);
   console.log(`[postei] chave de API: ${config.chaveApi ? 'configurada' : 'AUSENTE'}`);
