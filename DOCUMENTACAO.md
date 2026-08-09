@@ -269,6 +269,7 @@ trocar a foto.
 ## O que falta
 
 **Curto prazo**
+- Fontes científicas reais (PubMed) para embasar legenda de nicho regulado
 - Agendar publicação (a tabela `publicacoes` já prevê data e situação)
 - Renovar o token do Instagram antes dos 60 dias — vence **07/10/2026**
 - Trocar a foto que não casou
@@ -283,5 +284,5 @@ trocar a foto.
 
 **Depois**
 - Imagens por IA (anunciadas nos planos pagos, dependem de billing no Gemini)
-- Carrossel e Reels
+- Reels
 - Entrega por WhatsApp (Evolution API já está no servidor)
