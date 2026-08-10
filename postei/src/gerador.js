@@ -6,6 +6,7 @@ import { carregarNicho } from './nichos.js';
 import { gerarCriativo, gerarCarrossel } from './criativo.js';
 import { buscarFoto } from './foto.js';
 import { buscarEvidencia } from './ciencia.js';
+import { dnaDaMarca } from './banco.js';
 
 /**
  * M1 - Nucleo de geracao.
@@ -128,11 +129,53 @@ function chaveTitulo(titulo) {
   return palavras.length ? [...new Set(palavras)].sort().join('-') : null;
 }
 
-function montarPrompt({ nicho, marca, quantidade, jaGerados = [], temas = [], evidencias = null }) {
+/**
+ * O bloco de identidade de quem assina os posts.
+ *
+ * Quando ha DNA, ele MANDA no publico e no tom -- o do nicho e so o padrao
+ * de quem ainda nao preencheu. Deixar os dois lado a lado, com o mesmo peso,
+ * faria o modelo escolher o mais generico, que e sempre o mais facil.
+ */
+function blocoIdentidade({ nicho, dna }) {
+  if (!dna) {
+    return `PUBLICO: ${nicho.publico}\nTOM DE VOZ: ${nicho.tomDeVoz}`;
+  }
+
+  const campos = [
+    ['QUEM ASSINA', dna.quem],
+    ['PUBLICO', dna.publico || nicho.publico],
+    ['METODO E JEITO DE TRABALHAR', dna.metodo],
+    ['DIFERENCIAIS', dna.diferenciais],
+    ['OFERTAS E PRODUTOS', dna.ofertas],
+    ['TOM DE VOZ', dna.tom || nicho.tomDeVoz],
+  ]
+    .filter(([, v]) => String(v ?? '').trim())
+    .map(([r, v]) => `${r}: ${String(v).trim()}`)
+    .join('\n');
+
+  const proibidos = String(dna.nao_aborda ?? '').trim();
+
+  return `${campos}
+${proibidos ? `\nASSUNTOS QUE ESTA MARCA NAO ABORDA - nao escreva sobre nada disso, nem de passagem: ${proibidos}` : ''}
+ESCREVA COMO ESSA PESSOA, NAO COMO UM PERFIL GENERICO DO NICHO. O texto tem
+que ser reconhecivel: se ele pudesse ser publicado por qualquer concorrente
+da mesma area, esta errado. Use o metodo e os diferenciais acima como fonte
+do que dizer -- e nunca invente credencial, formacao, numero de clientes,
+premio ou experiencia que nao esteja escrita aqui.`;
+}
+
+function montarPrompt({
+  nicho,
+  marca,
+  quantidade,
+  jaGerados = [],
+  temas = [],
+  evidencias = null,
+  dna = null,
+}) {
   return `Gere ${quantidade} posts de Instagram para a marca "${marca}", no nicho "${nicho.nome}".
 
-PUBLICO: ${nicho.publico}
-TOM DE VOZ: ${nicho.tomDeVoz}
+${blocoIdentidade({ nicho, dna })}
 TEMAS DESTE BLOCO - use EXATAMENTE um post por tema, na ordem abaixo:
 ${temas
   .map((t, i) => {
@@ -286,6 +329,17 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
   const nicho = await carregarNicho(nichoId);
   const inicio = Date.now();
 
+  // O DNA e opcional: quem ainda nao preencheu continua gerando com o perfil
+  // padrao do nicho. E se o banco estiver fora, o pacote sai generico em vez
+  // de nao sair -- perder a geracao inteira por causa de um campo de apoio
+  // seria pior que o texto sair menos afiado.
+  let dna = null;
+  try {
+    dna = await dnaDaMarca(assinanteId, marca);
+  } catch (erro) {
+    console.error('[postei] nao consegui ler o DNA da marca:', erro.message);
+  }
+
   // Geracao em blocos: acima de ~6 posts numa tacada o modelo estoura o
   // limite de saida e devolve JSON truncado no meio. Blocos menores tambem
   // rendem mais variedade, porque cada chamada sorteia temas de novo.
@@ -321,6 +375,7 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
           jaGerados: bruto,
           temas: temasDoBloco,
           evidencias,
+          dna,
         }),
         assinanteId,
         json: true,

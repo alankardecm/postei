@@ -10,6 +10,7 @@ import { consumoDe } from "@/lib/cota";
 import { volumesDe, PLANOS } from "@/lib/planos";
 import { Assinatura } from "@/components/painel/Assinatura";
 import { sincronizarAssinatura } from "@/lib/assinatura-sync";
+import { DnaMarca } from "@/components/painel/DnaMarca";
 import { Instagram, type ContaIg } from "@/components/painel/Instagram";
 import { Agendados, type Agendado } from "@/components/painel/Agendados";
 
@@ -182,6 +183,12 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
             statusPagamento={cota.statusPagamento}
             proximoPagamento={cota.proximoPagamento}
             cortesia={cota.cortesia}
+          />
+
+          {/* As marcas dos pacotes já gerados, mais as deste ciclo: quem
+              acabou de criar a primeira marca também precisa ver o DNA. */}
+          <DnaMarca
+            marcas={[...new Set([...lotes.map((l) => l.marca), ...cota.marcas])].sort()}
           />
 
           <Agendados itens={(fila ?? []) as Agendado[]} />

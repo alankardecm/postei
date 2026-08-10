@@ -88,3 +88,26 @@ export async function geracoesOrfas(tentativasMax) {
       '&select=id,usuario_id,nicho,marca,quantidade,ciclo,tentativas&order=criado_em.asc&limit=10',
   );
 }
+
+/**
+ * O DNA da marca: quem publica, para quem, com que metodo.
+ *
+ * O nicho traz as travas do dominio (o que nao pode ser dito); o DNA traz a
+ * voz de quem assina. Sem ele o texto sai correto e generico -- foi o que a
+ * primeira usuaria real apontou, e o motivo provavel de ela nao ter
+ * publicado nenhum dos 30 posts.
+ *
+ * Buscado aqui, e nao recebido por parametro, para que uma geracao retomada
+ * depois de uma queda continue com o mesmo perfil.
+ */
+export async function dnaDaMarca(usuarioId, marca) {
+  const linhas = await chamar(
+    `marcas_dna?usuario_id=eq.${usuarioId}&marca=eq.${encodeURIComponent(marca)}` +
+      '&select=quem,publico,metodo,nao_aborda,diferenciais,ofertas,tom&limit=1',
+  );
+  const dna = linhas?.[0];
+  if (!dna) return null;
+  // Linha existente mas toda em branco nao e DNA -- evita mandar rotulos
+  // vazios para o modelo, que ele preencheria por conta propria.
+  return Object.values(dna).some((v) => String(v ?? '').trim()) ? dna : null;
+}
