@@ -218,8 +218,10 @@ um container agrupa os filhos, e só então publica.
 | Quando | O quê |
 |---|---|
 | a cada 5 min | `/api/cron/publicar` — publica o que venceu na fila |
+| a cada 10 min | `reconciliar-pendentes.sh` — confere quem está esperando pagamento |
 | diário 03h41 | `backup.sh` — banco, auth e pacotes; 14 dias |
 | diário 04h17 | `renovar-tokens.mjs` — renova o token antes dos 60 dias |
+| diário 05h07 | `reconciliar-assinaturas.sh` — confere **todas** as assinaturas |
 
 A publicação vive em `lib/publicacao.ts` e é usada pelos **dois** caminhos: o botão do
 painel e o agendador. O item é marcado `publicando` com update condicional antes de
@@ -238,6 +240,35 @@ de todos os outros.
 A geração vive na tabela `geracoes`, não em memória. Se o processo cair no meio, o motor
 **retoma na subida** — refazendo a geração inteira, porque o pacote sai em blocos e não há
 ponto de retomada confiável. Teto de 3 tentativas.
+
+### Pagamento
+
+Assinatura mensal no Mercado Pago, modelo *preapproval* sem plano associado. O cartão
+**nunca passa pelo nosso servidor** — a pessoa paga no checkout deles.
+
+Na criação gravamos `external_reference = "{id-do-usuário}:{plano}"`. É essa referência
+que permite perguntar depois, a qualquer momento, "o que houve com o pagamento deste
+usuário?" — sem depender de nada que tenha chegado até nós.
+
+**Nada que chega é levado a sério.** O aviso do gateway diz apenas *que* algo mudou; o
+estado é sempre buscado na API deles. Sem isso, qualquer um poderia POSTar no nosso
+endereço dizendo "assinatura autorizada" e ganhar um plano de graça.
+
+**O plano é liberado por três caminhos**, e a regra vive num lugar só
+(`lib/assinatura-sync.ts`):
+
+| Caminho | Prazo |
+|---|---|
+| volta do checkout (`/painel?pagamento=voltou`) | segundos — é o caminho normal |
+| webhook `/api/pagamento/webhook` | instantâneo, **mas nunca funcionou** (ver Armadilhas) |
+| rotinas de 10 min e diária | fecha o resto |
+
+O que cada estado faz com o acesso — e **nenhum deles tranca a pessoa fora do produto**:
+
+- **autorizado** → o plano pago passa a valer;
+- **pendente** → não mexe em nada. Quem clicou em "Assinar" e desistiu continua com o
+  que já tinha; perder o plano gratuito por ter desistido de pagar seria absurdo;
+- **cancelado/pausado** → acesso até a data já paga, depois cai para o gratuito.
 
 ### Evidência científica
 
@@ -296,9 +327,26 @@ billing** — custa ~R$ 0,08 por assinante/mês.
 veio com criança de 4 anos. É limite de banco de imagem; a solução é o assinante poder
 trocar a foto.
 
-**Não há recuperação de senha.** O SMTP do Supabase é a caixa de teste.
+**O webhook do Mercado Pago nunca chegou.** Nas duas cobranças de teste, nenhum aviso.
+O endereço responde 200 de fora, tem certificado Let's Encrypt válido e DNS v4 e v6 —
+a entrega simplesmente não aconteceu, e não foi possível descobrir o motivo sem o painel
+de webhooks deles. **Por isso o pagamento não depende do webhook**: as rotinas de 10 min
+e diária conferem na fonte. Se um dia ele passar a chegar, é só um atalho.
 
-**Fila de tarefas em memória.** Reiniciar o pm2 no meio de uma geração perde a tarefa.
+**O `supabase-js` devolve o erro, não o lança.** `const { error } = await admin.from(…)`
+— ignorar esse retorno faz uma falha de banco virar HTTP 200. No webhook isso significava
+o gateway nunca reenviar o aviso e uma assinatura paga ficar sem ser liberada, sem erro
+em lugar nenhum. Sempre checar `error`.
+
+**`external_reference` vai para coluna `uuid`.** Ela vem de fora e pode ser qualquer
+coisa; lixo ali derrubava o insert inteiro do evento — justamente o registro usado para
+depurar. Validar antes.
+
+**A senha de app do Gmail vem com espaços.** São 19 caracteres na tela e 16 de verdade.
+
+**Segredo em `/etc/cron.d`.** `postei-fila` tem a `POSTEI_API_KEY` escrita em texto puro —
+qualquer `cat` no arquivo a expõe. As rotinas de assinatura leem do `.env` em tempo de
+execução; **`postei-fila` ainda precisa do mesmo tratamento**.
 
 **Dev local precisa de túnel:** `ssh -N -L 4710:127.0.0.1:4710 root@217.196.61.190`
 
@@ -320,7 +368,9 @@ trocar a foto.
 - **Domínio próprio** — resolve três coisas: o `contato@postei.com.br` publicado e
   inexistente, a entrega dos e-mails (hoje caem no spam porque o remetente é `@gmail.com`
   e o link aponta para outro domínio) e o endereço para vender
-- Gateway de pagamento e assinatura recorrente
+- **Trocar as credenciais do Mercado Pago para produção.** Hoje o `MP_ACCESS_TOKEN` é de
+  uma **conta de teste** (sandbox) — cobrança de verdade não acontece
+- **Rotacionar a `POSTEI_API_KEY`** e tirá-la do arquivo de cron
 - Cópia de backup fora do servidor
 - Revisão jurídica dos documentos
 - Contrato de comissionamento da parte comercial
