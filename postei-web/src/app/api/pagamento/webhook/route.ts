@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { verAssinatura } from "@/lib/mercadopago";
+import { verAssinatura, ErroMercadoPago } from "@/lib/mercadopago";
 import { sincronizarAssinatura } from "@/lib/assinatura-sync";
 import { PLANOS } from "@/lib/planos";
 
@@ -104,6 +104,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, ...r });
   } catch (erro) {
+    // Assinatura que não existe (é o que o "Simular notificação" do painel
+    // manda, com id 123456) não é falha nossa: pedir reenvio nunca daria
+    // certo e o painel marcaria o endereço como quebrado.
+    if (erro instanceof ErroMercadoPago && erro.status >= 400 && erro.status < 500) {
+      return NextResponse.json({ ok: true, desconhecida: true });
+    }
+
     console.error("[postei][webhook]", (erro as Error).message);
     // Devolver erro faz o Mercado Pago reenviar depois, que é o desejado
     // quando a falha é nossa (banco fora, timeout).

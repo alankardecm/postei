@@ -15,6 +15,22 @@ import { PLANOS, type Plano } from "@/lib/planos";
 
 const API = "https://api.mercadopago.com";
 
+/**
+ * Carrega o código HTTP junto do erro.
+ *
+ * Quem chama precisa distinguir "não existe" (4xx — insistir não adianta) de
+ * "eles estão fora do ar" (5xx — vale tentar de novo). Sem isso, o webhook
+ * pedia reenvio até para id inexistente.
+ */
+export class ErroMercadoPago extends Error {
+  constructor(
+    mensagem: string,
+    readonly status: number,
+  ) {
+    super(mensagem);
+  }
+}
+
 function token() {
   const t = process.env.MP_ACCESS_TOKEN;
   if (!t) throw new Error("MP_ACCESS_TOKEN não configurado.");
@@ -42,7 +58,10 @@ async function chamar<T>(caminho: string, init: RequestInit = {}): Promise<T> {
 
   if (!resposta.ok) {
     const e = dados as { message?: string; error?: string };
-    throw new Error(`Mercado Pago (${resposta.status}): ${e?.message || e?.error || "erro"}`);
+    throw new ErroMercadoPago(
+      `Mercado Pago (${resposta.status}): ${e?.message || e?.error || "erro"}`,
+      resposta.status,
+    );
   }
   return dados as T;
 }
