@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Cabecalho } from "@/components/site/Cabecalho";
+import { SlidesCarrossel } from "@/components/painel/SlidesCarrossel";
 import { EditarPost } from "@/components/painel/EditarPost";
 import { motor, usuarioAtual, ErroMotor } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
@@ -152,31 +153,7 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                     acabava aprovando um carrossel tendo visto só a capa. */}
                 {post.imagens && post.imagens.length > 1 && (
                   <div className="sm:col-span-2">
-                    <span className="rotulo">Os {post.imagens.length} slides, na ordem</span>
-                    <div className="mt-2 flex gap-3 overflow-x-auto pb-2">
-                      {post.imagens.map((arquivo, s) => (
-                        <a
-                          key={arquivo}
-                          href={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(arquivo)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group relative shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
-                          title="Abrir em tamanho real"
-                        >
-                          <Image
-                            src={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(arquivo)}`}
-                            alt={`Slide ${s + 1} de ${post.imagens!.length}`}
-                            width={1080}
-                            height={1350}
-                            className="h-auto w-40 rounded-lg border border-linha transition-colors group-hover:border-folha"
-                            unoptimized
-                          />
-                          <span className="absolute left-2 top-2 rounded-full bg-tinta/85 px-2 py-0.5 text-[.68rem] font-medium text-papel tabular-nums">
-                            {s + 1}/{post.imagens!.length}
-                          </span>
-                        </a>
-                      ))}
-                    </div>
+                    <SlidesCarrossel loteId={loteId} arquivos={post.imagens} />
                   </div>
                 )}
               </li>
