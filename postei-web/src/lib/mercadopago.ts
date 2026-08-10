@@ -54,6 +54,7 @@ export type Preapproval = {
   external_reference?: string;
   next_payment_date?: string;
   payer_email?: string;
+  date_created?: string;
 };
 
 export async function criarAssinatura({
@@ -94,6 +95,24 @@ export async function criarAssinatura({
       status: "pending",
     }),
   });
+}
+
+/**
+ * Todas as assinaturas de um usuário, direto no Mercado Pago.
+ *
+ * É o que permite reconciliar sem depender do aviso (webhook) ter chegado:
+ * a verdade é buscada na fonte, usando a referência que nós mesmos gravamos
+ * na criação. O filtro do endpoint deles é frouxo -- devolve resultados que
+ * apenas se parecem com a busca --, então conferimos a referência aqui.
+ */
+export async function buscarAssinaturas(usuarioId: string) {
+  const busca = await chamar<{ results?: Preapproval[] }>(
+    `/preapproval/search?external_reference=${encodeURIComponent(usuarioId)}`,
+  );
+  // A referência é "{usuarioId}:{plano}"; o plano não é conhecido aqui.
+  return (busca.results ?? []).filter((r) =>
+    String(r.external_reference ?? "").startsWith(`${usuarioId}:`),
+  );
 }
 
 /**

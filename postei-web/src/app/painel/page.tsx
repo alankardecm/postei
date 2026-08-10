@@ -9,6 +9,7 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { consumoDe } from "@/lib/cota";
 import { volumesDe, PLANOS } from "@/lib/planos";
 import { Assinatura } from "@/components/painel/Assinatura";
+import { sincronizarAssinatura } from "@/lib/assinatura-sync";
 import { Instagram, type ContaIg } from "@/components/painel/Instagram";
 import { Agendados, type Agendado } from "@/components/painel/Agendados";
 
@@ -19,6 +20,17 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
   const user = await usuarioAtual();
   // O proxy.ts ja barra quem nao entrou; esta e a segunda tranca.
   if (!user) redirect("/entrar?de=/painel");
+
+  // Quem acabou de voltar do checkout ve o plano ja valendo, sem depender do
+  // aviso do gateway ter chegado. Falha aqui nao pode derrubar o painel: a
+  // rotina diaria conferiria de novo mais tarde.
+  if ((await searchParams).pagamento === "voltou") {
+    try {
+      await sincronizarAssinatura(user.id);
+    } catch (erro) {
+      console.error("[postei][assinatura]", (erro as Error).message);
+    }
+  }
 
   // O painel nao pode cair so porque o motor esta fora do ar: mostra o que
   // deu e segue funcionando no resto.
