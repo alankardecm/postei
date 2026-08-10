@@ -299,6 +299,15 @@ Decisões que valem entender:
   tempo de carreira, caso de atendimento, e também cena doméstica ("na minha casa sempre
   foi assim"), ainda que combine com o perfil.
 
+**As cores também vêm daqui.** Antes a paleta era do nicho, então dois assinantes do mesmo
+ramo tinham feeds visualmente idênticos, mudando só o nome no rodapé — problema de
+retenção, não de estética. O painel mostra prévia ao vivo.
+
+A conferência de contraste (WCAG AA, mínimo 3:1) vive nos **dois lados**: `lib/paleta.ts`
+avisa enquanto a pessoa escolhe, `postei/src/paleta.js` recusa na hora de renderizar. Se
+mexer na regra, mexa nos dois. Cor recusada **não derruba a geração** — cai para a do nicho,
+porque pacote com a cor errada é melhor que pacote nenhum.
+
 ### Acesso de cortesia
 
 Alan, Juliana e Junior têm o plano **Estúdio sem cobrança**. A lista é de e-mails, em
