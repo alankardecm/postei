@@ -270,6 +270,20 @@ O que cada estado faz com o acesso — e **nenhum deles tranca a pessoa fora do 
   que já tinha; perder o plano gratuito por ter desistido de pagar seria absurdo;
 - **cancelado/pausado** → acesso até a data já paga, depois cai para o gratuito.
 
+### Acesso de cortesia
+
+Alan, Juliana e Junior têm o plano **Estúdio sem cobrança**. A lista é de e-mails, em
+`lib/planos.ts`, e por isso vale **antes do cadastro** — quem está nela já cria a conta com
+o acesso valendo, sem ninguém precisar liberar nada.
+
+Fica em código e não numa tela de administração de propósito: conceder plano de graça pela
+interface é porta de entrada se alguém tomar uma conta.
+
+A coluna `assinaturas.cortesia` marca essas contas, e a reconciliação **as ignora** — sem
+isso a rotina diária derrubaria o plano cheio de quem nunca vai pagar, todo dia. O
+`status_pagamento` continua `sem_cobranca`, que já é o estado certo (o banco tem restrição
+que só aceita os estados conhecidos; inventar um valor quebra o cadastro na hora).
+
 ### Evidência científica
 
 Nichos com `evidencia: true` buscam no PubMed **antes** de escrever: os temas viram
@@ -344,9 +358,16 @@ depurar. Validar antes.
 
 **A senha de app do Gmail vem com espaços.** São 19 caracteres na tela e 16 de verdade.
 
-**Segredo em `/etc/cron.d`.** `postei-fila` tem a `POSTEI_API_KEY` escrita em texto puro —
-qualquer `cat` no arquivo a expõe. As rotinas de assinatura leem do `.env` em tempo de
-execução; **`postei-fila` ainda precisa do mesmo tratamento**.
+**A `POSTEI_API_KEY` faz dois trabalhos.** Além de autenticar o painel no motor, ela é o
+segredo que **assina as URLs temporárias de imagem** (`imagem-publica.ts`). Rotacionar
+invalida as assinaturas em circulação — como valem 15 minutos, o risco é só uma publicação
+exatamente em curso. **Vale separar em dois segredos** quando houver oportunidade.
+
+**Nem toda rota do motor exige chave.** `/saude` e `/nichos` são públicas de propósito;
+testar rotação nelas dá falso negativo. Usar `/lotes` para verificar.
+
+**`status_pagamento` tem restrição no banco** (`sem_cobranca`, `pendente`, `ativa`,
+`pausada`, `cancelada`). Gravar um valor fora dessa lista quebra o cadastro na hora.
 
 **Dev local precisa de túnel:** `ssh -N -L 4710:127.0.0.1:4710 root@217.196.61.190`
 
@@ -370,7 +391,6 @@ execução; **`postei-fila` ainda precisa do mesmo tratamento**.
   e o link aponta para outro domínio) e o endereço para vender
 - **Trocar as credenciais do Mercado Pago para produção.** Hoje o `MP_ACCESS_TOKEN` é de
   uma **conta de teste** (sandbox) — cobrança de verdade não acontece
-- **Rotacionar a `POSTEI_API_KEY`** e tirá-la do arquivo de cron
 - Cópia de backup fora do servidor
 - Revisão jurídica dos documentos
 - Contrato de comissionamento da parte comercial
