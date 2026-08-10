@@ -303,6 +303,12 @@ Decisões que valem entender:
 ramo tinham feeds visualmente idênticos, mudando só o nome no rodapé — problema de
 retenção, não de estética. O painel mostra prévia ao vivo.
 
+**Quem já tem marca** cola o código da cor (aceita `2E1065`, `#2e1065`, `#abc`) em vez de
+caçar no seletor. E se a paleta real reprovar no contraste — bege claro com dourado é
+identidade legítima —, o painel oferece ajustar: clareia ou escurece **só o necessário**,
+preservando o matiz e sem tocar no fundo, que é o que mais carrega a identidade. Recusar e
+mandar embora seria a resposta errada para quem diria, com razão, "mas essa é a minha marca".
+
 A conferência de contraste (WCAG AA, mínimo 3:1) vive nos **dois lados**: `lib/paleta.ts`
 avisa enquanto a pessoa escolhe, `postei/src/paleta.js` recusa na hora de renderizar. Se
 mexer na regra, mexa nos dois. Cor recusada **não derruba a geração** — cai para a do nicho,
