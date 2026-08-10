@@ -13,13 +13,29 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  *   - é impossível de adivinhar ou alterar sem a chave do servidor.
  */
 
-const SEGREDO = process.env.POSTEI_API_KEY || "";
+/**
+ * Segredo PRÓPRIO, separado da chave que o painel usa para falar com o motor.
+ *
+ * Antes os dois eram a mesma coisa, e isso prendia um ao outro: rotacionar a
+ * chave de acesso invalidava, de tabela, todas as URLs assinadas em
+ * circulação. São responsabilidades diferentes e devem poder ser trocadas
+ * em separado.
+ *
+ * Lido a cada uso e sem valor padrão: com `|| ""` uma variável ausente
+ * assinaria com chave vazia, qualquer um forjaria URL e nada acusaria. É
+ * melhor a publicação falhar com erro claro.
+ */
+function segredo() {
+  const s = process.env.POSTEI_SEGREDO_IMAGEM;
+  if (!s) throw new Error("POSTEI_SEGREDO_IMAGEM não configurada no servidor.");
+  return s;
+}
 
 /** Janela curta: a Meta baixa a imagem em segundos, não em horas. */
 const VALIDADE_MS = 15 * 60 * 1000;
 
 function assinar(carga: string) {
-  return createHmac("sha256", SEGREDO).update(carga).digest("base64url");
+  return createHmac("sha256", segredo()).update(carga).digest("base64url");
 }
 
 export function gerarUrlPublica({
