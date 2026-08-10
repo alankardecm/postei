@@ -1,10 +1,48 @@
 import { NextResponse } from "next/server";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { verAssinatura } from "@/lib/mercadopago";
 import { sincronizarAssinatura } from "@/lib/assinatura-sync";
 import { PLANOS } from "@/lib/planos";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Confere que o aviso veio mesmo do Mercado Pago.
+ *
+ * Eles assinam com o segredo da aplicação: o cabeçalho `x-signature` traz
+ * `ts` e `v1`, e `v1` é o HMAC-SHA256 de `id:{id};request-id:{req};ts:{ts};`.
+ *
+ * Não é o que nos protege de fraude -- disso quem cuida é buscar o estado na
+ * API deles, e isso continua valendo. Serve para descartar barulho cedo:
+ * sem a conferência, qualquer um POSTando aqui faria o servidor abrir uma
+ * chamada à API do Mercado Pago para cada requisição.
+ *
+ * Enquanto o segredo não estiver configurado, deixa passar -- é o que evita
+ * derrubar o recebimento no intervalo entre publicar isto e gravar a chave.
+ */
+function origemConfere(request: Request, id: string) {
+  const segredo = process.env.MP_WEBHOOK_SECRET;
+  if (!segredo) return true;
+
+  const assinatura = request.headers.get("x-signature");
+  if (!assinatura) return false;
+
+  const partes = Object.fromEntries(
+    assinatura.split(",").map((p) => p.split("=").map((s) => s.trim()) as [string, string]),
+  );
+  if (!partes.ts || !partes.v1) return false;
+
+  const requisicao = request.headers.get("x-request-id") ?? "";
+  const manifesto = `id:${id};request-id:${requisicao};ts:${partes.ts};`;
+  const esperada = createHmac("sha256", segredo).update(manifesto).digest("hex");
+
+  // Tempo constante: comparar com === vaza, pelo tempo de resposta, quantos
+  // caracteres iniciais o atacante acertou.
+  const a = Buffer.from(partes.v1);
+  const b = Buffer.from(esperada);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
 
 /**
  * Avisos do Mercado Pago.
@@ -23,6 +61,13 @@ export async function POST(request: Request) {
   // O Mercado Pago manda avisos de vários assuntos no mesmo endereço.
   if (!id || !String(tipo ?? "").includes("preapproval")) {
     return NextResponse.json({ ok: true, ignorado: true });
+  }
+
+  if (!origemConfere(request, String(id))) {
+    console.error("[postei][webhook] assinatura de origem não confere");
+    // 401 e não 500: o Mercado Pago reenvia o que falhou por culpa nossa, e
+    // este caso não é. Reenviar não consertaria uma assinatura inválida.
+    return NextResponse.json({ erro: "origem não confere" }, { status: 401 });
   }
 
   const admin = criarClienteAdmin();
