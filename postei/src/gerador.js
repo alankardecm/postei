@@ -138,7 +138,13 @@ function chaveTitulo(titulo) {
  * faria o modelo escolher o mais generico, que e sempre o mais facil.
  */
 function blocoIdentidade({ nicho, dna }) {
-  if (!dna) {
+  // Cor nao e texto: quem preencheu so a paleta nao descreveu identidade
+  // nenhuma, e um bloco vazio seguido de "escreva como essa pessoa" mandaria
+  // o modelo inventar quem ela e.
+  const TEXTUAIS = ['quem', 'publico', 'metodo', 'nao_aborda', 'diferenciais', 'ofertas', 'tom'];
+  const temTexto = dna && TEXTUAIS.some((c) => String(dna[c] ?? '').trim());
+
+  if (!temTexto) {
     return `PUBLICO: ${nicho.publico}\nTOM DE VOZ: ${nicho.tomDeVoz}`;
   }
 

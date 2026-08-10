@@ -103,7 +103,8 @@ export async function geracoesOrfas(tentativasMax) {
 export async function dnaDaMarca(usuarioId, marca) {
   const linhas = await chamar(
     `marcas_dna?usuario_id=eq.${usuarioId}&marca=eq.${encodeURIComponent(marca)}` +
-      '&select=quem,publico,metodo,nao_aborda,diferenciais,ofertas,tom&limit=1',
+      '&select=quem,publico,metodo,nao_aborda,diferenciais,ofertas,tom,' +
+      'cor_fundo,cor_texto,cor_destaque&limit=1',
   );
   const dna = linhas?.[0];
   if (!dna) return null;
