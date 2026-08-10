@@ -276,6 +276,29 @@ O que cada estado faz com o acesso — e **nenhum deles tranca a pessoa fora do 
   que já tinha; perder o plano gratuito por ter desistido de pagar seria absurdo;
 - **cancelado/pausado** → acesso até a data já paga, depois cai para o gratuito.
 
+### DNA da marca
+
+O nicho diz o que **não pode ser dito** naquele ramo; o DNA diz **quem está falando**. Sem
+ele o texto sai correto e genérico — foi exatamente a crítica da primeira usuária real, e a
+explicação mais provável de ela não ter publicado nenhum dos 30 posts.
+
+Sete campos por marca (tabela `marcas_dna`), todos opcionais, editáveis no painel. O mais
+útil é **"assuntos que você NÃO aborda"**: é a única forma de o assinante calar um tema que
+o nicho traz.
+
+Decisões que valem entender:
+
+- **Com DNA, ele manda** no público e no tom; o do nicho vira só o padrão de quem não
+  preencheu. Lado a lado com o mesmo peso, o modelo escolhe o mais genérico — sempre.
+- **O motor busca no banco**, em vez de receber por parâmetro: assim uma geração retomada
+  depois de uma queda continua com o mesmo perfil.
+- **Falha ao ler o DNA não derruba a geração.** Sai genérico em vez de não sair.
+- **Os diferenciais são limite, não só assunto.** Quem declara ser contra contagem de
+  caloria não pode ter um post que explique algo por "balanço calórico".
+- **Receber uma identidade não autoriza inventar o resto dela.** Proibido criar credencial,
+  tempo de carreira, caso de atendimento, e também cena doméstica ("na minha casa sempre
+  foi assim"), ainda que combine com o perfil.
+
 ### Acesso de cortesia
 
 Alan, Juliana e Junior têm o plano **Estúdio sem cobrança**. A lista é de e-mails, em
