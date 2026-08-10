@@ -81,10 +81,20 @@ export async function sincronizarAssinatura(usuarioId: string) {
   return { mudou: true, situacao, plano, preapproval: atual.id };
 }
 
-/** Reconcilia todo mundo. Usado pela rotina diária. */
-export async function sincronizarTodas() {
+/**
+ * Reconcilia várias assinaturas de uma vez.
+ *
+ * `apenasPendentes` existe para rodar de dez em dez minutos sem pesar: quem
+ * fechou o navegador na tela de sucesso, sem clicar em "voltar ao site",
+ * pagou e ficaria esperando a rotina da madrugada. Quem está pendente é
+ * quase sempre ninguém, então a checagem frequente sai de graça.
+ */
+export async function sincronizarTodas({ apenasPendentes = false } = {}) {
   const admin = criarClienteAdmin();
-  const { data, error } = await admin.from("assinaturas").select("usuario_id");
+  const consulta = admin.from("assinaturas").select("usuario_id");
+  if (apenasPendentes) consulta.eq("status_pagamento", "pendente");
+
+  const { data, error } = await consulta;
   if (error) throw new Error(`listar assinaturas: ${error.message}`);
 
   const resultados: { usuarioId: string; ok: boolean; detalhe: string }[] = [];

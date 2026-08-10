@@ -15,8 +15,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "Chave inválida." }, { status: 401 });
   }
 
+  // ?pendentes=1 -> passada rápida, de dez em dez minutos, só de quem está
+  // esperando confirmação. Sem o parâmetro, confere todo mundo (uma vez ao
+  // dia), que é o que pega renovação, falha de cobrança e cancelamento.
+  const apenasPendentes = new URL(request.url).searchParams.get("pendentes") === "1";
+
   try {
-    const resultados = await sincronizarTodas();
+    const resultados = await sincronizarTodas({ apenasPendentes });
     return NextResponse.json({
       conferidas: resultados.length,
       falhas: resultados.filter((r) => !r.ok).length,
