@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { verAssinatura, situacaoDe } from "@/lib/mercadopago";
-import { PLANOS, type Plano } from "@/lib/planos";
+import { verAssinatura } from "@/lib/mercadopago";
+import { sincronizarAssinatura } from "@/lib/assinatura-sync";
+import { PLANOS } from "@/lib/planos";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -51,26 +52,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, semVinculo: true });
     }
 
-    const situacao = situacaoDe(assinatura.status);
+    // A decisão de o que o pagamento faz com o acesso vive num lugar só. O
+    // webhook é apenas o gatilho rápido; a rotina diária chama exatamente
+    // esta função. Duas cópias da regra se desencontrariam com o tempo.
+    const r = await sincronizarAssinatura(usuarioId);
 
-    const { error: erroAssinatura } = await admin
-      .from("assinaturas")
-      .update({
-        // O plano só passa a valer quando o pagamento está autorizado. Antes
-        // disso a pessoa continua no que já tinha — nada de liberar cota
-        // enquanto a cobrança está apenas "pendente".
-        ...(situacao === "ativa" ? { plano: plano as Plano } : {}),
-        ativa: situacao === "ativa",
-        status_pagamento: situacao,
-        mp_preapproval_id: assinatura.id,
-        proximo_pagamento: assinatura.next_payment_date ?? null,
-        atualizado_em: new Date().toISOString(),
-      })
-      .eq("usuario_id", usuarioId);
-
-    if (erroAssinatura) throw new Error(`atualizar assinatura: ${erroAssinatura.message}`);
-
-    return NextResponse.json({ ok: true, situacao });
+    return NextResponse.json({ ok: true, ...r });
   } catch (erro) {
     console.error("[postei][webhook]", (erro as Error).message);
     // Devolver erro faz o Mercado Pago reenviar depois, que é o desejado

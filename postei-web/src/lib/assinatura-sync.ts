@@ -1,6 +1,6 @@
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { buscarAssinaturas, situacaoDe, type Preapproval } from "@/lib/mercadopago";
-import { PLANOS, type Plano } from "@/lib/planos";
+import { PLANOS, PLANO_PADRAO, type Plano } from "@/lib/planos";
 
 /**
  * Põe o banco em dia com o Mercado Pago.
@@ -42,13 +42,33 @@ export async function sincronizarAssinatura(usuarioId: string) {
   const situacao = situacaoDe(atual.status);
   const admin = criarClienteAdmin();
 
+  // O que o pagamento faz com o acesso. Três regras, e nenhuma delas pode
+  // trancar a pessoa fora do produto:
+  //
+  //  - autorizado: o plano pago passa a valer;
+  //  - pendente: NÃO se mexe em nada. Quem clicou em "Assinar" e desistiu no
+  //    checkout continua com o que já tinha -- perder o plano gratuito por
+  //    ter desistido de pagar seria absurdo;
+  //  - cancelado/pausado: o acesso vale até o fim do ciclo já pago (é o que
+  //    a tela de cancelamento promete) e depois cai para o gratuito. Nunca
+  //    para "inativo", que bloquearia até a geração de teste.
+  const fimDoCicloPago = atual.next_payment_date
+    ? new Date(atual.next_payment_date) > new Date()
+    : false;
+
+  const acesso =
+    situacao === "ativa"
+      ? { plano: plano as Plano, ativa: true }
+      : situacao === "pendente"
+        ? {}
+        : fimDoCicloPago
+          ? { plano: plano as Plano, ativa: true }
+          : { plano: PLANO_PADRAO, ativa: true };
+
   const { error } = await admin
     .from("assinaturas")
     .update({
-      // Só o pagamento autorizado libera o plano. Enquanto está pendente a
-      // pessoa continua no que já tinha -- nada de conceder cota adiantado.
-      ...(situacao === "ativa" ? { plano: plano as Plano } : {}),
-      ativa: situacao === "ativa",
+      ...acesso,
       status_pagamento: situacao,
       mp_preapproval_id: atual.id,
       proximo_pagamento: atual.next_payment_date ?? null,
