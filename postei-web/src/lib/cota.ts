@@ -1,5 +1,5 @@
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { PLANOS, PLANO_PADRAO, type Plano } from "@/lib/planos";
+import { PLANOS, PLANO_PADRAO, PLANO_CORTESIA, ehCortesia, type Plano } from "@/lib/planos";
 
 /**
  * Cota mensal por assinante.
@@ -23,7 +23,7 @@ export async function assinaturaDe(usuarioId: string) {
 
   const { data } = await admin
     .from("assinaturas")
-    .select("plano, ativa, dia_ciclo, status_pagamento, proximo_pagamento")
+    .select("plano, ativa, dia_ciclo, status_pagamento, proximo_pagamento, cortesia")
     .eq("usuario_id", usuarioId)
     .maybeSingle();
 
@@ -34,21 +34,35 @@ export async function assinaturaDe(usuarioId: string) {
       dia_ciclo: number;
       status_pagamento: string;
       proximo_pagamento: string | null;
+      cortesia: boolean;
     };
 
   // Primeiro acesso: cria o plano de teste, com o ciclo virando no dia do
   // cadastro. Assim a renovação acompanha a data de pagamento, não o dia 1º.
+  //
+  // Quem está na lista de cortesia já nasce com o plano cheio -- é o que faz
+  // funcionar para quem ainda nem se cadastrou.
+  const { data: dono } = await admin.auth.admin.getUserById(usuarioId);
+  const cortesia = ehCortesia(dono?.user?.email);
+
   const dia = Math.min(new Date().getDate(), 28);
+  const plano = cortesia ? PLANO_CORTESIA : PLANO_PADRAO;
+
   await admin
     .from("assinaturas")
-    .insert({ usuario_id: usuarioId, plano: PLANO_PADRAO, dia_ciclo: dia });
+    .insert({ usuario_id: usuarioId, plano, dia_ciclo: dia, cortesia });
 
   return {
-    plano: PLANO_PADRAO,
+    plano,
     ativa: true,
     dia_ciclo: dia,
+    // "sem_cobranca" já é o estado certo: cortesia não tem o que cobrar. Quem
+    // distingue os dois é a coluna `cortesia`, e o banco tem uma restrição
+    // que só aceita os estados conhecidos -- inventar um valor aqui quebraria
+    // o cadastro na hora.
     status_pagamento: "sem_cobranca",
     proximo_pagamento: null,
+    cortesia,
   };
 }
 
@@ -68,6 +82,7 @@ export async function consumoDe(usuarioId: string) {
   return {
     plano: assinatura.plano,
     ativa: assinatura.ativa,
+    cortesia: assinatura.cortesia,
     statusPagamento: assinatura.status_pagamento,
     proximoPagamento: assinatura.proximo_pagamento,
     ciclo,

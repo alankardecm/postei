@@ -181,6 +181,7 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
             plano={cota.plano}
             statusPagamento={cota.statusPagamento}
             proximoPagamento={cota.proximoPagamento}
+            cortesia={cota.cortesia}
           />
 
           <Agendados itens={(fila ?? []) as Agendado[]} />

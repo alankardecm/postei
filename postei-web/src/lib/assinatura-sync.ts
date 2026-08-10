@@ -32,6 +32,17 @@ function aQueVale(assinaturas: Preapproval[]) {
 }
 
 export async function sincronizarAssinatura(usuarioId: string) {
+  // Cortesia não se mexe. Sem esta trava, a rotina diária derrubaria o plano
+  // cheio de quem nunca vai pagar -- e faria isso de novo todo dia.
+  const admin0 = criarClienteAdmin();
+  const { data: atualNoBanco } = await admin0
+    .from("assinaturas")
+    .select("cortesia")
+    .eq("usuario_id", usuarioId)
+    .maybeSingle();
+
+  if (atualNoBanco?.cortesia) return { mudou: false, motivo: "acesso de cortesia" };
+
   const encontradas = await buscarAssinaturas(usuarioId);
   if (encontradas.length === 0) return { mudou: false, motivo: "sem assinatura no gateway" };
 

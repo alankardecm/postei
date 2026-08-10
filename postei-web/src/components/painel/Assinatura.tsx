@@ -8,10 +8,12 @@ export function Assinatura({
   plano,
   statusPagamento,
   proximoPagamento,
+  cortesia = false,
 }: {
   plano: Plano;
   statusPagamento: string;
   proximoPagamento: string | null;
+  cortesia?: boolean;
 }) {
   const router = useRouter();
   const [ocupado, setOcupado] = useState<string | null>(null);
@@ -54,6 +56,24 @@ export function Assinatura({
 
   const pagante = statusPagamento === "ativa";
   const pendente = statusPagamento === "pendente";
+
+  // Cortesia não vê preço nem botão de assinar: não há o que cobrar, e um
+  // botão de pagamento numa conta que nunca paga só confunde.
+  if (cortesia) {
+    return (
+      <section className="mt-12">
+        <h2 className="rotulo mb-4">Assinatura</h2>
+        <div className="rounded-2xl border border-linha bg-branco p-6">
+          <p className="fonte-display text-lg font-bold tracking-tight">
+            Plano {PLANOS[plano].nome} · cortesia
+          </p>
+          <p className="mt-1 text-sm text-cinza">
+            Acesso liberado, sem cobrança e sem data de renovação.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-12">
