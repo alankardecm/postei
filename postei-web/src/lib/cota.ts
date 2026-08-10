@@ -23,11 +23,18 @@ export async function assinaturaDe(usuarioId: string) {
 
   const { data } = await admin
     .from("assinaturas")
-    .select("plano, ativa, dia_ciclo")
+    .select("plano, ativa, dia_ciclo, status_pagamento, proximo_pagamento")
     .eq("usuario_id", usuarioId)
     .maybeSingle();
 
-  if (data) return data as { plano: Plano; ativa: boolean; dia_ciclo: number };
+  if (data)
+    return data as {
+      plano: Plano;
+      ativa: boolean;
+      dia_ciclo: number;
+      status_pagamento: string;
+      proximo_pagamento: string | null;
+    };
 
   // Primeiro acesso: cria o plano de teste, com o ciclo virando no dia do
   // cadastro. Assim a renovação acompanha a data de pagamento, não o dia 1º.
@@ -36,7 +43,13 @@ export async function assinaturaDe(usuarioId: string) {
     .from("assinaturas")
     .insert({ usuario_id: usuarioId, plano: PLANO_PADRAO, dia_ciclo: dia });
 
-  return { plano: PLANO_PADRAO, ativa: true, dia_ciclo: dia };
+  return {
+    plano: PLANO_PADRAO,
+    ativa: true,
+    dia_ciclo: dia,
+    status_pagamento: "sem_cobranca",
+    proximo_pagamento: null,
+  };
 }
 
 export async function consumoDe(usuarioId: string) {
@@ -55,6 +68,8 @@ export async function consumoDe(usuarioId: string) {
   return {
     plano: assinatura.plano,
     ativa: assinatura.ativa,
+    statusPagamento: assinatura.status_pagamento,
+    proximoPagamento: assinatura.proximo_pagamento,
     ciclo,
     limites,
     usados: data?.posts ?? 0,
