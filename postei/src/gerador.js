@@ -48,7 +48,10 @@ REGRAS INEGOCIAVEIS:
   escreva "NÃO", "É", "SÓ" -- e nunca "NAO", "E", "SO". Texto sem acento vai
   direto para a arte do post e queima a credibilidade da marca do assinante.
 - MAIUSCULA: titulo e legenda comecam com letra maiuscula. Nunca escreva
-  tudo em caixa baixa.
+  tudo em caixa baixa -- e nunca o contrario: TITULO INTEIRO EM CAIXA ALTA
+  parece spam e queima a marca do assinante. Caixa alta so para UMA palavra
+  de enfase, no maximo, e so quando ela muda o sentido da frase. Tambem nao
+  encerre o titulo com palavra solta de apelo ("AQUI", "ISSO", "AGORA").
 - NUMERO: nunca invente estatistica, percentual ou valor ("50% de desconto",
   "3x mais vendas"). Se nao for fato verificavel, escreva sem numero.
 - VALOR NUTRICIONAL: nunca cite caloria, grama de macronutriente ou
