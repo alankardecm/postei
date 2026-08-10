@@ -164,6 +164,7 @@ Componentes animados do **React Bits** (MIT + Commons Clause).
 | `/painel` | gerar, histórico, Instagram, captação |
 | `/painel/lote/[id]` | os posts do pacote: editar texto, publicar agora ou agendar |
 | `/l/[codigo]` | página pública do link de captação |
+| `/esqueci-senha` · `/nova-senha` | recuperação de senha |
 | `/privacidade` · `/termos` · `/exclusao-de-dados` | documentos legais |
 
 ### Regra de ouro da segurança
@@ -217,12 +218,26 @@ um container agrupa os filhos, e só então publica.
 | Quando | O quê |
 |---|---|
 | a cada 5 min | `/api/cron/publicar` — publica o que venceu na fila |
+| diário 03h41 | `backup.sh` — banco, auth e pacotes; 14 dias |
 | diário 04h17 | `renovar-tokens.mjs` — renova o token antes dos 60 dias |
 
 A publicação vive em `lib/publicacao.ts` e é usada pelos **dois** caminhos: o botão do
 painel e o agendador. O item é marcado `publicando` com update condicional antes de
 começar — se a rotina rodar de novo durante uma publicação demorada, não pega o mesmo
 item e o assinante não posta duplicado.
+
+### Cota mensal
+
+Cada assinante tem plano e limite (`lib/planos.ts`). A reserva acontece numa **função no
+banco**, antes de enfileirar: entre "ler o consumo" e "gravar o novo" cabem duas requisições
+simultâneas, e as duas passariam pelo limite. Sem cota, um usuário queima a cota do provedor
+de todos os outros.
+
+### Fila que sobrevive a reinício
+
+A geração vive na tabela `geracoes`, não em memória. Se o processo cair no meio, o motor
+**retoma na subida** — refazendo a geração inteira, porque o pacote sai em blocos e não há
+ponto de retomada confiável. Teto de 3 tentativas.
 
 ### Evidência científica
 
@@ -302,9 +317,11 @@ trocar a foto.
   diretamente por que não postou vale mais que qualquer recurso novo.
 
 **Antes de cobrar**
-- Domínio próprio (`contato@postei.com.br` está publicado e não existe)
-- SMTP real
+- **Domínio próprio** — resolve três coisas: o `contato@postei.com.br` publicado e
+  inexistente, a entrega dos e-mails (hoje caem no spam porque o remetente é `@gmail.com`
+  e o link aponta para outro domínio) e o endereço para vender
 - Gateway de pagamento e assinatura recorrente
+- Cópia de backup fora do servidor
 - Revisão jurídica dos documentos
 - Contrato de comissionamento da parte comercial
 
