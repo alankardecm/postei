@@ -157,6 +157,11 @@ function blocoIdentidade({ nicho, dna }) {
 
   return `${campos}
 ${proibidos ? `\nASSUNTOS QUE ESTA MARCA NAO ABORDA - nao escreva sobre nada disso, nem de passagem: ${proibidos}` : ''}
+OS DIFERENCIAIS ACIMA SAO LIMITE, NAO SO ASSUNTO. Nada no post pode
+contradizer o que essa pessoa defende -- quem diz ser contra contagem de
+caloria nao pode explicar nada por "balanco calorico", nem de passagem.
+Se o tema sorteado so fizer sentido pelo caminho que ela rejeita, escreva
+sobre ele pelo angulo DELA.
 ESCREVA COMO ESSA PESSOA, NAO COMO UM PERFIL GENERICO DO NICHO. O texto tem
 que ser reconhecivel: se ele pudesse ser publicado por qualquer concorrente
 da mesma area, esta errado. Use o metodo e os diferenciais acima como fonte
