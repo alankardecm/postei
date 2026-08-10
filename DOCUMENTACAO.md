@@ -259,9 +259,15 @@ endereço dizendo "assinatura autorizada" e ganhar um plano de graça.
 
 | Caminho | Prazo |
 |---|---|
-| volta do checkout (`/painel?pagamento=voltou`) | segundos — é o caminho normal |
-| webhook `/api/pagamento/webhook` | instantâneo, **mas nunca funcionou** (ver Armadilhas) |
-| rotinas de 10 min e diária | fecha o resto |
+| webhook `/api/pagamento/webhook` | instantâneo |
+| volta do checkout (`/painel?pagamento=voltou`) | segundos |
+| rotina de pendentes | a cada 10 min |
+| rotina diária 05h07 | pega renovação, falha de cobrança e cancelamento |
+
+O webhook confere a origem pelo cabeçalho `x-signature` (HMAC do manifesto
+`id:{id};request-id:{req};ts:{ts};` com a `MP_WEBHOOK_SECRET`). Isso **não** é o que protege
+de fraude — disso cuida buscar o estado na API deles. Serve para descartar barulho antes de
+gastar uma chamada à API por requisição recebida.
 
 O que cada estado faz com o acesso — e **nenhum deles tranca a pessoa fora do produto**:
 
@@ -341,11 +347,18 @@ billing** — custa ~R$ 0,08 por assinante/mês.
 veio com criança de 4 anos. É limite de banco de imagem; a solução é o assinante poder
 trocar a foto.
 
-**O webhook do Mercado Pago nunca chegou.** Nas duas cobranças de teste, nenhum aviso.
-O endereço responde 200 de fora, tem certificado Let's Encrypt válido e DNS v4 e v6 —
-a entrega simplesmente não aconteceu, e não foi possível descobrir o motivo sem o painel
-de webhooks deles. **Por isso o pagamento não depende do webhook**: as rotinas de 10 min
-e diária conferem na fonte. Se um dia ele passar a chegar, é só um atalho.
+**O `notification_url` dentro do pedido é IGNORADO.** Foi o que fez o webhook não chegar em
+nenhuma das duas cobranças de teste, com o endereço respondendo 200 de fora e certificado
+válido. O Mercado Pago só entrega para a URL registrada no painel, em **Sua aplicação →
+Notificações → Webhooks**, com o evento *Planos e assinaturas* marcado. Resolvido em 10/08.
+
+Mesmo assim o pagamento **não depende** dele: as rotinas de 10 min e diária conferem na
+fonte. O webhook é o caminho rápido, não a garantia.
+
+**O simulador do painel manda `data.id = "123456"`**, que não existe. Responder 500 a isso
+faz o Mercado Pago reenviar para sempre algo que nunca vai existir, e marcar o endereço
+como quebrado. Regra: **4xx da API deles → 200** (não existe, insistir não adianta);
+**5xx e falha de rede → 500** (aí reenviar ajuda).
 
 **O `supabase-js` devolve o erro, não o lança.** `const { error } = await admin.from(…)`
 — ignorar esse retorno faz uma falha de banco virar HTTP 200. No webhook isso significava
