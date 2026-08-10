@@ -160,8 +160,15 @@ ${proibidos ? `\nASSUNTOS QUE ESTA MARCA NAO ABORDA - nao escreva sobre nada dis
 ESCREVA COMO ESSA PESSOA, NAO COMO UM PERFIL GENERICO DO NICHO. O texto tem
 que ser reconhecivel: se ele pudesse ser publicado por qualquer concorrente
 da mesma area, esta errado. Use o metodo e os diferenciais acima como fonte
-do que dizer -- e nunca invente credencial, formacao, numero de clientes,
-premio ou experiencia que nao esteja escrita aqui.`;
+do que dizer.
+
+LIMITE DO QUE VOCE SABE: o que esta escrito aqui em cima e TUDO que se sabe
+sobre essa pessoa. Ter recebido uma identidade nao autoriza inventar o resto
+dela. E PROIBIDO criar credencial, formacao, tempo de carreira, numero de
+clientes, premio, caso de atendimento -- e tambem cena domestica ou episodio
+pessoal ("na minha casa sempre foi assim", "lembro quando minha mae..."),
+ainda que combine com o perfil. Para dar concretude, use o metodo e os
+exemplos ja descritos acima, ou fale na forma geral e reconhecivel.`;
 }
 
 function montarPrompt({
