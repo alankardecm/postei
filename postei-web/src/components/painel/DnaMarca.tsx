@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { problemaDaPaleta } from "@/lib/paleta";
+import { problemaDaPaleta, normalizarHex, aproximarLegivel, HEX } from "@/lib/paleta";
 
 /**
  * O DNA da marca: quem assina os posts.
@@ -129,6 +129,12 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
     destaque: dna.cor_destaque || undefined,
   });
 
+  // O ajuste automático só faz sentido quando as três cores são válidas e o
+  // problema é de contraste. Hex mal digitado a pessoa corrige na mão.
+  const podeAjustar =
+    Boolean(problema) &&
+    [dna.cor_fundo, dna.cor_texto, dna.cor_destaque].every((c) => HEX.test(String(c ?? "")));
+
   return (
     <section className="mt-12">
       <h2 className="rotulo mb-1">DNA da marca</h2>
@@ -180,9 +186,9 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
 
           <div className="flex flex-wrap items-start gap-5">
             <Previa
-              fundo={dna.cor_fundo || "#161B33"}
-              texto={dna.cor_texto || "#F5EFE2"}
-              destaque={dna.cor_destaque || "#E0B15C"}
+              fundo={HEX.test(String(dna.cor_fundo ?? "")) ? dna.cor_fundo! : "#161B33"}
+              texto={HEX.test(String(dna.cor_texto ?? "")) ? dna.cor_texto! : "#F5EFE2"}
+              destaque={HEX.test(String(dna.cor_destaque ?? "")) ? dna.cor_destaque! : "#E0B15C"}
               marca={marca}
             />
 
@@ -191,14 +197,25 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
                 <label key={cor.id} className="flex items-center gap-3">
                   <input
                     type="color"
-                    value={dna[cor.id] || cor.padrao}
+                    value={HEX.test(String(dna[cor.id] ?? "")) ? dna[cor.id]! : cor.padrao}
                     onChange={(e) => setDna((d) => ({ ...d, [cor.id]: e.target.value }))}
                     className="h-9 w-14 cursor-pointer rounded border border-linha bg-branco"
                   />
                   <span className="w-20 text-sm">{cor.rotulo}</span>
-                  <span className="font-mono text-xs text-cinza tabular-nums">
-                    {(dna[cor.id] || cor.padrao).toUpperCase()}
-                  </span>
+                  {/* Campo de texto além do seletor: quem já tem marca recebe
+                      o código pronto da designer e precisa poder colar. */}
+                  <input
+                    type="text"
+                    value={dna[cor.id] ?? ""}
+                    onChange={(e) => {
+                      const bruto = e.target.value;
+                      const hex = normalizarHex(bruto);
+                      setDna((d) => ({ ...d, [cor.id]: hex ?? bruto }));
+                    }}
+                    placeholder={cor.padrao}
+                    spellCheck={false}
+                    className="w-28 rounded border border-linha bg-papel px-2 py-1.5 font-mono text-xs uppercase outline-none focus:border-folha"
+                  />
                 </label>
               ))}
 
@@ -215,9 +232,30 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
           </div>
 
           {problema && (
-            <p role="alert" className="mt-3 rounded-lg bg-areia px-3 py-2 text-sm text-tinta">
-              {problema}
-            </p>
+            <div role="alert" className="mt-3 rounded-lg bg-areia px-3 py-2.5 text-sm text-tinta">
+              <p>{problema}</p>
+              {podeAjustar && (
+                <>
+                  <p className="mt-1 text-cinza">
+                    Se essa é mesmo a paleta da sua marca, eu clareio ou escureço só o
+                    necessário — o matiz continua o seu, e o fundo não muda.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDna((d) => ({
+                        ...d,
+                        cor_texto: aproximarLegivel(d.cor_texto!, d.cor_fundo!),
+                        cor_destaque: aproximarLegivel(d.cor_destaque!, d.cor_fundo!),
+                      }))
+                    }
+                    className="mt-2 rounded-full border border-tinta/25 px-3 py-1.5 text-sm transition-colors hover:border-tinta/60"
+                  >
+                    Ajustar para ficar legível
+                  </button>
+                </>
+              )}
+            </div>
           )}
         </div>
 

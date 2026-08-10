@@ -18,7 +18,7 @@ function canal(v: number) {
   return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 }
 
-function luminancia(hex: string) {
+export function luminancia(hex: string) {
   const n = parseInt(hex.slice(1), 16);
   return (
     0.2126 * canal((n >> 16) & 255) +
@@ -33,6 +33,57 @@ export function contraste(a: string, b: string) {
 }
 
 export type Paleta = { fundo: string; texto: string; destaque: string };
+
+/** Aceita `2E1065`, `#2e1065`, `# 2E1065`. Quem cola um hex vindo do manual
+ *  da marca não deve ter que se preocupar com o formato. */
+export function normalizarHex(bruto: string) {
+  const limpo = bruto.trim().replace(/^#/, "").replace(/\s/g, "");
+  // Forma curta (#abc) é comum em manual de marca.
+  const expandido =
+    limpo.length === 3
+      ? limpo
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : limpo;
+  return /^[0-9a-f]{6}$/i.test(expandido) ? `#${expandido.toLowerCase()}` : null;
+}
+
+function componentes(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function paraHex([r, g, b]: number[]) {
+  return `#${[r, g, b].map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/**
+ * A cor legível mais próxima da que a pessoa escolheu.
+ *
+ * Existe para não mandar embora quem tem paleta de marca real: um bege com
+ * dourado é identidade legítima e reprova no contraste. Em vez de recusar,
+ * mexemos SÓ no que precisa — clareando ou escurecendo a própria cor, sem
+ * trocar o matiz — e mantemos fundo e destaque como a marca manda.
+ */
+export function aproximarLegivel(cor: string, fundo: string): string {
+  if (contraste(cor, fundo) >= CONTRASTE_MINIMO) return cor;
+
+  const rgb = componentes(cor);
+  // Fundo escuro pede texto mais claro, e vice-versa.
+  const paraClaro = luminancia(fundo) < 0.5;
+
+  let melhor = cor;
+  for (let passo = 1; passo <= 100; passo += 1) {
+    const f = passo / 100;
+    const ajustada = paraHex(
+      rgb.map((v) => (paraClaro ? v + (255 - v) * f : v * (1 - f))),
+    );
+    melhor = ajustada;
+    if (contraste(ajustada, fundo) >= CONTRASTE_MINIMO) break;
+  }
+  return melhor;
+}
 
 /** `null` quando está tudo certo; a explicação quando não está. */
 export function problemaDaPaleta(p: Partial<Paleta>): string | null {
