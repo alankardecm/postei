@@ -358,10 +358,14 @@ depurar. Validar antes.
 
 **A senha de app do Gmail vem com espaços.** São 19 caracteres na tela e 16 de verdade.
 
-**A `POSTEI_API_KEY` faz dois trabalhos.** Além de autenticar o painel no motor, ela é o
-segredo que **assina as URLs temporárias de imagem** (`imagem-publica.ts`). Rotacionar
-invalida as assinaturas em circulação — como valem 15 minutos, o risco é só uma publicação
-exatamente em curso. **Vale separar em dois segredos** quando houver oportunidade.
+**Dois segredos, propósitos diferentes.** `POSTEI_API_KEY` autentica o painel no motor e
+precisa ser **idêntica** nos dois `.env`. `POSTEI_SEGREDO_IMAGEM` assina as URLs temporárias
+que a Meta baixa ao publicar, e só existe no painel. Eram a mesma variável até 10/08 — o que
+prendia uma à outra: rotacionar o acesso invalidava, de tabela, todas as URLs em circulação.
+
+⚠️ **Segredo de assinatura nunca pode ter valor padrão.** O código tinha
+`process.env.X || ""`: variável ausente assinaria com **chave vazia**, qualquer um forjaria
+URL de imagem e nada acusaria. Hoje falha com erro claro.
 
 **Nem toda rota do motor exige chave.** `/saude` e `/nichos` são públicas de propósito;
 testar rotação nelas dá falso negativo. Usar `/lotes` para verificar.
