@@ -7,6 +7,7 @@ import { gerarCriativo, gerarCarrossel } from './criativo.js';
 import { buscarFoto } from './foto.js';
 import { buscarEvidencia } from './ciencia.js';
 import { dnaDaMarca } from './banco.js';
+import { paletaDaMarca } from './paleta.js';
 
 /**
  * M1 - Nucleo de geracao.
@@ -352,6 +353,10 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
     console.error('[postei] nao consegui ler o DNA da marca:', erro.message);
   }
 
+  // As cores tambem vem do DNA. Sem elas, dois assinantes do mesmo nicho
+  // teriam feeds identicos, mudando so o nome no rodape.
+  const paleta = paletaDaMarca(nicho, dna);
+
   // Geracao em blocos: acima de ~6 posts numa tacada o modelo estoura o
   // limite de saida e devolve JSON truncado no meio. Blocos menores tambem
   // rendem mais variedade, porque cada chamada sorteia temas de novo.
@@ -481,7 +486,7 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
     let formato;
 
     if (post.formato === 'carrossel') {
-      const r = await gerarCarrossel({ post, nicho, marca, foto });
+      const r = await gerarCarrossel({ post, nicho, marca, foto, paleta });
       formato = r.formato;
       // Um arquivo por slide, numerado na ordem de exibicao. O primeiro
       // tambem e a "capa" usada nas listagens.
@@ -493,7 +498,7 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
       }
       arquivo = imagens[0];
     } else {
-      const r = await gerarCriativo({ post, nicho, marca, foto });
+      const r = await gerarCriativo({ post, nicho, marca, foto, paleta });
       formato = r.formato;
       arquivo = `post-${numero}.${r.extensao}`;
       await fs.writeFile(path.join(dirLote, arquivo), r.imagem);

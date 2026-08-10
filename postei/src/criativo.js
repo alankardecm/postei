@@ -310,9 +310,9 @@ async function renderizar(arvore, fontes, comFoto) {
  * Gera todos os slides de um carrossel, na ordem de exibicao.
  * Só a capa pode ter foto; o miolo e o fechamento sao tipograficos.
  */
-export async function gerarCarrossel({ post, nicho, marca, foto = null }) {
+export async function gerarCarrossel({ post, nicho, marca, foto = null, paleta = null }) {
   const fontes = await carregarFontes();
-  const arvores = montarSlides(post, nicho.paleta, marca, foto);
+  const arvores = montarSlides(post, paleta ?? nicho.paleta, marca, foto);
 
   const imagens = [];
   for (const [i, arvore] of arvores.entries()) {
@@ -321,9 +321,10 @@ export async function gerarCarrossel({ post, nicho, marca, foto = null }) {
   return { imagens, extensao: 'jpg', formato: 'carrossel' };
 }
 
-export async function gerarCriativo({ post, nicho, marca, foto = null }) {
+export async function gerarCriativo({ post, nicho, marca, foto = null, paleta = null }) {
   const fontes = await carregarFontes();
-  const paleta = nicho.paleta;
+  // A paleta da marca quando ha; a do nicho e o padrao de quem nao escolheu.
+  const cores = paleta ?? nicho.paleta;
 
   // Lista sem itens vira citacao: melhor trocar de layout do que renderizar
   // uma lista vazia e entregar um post quebrado ao assinante.
@@ -336,8 +337,8 @@ export async function gerarCriativo({ post, nicho, marca, foto = null }) {
   if (usaFoto) formato = 'foto';
 
   const arvore = usaFoto
-    ? layoutFoto(post, paleta, marca, foto)
-    : LAYOUTS[formato](post, paleta, marca);
+    ? layoutFoto(post, cores, marca, foto)
+    : LAYOUTS[formato](post, cores, marca);
 
   const imagem = await renderizar(arvore, fontes, usaFoto);
   return { imagem, extensao: 'jpg', formato };

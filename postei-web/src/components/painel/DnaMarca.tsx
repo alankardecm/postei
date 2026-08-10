@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { problemaDaPaleta } from "@/lib/paleta";
 
 /**
  * O DNA da marca: quem assina os posts.
@@ -54,8 +55,35 @@ const CAMPOS = [
   },
 ] as const;
 
+const CORES = [
+  { id: "cor_fundo", rotulo: "Fundo", padrao: "#161B33" },
+  { id: "cor_texto", rotulo: "Texto", padrao: "#F5EFE2" },
+  { id: "cor_destaque", rotulo: "Destaque", padrao: "#E0B15C" },
+] as const;
+
 type Campo = (typeof CAMPOS)[number]["id"];
-type Dna = Partial<Record<Campo, string>>;
+type Cor = (typeof CORES)[number]["id"];
+type Dna = Partial<Record<Campo | Cor, string>>;
+
+/** A arte em miniatura, com as cores escolhidas. Espelha `moldura()` do
+ *  motor: fundo, título, barra de destaque e assinatura da marca. */
+function Previa({ fundo, texto, destaque, marca }: Record<string, string>) {
+  return (
+    <div
+      className="flex aspect-square w-40 shrink-0 flex-col justify-between rounded-xl p-4"
+      style={{ backgroundColor: fundo }}
+    >
+      <span style={{ color: destaque, fontSize: 11, fontWeight: 700 }}>“</span>
+      <span style={{ color: texto, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>
+        O lanche das 16h que sabota seu jantar
+      </span>
+      <span className="flex flex-col gap-1.5">
+        <span style={{ backgroundColor: destaque, height: 3, width: 28, borderRadius: 2 }} />
+        <span style={{ color: texto, opacity: 0.75, fontSize: 10 }}>{marca}</span>
+      </span>
+    </div>
+  );
+}
 
 export function DnaMarca({ marcas }: { marcas: string[] }) {
   const [marca, setMarca] = useState(marcas[0] ?? "");
@@ -93,6 +121,13 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
   if (marcas.length === 0) return null;
 
   const preenchidos = CAMPOS.filter((c) => String(dna[c.id] ?? "").trim()).length;
+
+  // Avisa enquanto a pessoa escolhe; o servidor confere de novo ao gravar.
+  const problema = problemaDaPaleta({
+    fundo: dna.cor_fundo || undefined,
+    texto: dna.cor_texto || undefined,
+    destaque: dna.cor_destaque || undefined,
+  });
 
   return (
     <section className="mt-12">
@@ -136,11 +171,61 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
           </label>
         ))}
 
+        <div className="mt-2 border-t border-linha pt-4">
+          <span className="rotulo">Cores da marca</span>
+          <p className="mt-1 mb-3 max-w-xl text-sm text-cinza">
+            Sem isto, todo mundo do mesmo ramo recebe a arte na mesma cor. Deixe em branco
+            para usar a paleta padrão do nicho.
+          </p>
+
+          <div className="flex flex-wrap items-start gap-5">
+            <Previa
+              fundo={dna.cor_fundo || "#161B33"}
+              texto={dna.cor_texto || "#F5EFE2"}
+              destaque={dna.cor_destaque || "#E0B15C"}
+              marca={marca}
+            />
+
+            <div className="flex flex-col gap-3">
+              {CORES.map((cor) => (
+                <label key={cor.id} className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={dna[cor.id] || cor.padrao}
+                    onChange={(e) => setDna((d) => ({ ...d, [cor.id]: e.target.value }))}
+                    className="h-9 w-14 cursor-pointer rounded border border-linha bg-branco"
+                  />
+                  <span className="w-20 text-sm">{cor.rotulo}</span>
+                  <span className="font-mono text-xs text-cinza tabular-nums">
+                    {(dna[cor.id] || cor.padrao).toUpperCase()}
+                  </span>
+                </label>
+              ))}
+
+              <button
+                type="button"
+                onClick={() =>
+                  setDna((d) => ({ ...d, cor_fundo: "", cor_texto: "", cor_destaque: "" }))
+                }
+                className="self-start text-sm text-cinza underline underline-offset-4 hover:text-tinta"
+              >
+                Voltar à paleta do nicho
+              </button>
+            </div>
+          </div>
+
+          {problema && (
+            <p role="alert" className="mt-3 rounded-lg bg-areia px-3 py-2 text-sm text-tinta">
+              {problema}
+            </p>
+          )}
+        </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={salvar}
-            disabled={salvando || carregando}
+            disabled={salvando || carregando || Boolean(problema)}
             className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             {salvando ? "Salvando…" : "Salvar DNA"}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { usuarioAtual } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { problemaDaPaleta } from "@/lib/paleta";
 
 /**
  * O DNA de uma marca do assinante.
@@ -13,7 +14,18 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
  * mesmo resultado que a RLS daria, sem repassar o token do usuário até aqui.
  */
 
-const CAMPOS = ["quem", "publico", "metodo", "nao_aborda", "diferenciais", "ofertas", "tom"] as const;
+const CAMPOS = [
+  "quem",
+  "publico",
+  "metodo",
+  "nao_aborda",
+  "diferenciais",
+  "ofertas",
+  "tom",
+  "cor_fundo",
+  "cor_texto",
+  "cor_destaque",
+] as const;
 
 /** Teto por campo: o DNA inteiro entra no prompt de CADA bloco de geração.
  *  Sem limite, um texto colado sem cuidado encareceria todos os pacotes. */
@@ -57,6 +69,15 @@ export async function PUT(request: Request) {
     }
     valores[campo] = v || null;
   }
+
+  // Recusar aqui, e nao na tela: a arte com texto ilegivel seria culpa do
+  // produto aos olhos do assinante, nao da escolha dele.
+  const problema = problemaDaPaleta({
+    fundo: valores.cor_fundo ?? undefined,
+    texto: valores.cor_texto ?? undefined,
+    destaque: valores.cor_destaque ?? undefined,
+  });
+  if (problema) return NextResponse.json({ erro: problema }, { status: 400 });
 
   const admin = criarClienteAdmin();
   const { error } = await admin.from("marcas_dna").upsert(
