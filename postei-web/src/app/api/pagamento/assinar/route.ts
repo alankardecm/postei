@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       email: user.email!,
       usuarioId: user.id,
       retorno: `${base}/painel?pagamento=voltou`,
+      notificacao: `${base}/api/pagamento/webhook`,
     });
 
     // Guarda o vínculo ANTES de mandar a pessoa para o checkout: se ela

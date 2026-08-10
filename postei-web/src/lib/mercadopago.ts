@@ -61,11 +61,13 @@ export async function criarAssinatura({
   email,
   usuarioId,
   retorno,
+  notificacao,
 }: {
   plano: Exclude<Plano, "teste">;
   email: string;
   usuarioId: string;
   retorno: string;
+  notificacao: string;
 }) {
   const config = PLANOS[plano];
 
@@ -79,6 +81,10 @@ export async function criarAssinatura({
       external_reference: `${usuarioId}:${plano}`,
       payer_email: email,
       back_url: retorno,
+      // O endereço do aviso vai no próprio pedido: assim não depende de
+      // configuração no painel do Mercado Pago, que muda de lugar e é fácil
+      // de esquecer ao criar uma aplicação nova.
+      notification_url: notificacao,
       auto_recurring: {
         frequency: 1,
         frequency_type: "months",
