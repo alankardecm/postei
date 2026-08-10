@@ -3,6 +3,8 @@ import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { verAssinatura, situacaoDe } from "@/lib/mercadopago";
 import { PLANOS, type Plano } from "@/lib/planos";
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * Avisos do Mercado Pago.
  *
@@ -26,15 +28,24 @@ export async function POST(request: Request) {
 
   try {
     const assinatura = await verAssinatura(String(id));
-    const [usuarioId, plano] = String(assinatura.external_reference ?? "").split(":");
+    const [referencia, plano] = String(assinatura.external_reference ?? "").split(":");
+    // A referência devia ser o id do usuário, mas ela vem de fora e pode ser
+    // qualquer coisa (inclusive de uma assinatura criada à mão para teste).
+    // Gravar lixo numa coluna uuid derruba o insert inteiro e perderíamos o
+    // registro do evento -- justamente o que serve para depurar depois.
+    const usuarioId = UUID.test(referencia ?? "") ? referencia : null;
 
-    await admin.from("pagamentos_eventos").insert({
-      usuario_id: usuarioId || null,
+    const { error: erroEvento } = await admin.from("pagamentos_eventos").insert({
+      usuario_id: usuarioId,
       preapproval_id: assinatura.id,
       tipo: String(tipo),
       status: assinatura.status,
       bruto: corpo,
     });
+    // O supabase-js DEVOLVE o erro, não o lança. Sem esta checagem uma falha
+    // de banco viraria HTTP 200, o Mercado Pago nunca reenviaria o aviso e
+    // uma assinatura paga ficaria sem ser liberada, sem deixar rastro.
+    if (erroEvento) throw new Error(`gravar evento: ${erroEvento.message}`);
 
     if (!usuarioId || !(plano in PLANOS)) {
       return NextResponse.json({ ok: true, semVinculo: true });
@@ -42,7 +53,7 @@ export async function POST(request: Request) {
 
     const situacao = situacaoDe(assinatura.status);
 
-    await admin
+    const { error: erroAssinatura } = await admin
       .from("assinaturas")
       .update({
         // O plano só passa a valer quando o pagamento está autorizado. Antes
@@ -56,6 +67,8 @@ export async function POST(request: Request) {
         atualizado_em: new Date().toISOString(),
       })
       .eq("usuario_id", usuarioId);
+
+    if (erroAssinatura) throw new Error(`atualizar assinatura: ${erroAssinatura.message}`);
 
     return NextResponse.json({ ok: true, situacao });
   } catch (erro) {
