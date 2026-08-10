@@ -15,6 +15,7 @@ export function EditarPost({
   loteId,
   indice,
   conectado,
+  podeEditar,
   legenda: legendaInicial,
   cta: ctaInicial,
   hashtags: hashtagsIniciais,
@@ -22,6 +23,7 @@ export function EditarPost({
   loteId: string;
   indice: number;
   conectado: boolean;
+  podeEditar: boolean;
   legenda: string;
   cta: string | null;
   hashtags: string[];
@@ -72,13 +74,19 @@ export function EditarPost({
     return (
       <div className="flex flex-wrap items-center gap-3">
         <Publicar loteId={loteId} indice={indice} conectado={conectado} />
-        <button
-          type="button"
-          onClick={() => setEditando(true)}
-          className="rounded-full px-3 py-2 text-sm text-cinza transition-colors hover:text-tinta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
-        >
-          Editar texto
-        </button>
+        {podeEditar ? (
+          <button
+            type="button"
+            onClick={() => setEditando(true)}
+            className="rounded-full px-3 py-2 text-sm text-cinza transition-colors hover:text-tinta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          >
+            Editar texto
+          </button>
+        ) : (
+          <span className="text-sm text-cinza">
+            Editar o texto faz parte dos planos pagos.
+          </span>
+        )}
         {salvo && <span className="text-sm text-folha">Salvo</span>}
       </div>
     );

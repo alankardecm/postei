@@ -7,6 +7,7 @@ import { motor, usuarioAtual, type Lote, type Nicho } from "@/lib/motor";
 import { Captacao, type LinkResumo } from "@/components/painel/Captacao";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { consumoDe } from "@/lib/cota";
+import { volumesDe, PLANOS } from "@/lib/planos";
 import { Assinatura } from "@/components/painel/Assinatura";
 import { Instagram, type ContaIg } from "@/components/painel/Instagram";
 import { Agendados, type Agendado } from "@/components/painel/Agendados";
@@ -110,7 +111,7 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
             </p>
           ) : (
             <div className="mt-10">
-              <Gerador nichos={nichos} />
+              <Gerador nichos={nichos} volumes={volumesDe(cota.plano)} />
             </div>
           )}
 

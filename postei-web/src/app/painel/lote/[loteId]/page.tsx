@@ -5,6 +5,8 @@ import { Cabecalho } from "@/components/site/Cabecalho";
 import { EditarPost } from "@/components/painel/EditarPost";
 import { motor, usuarioAtual, ErroMotor } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { assinaturaDe } from "@/lib/cota";
+import { PLANOS } from "@/lib/planos";
 
 export const metadata = { title: "Pacote — Postei" };
 export const dynamic = "force-dynamic";
@@ -42,6 +44,8 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
     if ((erro as ErroMotor).status === 404) notFound();
     throw erro;
   }
+
+  const assinatura = await assinaturaDe(user.id);
 
   const admin = criarClienteAdmin();
   const { data: conta } = await admin
@@ -146,6 +150,7 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                       loteId={loteId}
                       indice={i}
                       conectado={Boolean(conta)}
+                      podeEditar={PLANOS[assinatura.plano].podeEditar}
                       legenda={post.legenda}
                       cta={post.cta}
                       hashtags={post.hashtags}

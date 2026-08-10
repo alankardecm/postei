@@ -67,7 +67,12 @@ export const planos = [
     nome: "Essencial",
     preco: "39,90",
     resumo: "Para quem está começando a postar com constância.",
-    itens: ["30 posts por mês", "1 marca", "Artes com foto e tipográficas", "Legendas e hashtags prontas"],
+    itens: [
+      "30 posts por mês",
+      "1 marca",
+      "Artes com foto e tipográficas",
+      "Editar o texto antes de publicar",
+    ],
     destaque: false,
   },
   {
@@ -77,7 +82,7 @@ export const planos = [
     itens: [
       "90 posts por mês",
       "Até 3 marcas",
-      "30 imagens geradas por IA",
+      "Carrosséis e posts únicos",
       "Link de captação de contatos",
     ],
     // Marcado como recomendado, NAO como "mais escolhido": nao existe venda
@@ -96,7 +101,7 @@ export const planos = [
     itens: [
       "300 posts por mês",
       "Até 10 marcas",
-      "100 imagens por IA",
+      "Agendamento do mês inteiro",
       "Nicho sob medida para cada cliente",
     ],
     destaque: false,

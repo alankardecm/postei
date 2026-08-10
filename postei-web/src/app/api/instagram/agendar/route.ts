@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { usuarioAtual } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { contaConectada } from "@/lib/publicacao";
+import { assinaturaDe } from "@/lib/cota";
+import { PLANOS } from "@/lib/planos";
 
 /** Agenda um post. Quem publica depois é a rotina em /api/cron/publicar. */
 export async function POST(request: Request) {
@@ -32,6 +34,27 @@ export async function POST(request: Request) {
   if (!conta) return NextResponse.json({ erro: "Conecte seu Instagram antes." }, { status: 400 });
 
   const admin = criarClienteAdmin();
+
+  // No plano de teste o agendamento é uma amostra: um, para sentir o ciclo.
+  const assinatura = await assinaturaDe(user.id);
+  const teto = PLANOS[assinatura.plano].agendamentos;
+  if (teto !== null) {
+    const { count } = await admin
+      .from("publicacoes")
+      .select("id", { count: "exact", head: true })
+      .eq("usuario_id", user.id);
+
+    if ((count ?? 0) >= teto) {
+      return NextResponse.json(
+        {
+          erro:
+            "O teste inclui um agendamento. Assine um plano para agendar o mês inteiro.",
+        },
+        { status: 402 },
+      );
+    }
+  }
+
   const { error } = await admin.from("publicacoes").insert({
     usuario_id: user.id,
     conta_id: conta.id,

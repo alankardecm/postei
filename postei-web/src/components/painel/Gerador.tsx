@@ -6,16 +6,14 @@ import type { Nicho } from "@/lib/motor";
 
 type Situacao = "parado" | "enviando" | "gerando" | "pronto" | "erro";
 
-const VOLUMES = [5, 10, 30];
-
 /** Quanto tempo esperar entre uma consulta de andamento e a proxima. */
 const INTERVALO_CONSULTA_MS = 4000;
 
-export function Gerador({ nichos }: { nichos: Nicho[] }) {
+export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[] }) {
   const router = useRouter();
   const [nicho, setNicho] = useState(nichos[0]?.id ?? "");
   const [marca, setMarca] = useState("");
-  const [quantidade, setQuantidade] = useState(10);
+  const [quantidade, setQuantidade] = useState(volumes[volumes.length - 1] ?? 2);
   const [situacao, setSituacao] = useState<Situacao>("parado");
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [segundos, setSegundos] = useState(0);
@@ -129,7 +127,7 @@ export function Gerador({ nichos }: { nichos: Nicho[] }) {
       <fieldset className="mt-5" disabled={ocupado}>
         <legend className="rotulo mb-2">Quantos posts</legend>
         <div className="flex flex-wrap gap-2">
-          {VOLUMES.map((v) => (
+          {volumes.map((v) => (
             <button
               key={v}
               type="button"
@@ -145,7 +143,11 @@ export function Gerador({ nichos }: { nichos: Nicho[] }) {
             </button>
           ))}
           <span className="self-center text-sm text-cinza">
-            {quantidade === 30 ? "um mês inteiro — leva uns 3 minutos" : "leva menos de 1 minuto"}
+            {quantidade >= 30
+              ? "um mês inteiro — leva uns 3 minutos"
+              : volumes.length === 1
+                ? "é o que o teste inclui"
+                : "leva menos de 1 minuto"}
           </span>
         </div>
       </fieldset>
