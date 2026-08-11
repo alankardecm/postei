@@ -1,9 +1,11 @@
 # Postei — mídia própria (foto + vídeo/Reels)
 
-**Status:** implementação em andamento (Fase 1 + Fase 2)  
+**Status:** implementado, commitado, **em produção** (Fase 1 + Fase 2)  
 **Data início:** 2026-08-11  
-**Projeto:** Postei (particular) — pasta `ESTEIRA-IA-CONTEUDO`  
-**Regra:** não fazer `git push` nem deploy sem autorização explícita do Alan.
+**Commit da feature:** `c859b2e`  
+**Push:** `origin/main` (github.com/alankardecm/postei)  
+**Deploy:** 2026-08-11 — motor + web OK em `https://postei.srv1121163.hstgr.cloud`  
+**Projeto:** Postei (particular) — pasta `ESTEIRA-IA-CONTEUDO`
 
 ---
 
@@ -185,10 +187,10 @@ POST /api/instagram/publicar
 | 2026-08-11 | **Fase 2:** gravação MP4, `publicarReels`, UI “Publicar como Reel”, URL pública HMAC para `.mp4` |
 | 2026-08-11 | Parser JSON do motor: rotas arte/video com limit alto; demais rotas 1mb |
 | 2026-08-11 | Cache da imagem do painel: `no-cache` + query `?t=` após re-render |
+| 2026-08-11 | **Commit** `c859b2e` + **push** `main` + **deploy** motor+web (autorização C) |
 
 ### Ainda NÃO feito (de propósito)
 
-- `git commit` / `git push` / `deploy.sh` — **só com autorização do Alan**
 - Geração automática de vídeo (Ken Burns / ffmpeg)
 - Agendar Reel (só publicar agora com modo reels; agendamento continua feed)
 
