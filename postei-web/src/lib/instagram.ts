@@ -204,6 +204,49 @@ export async function publicarCarrossel({
 }
 
 /**
+ * Publica um Reel a partir de uma URL pública do MP4.
+ * Fluxo igual ao da imagem: cria container → espera → media_publish.
+ * A Meta baixa o arquivo; o MP4 precisa estar acessível sem login
+ * (URL assinada, ver imagem-publica.ts).
+ */
+export async function publicarReels({
+  igUserId,
+  token,
+  urlVideo,
+  legenda,
+}: {
+  igUserId: string;
+  token: string;
+  urlVideo: string;
+  legenda: string;
+}) {
+  const criar = new URL(`${GRAFO}/${igUserId}/media`);
+  criar.searchParams.set("media_type", "REELS");
+  criar.searchParams.set("video_url", urlVideo);
+  criar.searchParams.set("caption", legenda);
+  criar.searchParams.set("access_token", token);
+
+  const { id: containerId } = await json<{ id: string }>(
+    await fetch(criar, { method: "POST" }),
+    "criação do container do Reel",
+  );
+
+  // Vídeo demora mais que JPEG — tenta por ~2 min.
+  await esperarProcessamento(containerId, token, 40, "o Reel");
+
+  const publicar = new URL(`${GRAFO}/${igUserId}/media_publish`);
+  publicar.searchParams.set("creation_id", containerId);
+  publicar.searchParams.set("access_token", token);
+
+  const { id } = await json<{ id: string }>(
+    await fetch(publicar, { method: "POST" }),
+    "publicação do Reel",
+  );
+
+  return { mediaId: id, containerId };
+}
+
+/**
  * O container não fica pronto na hora. Publicar antes da hora devolve erro
  * genérico ("media not ready"), então consultamos até FINISHED.
  */

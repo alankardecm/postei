@@ -16,12 +16,15 @@ type Post = {
   formato: string;
   fonte: { titulo: string; revista: string; ano: string; url: string } | null;
   imagens: string[] | null;
+  video?: string | null;
   titulo: string;
   subtitulo: string | null;
   legenda: string;
   cta: string | null;
   hashtags: string[];
   imagem: string;
+  /** ISO da última re-render (troca de foto) — usado para bust de cache na UI */
+  arteRefeitaEm?: string | null;
 };
 
 type Pacote = {
@@ -80,7 +83,11 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
               >
                 <div className="flex flex-col gap-2">
                   <Image
-                    src={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(post.imagem)}`}
+                    src={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(post.imagem)}${
+                      post.arteRefeitaEm
+                        ? `?t=${encodeURIComponent(post.arteRefeitaEm)}`
+                        : ""
+                    }`}
                     alt={post.titulo}
                     width={1080}
                     height={1350}
@@ -91,6 +98,14 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                     <span className="rotulo text-center">
                       capa · {post.imagens.length} slides abaixo
                     </span>
+                  )}
+                  {post.video && (
+                    <video
+                      src={`/api/lotes/${encodeURIComponent(loteId)}/video/${encodeURIComponent(post.video)}`}
+                      controls
+                      className="mt-1 w-full rounded-lg border border-linha"
+                      preload="metadata"
+                    />
                   )}
                 </div>
 
@@ -140,6 +155,7 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                       indice={i}
                       conectado={Boolean(conta)}
                       podeEditar={PLANOS[assinatura.plano].podeEditar}
+                      temVideo={Boolean(post.video)}
                       legenda={post.legenda}
                       cta={post.cta}
                       hashtags={post.hashtags}
@@ -153,7 +169,11 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                     acabava aprovando um carrossel tendo visto só a capa. */}
                 {post.imagens && post.imagens.length > 1 && (
                   <div className="sm:col-span-2">
-                    <SlidesCarrossel loteId={loteId} arquivos={post.imagens} />
+                    <SlidesCarrossel
+                      loteId={loteId}
+                      arquivos={post.imagens}
+                      cacheBust={post.arteRefeitaEm}
+                    />
                   </div>
                 )}
               </li>

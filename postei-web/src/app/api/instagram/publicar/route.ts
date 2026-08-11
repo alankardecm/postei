@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   const corpo = await request.json().catch(() => null);
   const loteId = typeof corpo?.loteId === "string" ? corpo.loteId : "";
   const indice = Number(corpo?.indice);
+  const modo = corpo?.modo === "reels" ? "reels" : "feed";
 
   if (!loteId || !Number.isInteger(indice) || indice < 0) {
     return NextResponse.json({ erro: "Informe o lote e qual post publicar." }, { status: 400 });
@@ -44,8 +45,9 @@ export async function POST(request: Request) {
       indice,
       registroId: registro!.id,
       base,
+      modo,
     });
-    return NextResponse.json({ ok: true, mediaId });
+    return NextResponse.json({ ok: true, mediaId, modo });
   } catch (erro) {
     return NextResponse.json({ erro: (erro as Error).message }, { status: 502 });
   }

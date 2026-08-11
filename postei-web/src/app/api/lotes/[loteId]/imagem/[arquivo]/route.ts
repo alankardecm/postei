@@ -30,7 +30,8 @@ export async function GET(
   return new Response(resposta.body, {
     headers: {
       "Content-Type": arquivo.endsWith(".png") ? "image/png" : "image/jpeg",
-      "Cache-Control": "private, max-age=3600",
+      // Sem cache longo: trocar foto re-grava o mesmo nome de arquivo.
+      "Cache-Control": "private, no-cache",
     },
   });
 }

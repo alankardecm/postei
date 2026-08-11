@@ -428,12 +428,24 @@ testar rotação nelas dá falso negativo. Usar `/lotes` para verificar.
 
 ---
 
+## Mídia própria (foto + Reels)
+
+Implementado em 2026-08-11 (código local; **sem push/deploy até autorização**).
+
+- Trocar foto (Pexels) ou enviar foto própria → re-render da arte (card/carrossel)
+- Anexar MP4 e publicar como Reel
+- Backup automático em `saida/.../_backup_arte_<timestamp>/`
+
+Detalhes, contrato de API e **ponto de recuperação**: [`docs/MIDIA-FOTO-VIDEO.md`](docs/MIDIA-FOTO-VIDEO.md).
+
+---
+
 ## O que falta
 
 **Curto prazo**
-- Trocar a foto que não casou com o tema
+- ~~Trocar a foto que não casou com o tema~~ (feito — ver mídia própria)
 - Baixar o zip do pacote pelo painel
-- Reels
+- ~~Reels~~ (upload + publicar; geração automática Ken Burns ainda não)
 
 **O que o piloto revelou**
 - A primeira usuária não publicou nenhum post. Ela apontou conteúdo vago e falta de gancho;

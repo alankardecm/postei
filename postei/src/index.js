@@ -5,9 +5,16 @@ import { config } from './config.js';
 import { listarNichos } from './nichos.js';
 import { pastaDoAssinante } from './gerador.js';
 import { criarTarefa, verTarefa, retomarPendentes, encerrarInsistentes } from './tarefas.js';
+import { refazerArte, gravarVideoPost } from './refazer-arte.js';
 
 const app = express();
-app.use(express.json());
+// Upload de foto/video precisa de teto maior. O parser global de 1mb
+// NAO pode rodar nessas rotas — no Express o primeiro body parser
+// consome o stream; se ele estourar o limite, a rota dedicada nunca roda.
+app.use((req, res, next) => {
+  if (/\/posts\/[^/]+\/(arte|video)$/.test(req.path)) return next();
+  return express.json({ limit: '1mb' })(req, res, next);
+});
 
 /**
  * O motor nao conhece usuario: quem autentica a pessoa e o painel (Next +
@@ -137,6 +144,81 @@ app.get('/lotes/:loteId/imagem/:arquivo', exigirChave, exigirAssinante, async (r
     if (erro && !res.headersSent) res.status(404).json({ erro: 'Imagem não encontrada.' });
   });
 });
+
+// Entrega o MP4 do post (Reels). Mesma higiene de caminho da imagem.
+app.get('/lotes/:loteId/video/:arquivo', exigirChave, exigirAssinante, async (req, res) => {
+  const loteId = String(req.params.loteId).replace(/[^a-zA-Z0-9._-]/g, '');
+  const arquivo = String(req.params.arquivo).replace(/[^a-zA-Z0-9._-]/g, '');
+  if (!/\.mp4$/i.test(arquivo)) {
+    return res.status(400).json({ erro: 'Arquivo de vídeo inválido.' });
+  }
+  const alvo = path.join(config.saida, req.assinante, loteId, arquivo);
+  res.sendFile(alvo, (erro) => {
+    if (erro && !res.headersSent) res.status(404).json({ erro: 'Vídeo não encontrado.' });
+  });
+});
+
+/**
+ * Re-renderiza a arte com nova foto (Pexels ou upload).
+ * Ver docs/MIDIA-FOTO-VIDEO.md. Sempre cria _backup_arte_* antes de gravar.
+ */
+app.post(
+  '/lotes/:loteId/posts/:indice/arte',
+  express.json({ limit: '12mb' }),
+  exigirChave,
+  exigirAssinante,
+  async (req, res) => {
+    const loteId = String(req.params.loteId).replace(/[^a-zA-Z0-9._-]/g, '');
+    const indice = Number(req.params.indice);
+    if (!Number.isInteger(indice) || indice < 0) {
+      return res.status(400).json({ erro: 'Índice de post inválido.' });
+    }
+    const { fonte, imagemBase64 } = req.body || {};
+    try {
+      const resultado = await refazerArte({
+        assinanteId: req.assinante,
+        loteId,
+        indice,
+        fonte,
+        imagemBase64,
+      });
+      res.json({ ok: true, ...resultado });
+    } catch (erro) {
+      const status = erro.codigo && Number.isInteger(erro.codigo) ? erro.codigo : 500;
+      res.status(status >= 400 && status < 600 ? status : 500).json({ erro: erro.message });
+    }
+  },
+);
+
+/**
+ * Anexa um MP4 ao post para publicar como Reel (nao gera video).
+ * Ver docs/MIDIA-FOTO-VIDEO.md.
+ */
+app.post(
+  '/lotes/:loteId/posts/:indice/video',
+  express.json({ limit: '110mb' }),
+  exigirChave,
+  exigirAssinante,
+  async (req, res) => {
+    const loteId = String(req.params.loteId).replace(/[^a-zA-Z0-9._-]/g, '');
+    const indice = Number(req.params.indice);
+    if (!Number.isInteger(indice) || indice < 0) {
+      return res.status(400).json({ erro: 'Índice de post inválido.' });
+    }
+    try {
+      const resultado = await gravarVideoPost({
+        assinanteId: req.assinante,
+        loteId,
+        indice,
+        videoBase64: req.body?.videoBase64,
+      });
+      res.json({ ok: true, ...resultado });
+    } catch (erro) {
+      const status = erro.codigo && Number.isInteger(erro.codigo) ? erro.codigo : 500;
+      res.status(status >= 400 && status < 600 ? status : 500).json({ erro: erro.message });
+    }
+  },
+);
 
 /**
  * Apaga TODOS os pacotes do assinante.

@@ -3,30 +3,35 @@
 import { useState } from "react";
 
 type Situacao = "parado" | "publicando" | "publicado" | "agendado" | "erro";
+type Modo = "feed" | "reels";
 
 export function Publicar({
   loteId,
   indice,
   conectado,
+  temVideo = false,
 }: {
   loteId: string;
   indice: number;
   conectado: boolean;
+  /** Se true, mostra a opção de publicar como Reel (MP4 anexado). */
+  temVideo?: boolean;
 }) {
   const [situacao, setSituacao] = useState<Situacao>("parado");
   const [erro, setErro] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState(false);
+  const [modoConfirm, setModoConfirm] = useState<Modo>("feed");
   const [agendando, setAgendando] = useState(false);
   const [quando, setQuando] = useState(sugestaoDeHorario());
 
-  async function publicar() {
+  async function publicar(modo: Modo = "feed") {
     setSituacao("publicando");
     setErro(null);
 
     const resposta = await fetch("/api/instagram/publicar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ loteId, indice }),
+      body: JSON.stringify({ loteId, indice, modo }),
     });
     const dados = await resposta.json();
 
@@ -79,7 +84,7 @@ export function Publicar({
   if (situacao === "publicado") {
     return (
       <p className="rounded-full bg-limao px-4 py-2 text-center text-sm font-medium text-tinta">
-        Publicado no Instagram
+        Publicado no Instagram{modoConfirm === "reels" ? " (Reel)" : ""}
       </p>
     );
   }
@@ -130,11 +135,15 @@ export function Publicar({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={publicar}
+            onClick={() => void publicar(modoConfirm)}
             disabled={situacao === "publicando"}
             className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
-            {situacao === "publicando" ? "Publicando…" : "Confirmar publicação"}
+            {situacao === "publicando"
+              ? "Publicando…"
+              : modoConfirm === "reels"
+                ? "Confirmar Reel"
+                : "Confirmar publicação"}
           </button>
           <button
             type="button"
@@ -149,11 +158,26 @@ export function Publicar({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setConfirmando(true)}
+            onClick={() => {
+              setModoConfirm("feed");
+              setConfirmando(true);
+            }}
             className="rounded-full border border-tinta px-4 py-2 text-sm font-medium transition-colors hover:bg-tinta hover:text-papel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             Publicar agora
           </button>
+          {temVideo && (
+            <button
+              type="button"
+              onClick={() => {
+                setModoConfirm("reels");
+                setConfirmando(true);
+              }}
+              className="rounded-full border border-folha px-4 py-2 text-sm font-medium text-folha transition-colors hover:bg-folha hover:text-papel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            >
+              Publicar como Reel
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setAgendando(true)}

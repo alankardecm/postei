@@ -15,16 +15,53 @@ const ENDPOINT = 'https://api.pexels.com/v1/search';
 /** Cache em memoria: o mesmo tema costuma se repetir entre lotes. */
 const cache = new Map();
 
-export async function buscarFoto({ consulta, largura, altura }) {
+/**
+ * Normaliza bytes de imagem para JPEG embutivel no satori.
+ * Usado tanto pelo Pexels quanto pelo upload do assinante.
+ */
+export async function prepararFotoDeBytes(bytes, meta = {}) {
+  if (!bytes || !bytes.length) return null;
+
+  try {
+    const sharp = (await import('sharp')).default;
+    const jpeg = await sharp(bytes)
+      .rotate() // respeita EXIF do celular
+      .resize({ width: config.criativo.largura, withoutEnlargement: true })
+      .jpeg({ quality: 90 })
+      .toBuffer();
+
+    return {
+      dataUri: `data:image/jpeg;base64,${jpeg.toString('base64')}`,
+      autor: meta.autor ?? null,
+      origem: meta.origem ?? null,
+      corMedia: meta.corMedia ?? null,
+      bytes: jpeg,
+    };
+  } catch (erro) {
+    console.warn(`[postei] foto em formato ilegivel, descartando: ${erro.message}`);
+    return null;
+  }
+}
+
+/**
+ * @param {{ consulta: string, ignorarCache?: boolean }} opts
+ * ignorarCache=true quando o assinante pede "outra foto" — senao o Map
+ * devolveria sempre a mesma imagem da primeira busca do tema.
+ */
+export async function buscarFoto({ consulta, ignorarCache = false }) {
   if (!consulta) return null;
 
   const chaveCache = consulta.toLowerCase().trim();
-  if (cache.has(chaveCache)) return cache.get(chaveCache);
+  if (!ignorarCache && cache.has(chaveCache)) return cache.get(chaveCache);
 
   const url = new URL(ENDPOINT);
   url.searchParams.set('query', consulta);
   url.searchParams.set('per_page', '12');
   url.searchParams.set('orientation', 'portrait');
+  // Pagina aleatoria leve: "outra foto" nao cai sempre nos mesmos 8.
+  if (ignorarCache) {
+    url.searchParams.set('page', String(1 + Math.floor(Math.random() * 3)));
+  }
 
   const cabecalhos = {};
   if (config.foto.apiKey) {
@@ -73,31 +110,14 @@ export async function buscarFoto({ consulta, largura, altura }) {
     return null;
   }
 
-  // Normaliza tudo para JPEG antes de embutir. O banco devolve WebP e PNG
-  // conforme o arquivo original, e o satori estoura com
-  // "Offset is outside the bounds of the DataView" quando o mime declarado
-  // no data URI nao corresponde aos bytes. Redimensionar aqui tambem evita
-  // carregar um arquivo de 3000px para renderizar num quadro de 1080.
-  try {
-    const sharp = (await import('sharp')).default;
-    bytes = await sharp(bytes)
-      .resize({ width: config.criativo.largura, withoutEnlargement: true })
-      .jpeg({ quality: 90 })
-      .toBuffer();
-  } catch (erro) {
-    console.warn(`[postei] foto em formato ilegivel, descartando: ${erro.message}`);
-    return null;
-  }
-
-  const resultado = {
-    // O satori aceita data URI direto; assim nao dependemos de rede na
-    // hora de renderizar nem vazamos URL externa para dentro da arte.
-    dataUri: `data:image/jpeg;base64,${bytes.toString('base64')}`,
+  const resultado = await prepararFotoDeBytes(bytes, {
     autor: escolhida.photographer || null,
     origem: escolhida.url || null,
     corMedia: escolhida.avg_color || null,
-  };
+  });
+  if (!resultado) return null;
 
-  cache.set(chaveCache, resultado);
+  // Nao cacheia pedido "outra foto": o assinante quer variedade.
+  if (!ignorarCache) cache.set(chaveCache, resultado);
   return resultado;
 }

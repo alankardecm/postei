@@ -3,19 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Publicar } from "@/components/painel/Publicar";
+import { MidiaPost } from "@/components/painel/MidiaPost";
 
 /**
  * Revisão do texto antes de publicar.
  *
  * Edita legenda, chamada e hashtags. O TÍTULO não entra: ele está impresso
  * na arte, e mudá-lo exigiria renderizar a imagem de novo — num carrossel,
- * todos os slides.
+ * todos os slides. Troca de foto/vídeo fica em MidiaPost (re-render no motor).
  */
 export function EditarPost({
   loteId,
   indice,
   conectado,
   podeEditar,
+  temVideo = false,
   legenda: legendaInicial,
   cta: ctaInicial,
   hashtags: hashtagsIniciais,
@@ -24,6 +26,7 @@ export function EditarPost({
   indice: number;
   conectado: boolean;
   podeEditar: boolean;
+  temVideo?: boolean;
   legenda: string;
   cta: string | null;
   hashtags: string[];
@@ -72,22 +75,30 @@ export function EditarPost({
 
   if (!editando) {
     return (
-      <div className="flex flex-wrap items-center gap-3">
-        <Publicar loteId={loteId} indice={indice} conectado={conectado} />
-        {podeEditar ? (
-          <button
-            type="button"
-            onClick={() => setEditando(true)}
-            className="rounded-full px-3 py-2 text-sm text-cinza transition-colors hover:text-tinta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
-          >
-            Editar texto
-          </button>
-        ) : (
-          <span className="text-sm text-cinza">
-            Editar o texto faz parte dos planos pagos.
-          </span>
-        )}
-        {salvo && <span className="text-sm text-folha">Salvo</span>}
+      <div className="flex flex-col gap-3">
+        <MidiaPost loteId={loteId} indice={indice} temVideo={temVideo} />
+        <div className="flex flex-wrap items-center gap-3">
+          <Publicar
+            loteId={loteId}
+            indice={indice}
+            conectado={conectado}
+            temVideo={temVideo}
+          />
+          {podeEditar ? (
+            <button
+              type="button"
+              onClick={() => setEditando(true)}
+              className="rounded-full px-3 py-2 text-sm text-cinza transition-colors hover:text-tinta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            >
+              Editar texto
+            </button>
+          ) : (
+            <span className="text-sm text-cinza">
+              Editar o texto faz parte dos planos pagos.
+            </span>
+          )}
+          {salvo && <span className="text-sm text-folha">Salvo</span>}
+        </div>
       </div>
     );
   }

@@ -10,12 +10,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * o 4 ela teria que ir e voltar duas vezes. Aqui a ampliação acontece por
  * cima, com as setas para andar entre os slides sem fechar.
  */
-export function SlidesCarrossel({ loteId, arquivos }: { loteId: string; arquivos: string[] }) {
+export function SlidesCarrossel({
+  loteId,
+  arquivos,
+  cacheBust,
+}: {
+  loteId: string;
+  arquivos: string[];
+  /** Quebra cache do browser após trocar a foto da capa. */
+  cacheBust?: string | null;
+}) {
   const [aberto, setAberto] = useState<number | null>(null);
   const fecharRef = useRef<HTMLButtonElement>(null);
 
-  const url = (arquivo: string) =>
-    `/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(arquivo)}`;
+  const url = (arquivo: string) => {
+    const base = `/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(arquivo)}`;
+    return cacheBust ? `${base}?t=${encodeURIComponent(cacheBust)}` : base;
+  };
 
   const andar = useCallback(
     (passo: number) =>

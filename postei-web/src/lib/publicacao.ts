@@ -1,7 +1,7 @@
 import { motor } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { gerarUrlPublica } from "@/lib/imagem-publica";
-import { publicarImagem, publicarCarrossel } from "@/lib/instagram";
+import { publicarImagem, publicarCarrossel, publicarReels } from "@/lib/instagram";
 
 /**
  * Publicação de um post no Instagram.
@@ -11,9 +11,12 @@ import { publicarImagem, publicarCarrossel } from "@/lib/instagram";
  * que se paga quando um lado é corrigido e o outro segue errado por meses.
  */
 
+export type ModoPublicacao = "feed" | "reels";
+
 type Post = {
   imagem: string;
   imagens: string[] | null;
+  video?: string | null;
   formato: string;
   legenda: string;
   cta: string | null;
@@ -62,12 +65,15 @@ export async function publicarAgora({
   indice,
   registroId,
   base,
+  modo = "feed",
 }: {
   usuarioId: string;
   loteId: string;
   indice: number;
   registroId: string;
   base: string;
+  /** feed = imagem/carrossel (padrão); reels = MP4 anexado ao post */
+  modo?: ModoPublicacao;
 }) {
   const admin = criarClienteAdmin();
 
@@ -90,14 +96,36 @@ export async function publicarAgora({
     const post = pacote.posts?.[indice];
     if (!post) throw new ErroPublicacao("Post não encontrado.", 404);
 
+    const legenda = montarLegenda(post);
+
+    // Reel: só se o assinante pediu e existe MP4 no post. Nunca promove
+    // imagem a Reel automaticamente — evita surpresa no feed.
+    if (modo === "reels") {
+      if (!post.video) {
+        throw new ErroPublicacao("Este post ainda não tem vídeo. Envie um MP4 primeiro.");
+      }
+      const urlVideo = gerarUrlPublica({
+        base,
+        assinanteId: usuarioId,
+        loteId,
+        arquivo: post.video,
+      });
+      const { mediaId } = await publicarReels({
+        igUserId: conta.ig_user_id,
+        token: conta.token,
+        urlVideo,
+        legenda,
+      });
+      await marcar({ situacao: "publicada", ig_media_id: mediaId, erro: null });
+      return { mediaId };
+    }
+
     const arquivos =
       post.formato === "carrossel" && post.imagens?.length ? post.imagens : [post.imagem];
 
     const urls = arquivos.map((arquivo) =>
       gerarUrlPublica({ base, assinanteId: usuarioId, loteId, arquivo }),
     );
-
-    const legenda = montarLegenda(post);
 
     const { mediaId } =
       urls.length > 1
