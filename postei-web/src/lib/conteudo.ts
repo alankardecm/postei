@@ -17,8 +17,14 @@ export type Criativo = {
 export const criativos = mostra as Criativo[];
 
 /**
- * Os nichos existentes hoje. O produto e MULTI-NICHO -- essa lista e a prova
- * disso na pagina, e cada um tem paleta e tom proprios.
+ * Nichos exibidos na landing (hero + seção Nichos).
+ *
+ * ⚠️ Precisa acompanhar os JSON em `postei/nichos/` — o motor lista o que
+ * existe no disco; a capa só mostra o que está AQUI. Se adicionar nicho no
+ * motor e esquecer este arquivo, a landing fica desatualizada (já aconteceu).
+ *
+ * Nomes curtos de propósito: na faixa "Já disponível para" cabem vários chips.
+ * O nome longo do JSON do motor vale no painel de geração.
  */
 export const nichos = [
   {
@@ -38,9 +44,30 @@ export const nichos = [
   {
     id: "nutricao-estudante",
     nome: "Nutrição",
-    publico: "Alimentação do dia a dia, esportiva e infantil",
+    publico: "Alimentação do dia a dia, com cuidado profissional",
     cor: "#7ED957",
     fundo: "#14251C",
+  },
+  {
+    id: "fe-crista",
+    nome: "Fé cristã",
+    publico: "Criadores de conteúdo de fé, sem jargão de púlpito",
+    cor: "#E0B15C",
+    fundo: "#161B33",
+  },
+  {
+    id: "espiritualidade-bem-estar",
+    nome: "Espiritualidade e bem-estar",
+    publico: "Terapeutas e práticas de calma, sem misticismo vago",
+    cor: "#D98E63",
+    fundo: "#2C2622",
+  },
+  {
+    id: "ia-para-empresas",
+    nome: "IA para empresas",
+    publico: "Consultoria de IA para PMEs, sem hype",
+    cor: "#9FE870",
+    fundo: "#101010",
   },
 ];
 

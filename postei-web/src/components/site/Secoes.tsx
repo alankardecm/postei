@@ -95,7 +95,11 @@ export function Numeros() {
     <section className="bg-tinta py-16 text-papel sm:py-20">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:grid-cols-3">
         <Numero valor={30} sufixo=" posts" texto="entregues de uma vez, no plano de entrada." />
-        <Numero valor={3} sufixo=" nichos" texto="prontos hoje, com tom e regras próprios." />
+        <Numero
+          valor={nichos.length}
+          sufixo=" nichos"
+          texto="prontos hoje, com tom e regras próprios."
+        />
         <Numero valor={10} sufixo=" min" texto="é o tempo que sobra pra você: revisar e publicar." />
       </div>
     </section>

@@ -8,7 +8,7 @@ import { criativos, nichos, type Criativo } from "@/lib/conteudo";
 /**
  * A tese da pagina e o proprio produto: em vez de descrever o que sai, a
  * faixa abaixo do titulo mostra criativos reais, gerados pelo Postei, dos
- * tres nichos. Por isso a esteira vem antes de qualquer explicacao.
+ * nichos ativos. Por isso a esteira vem antes de qualquer explicacao.
  */
 export function Heroi() {
   // Rodizio entre os nichos: os arquivos vem agrupados por ramo (todos os de
