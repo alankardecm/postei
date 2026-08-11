@@ -59,9 +59,10 @@ só confere a chave compartilhada e confia no `assinanteId` que recebe.
 
 | | |
 |---|---|
-| Painel e landing | https://postei.srv1121163.hstgr.cloud |
+| Painel e landing | **https://postei.amconsultoria.tech** (principal) · legado: https://postei.srv1121163.hstgr.cloud |
 | Supabase | https://api.postei.srv1121163.hstgr.cloud |
 | Repositório | `github.com/alankardecm/postei` (privado) |
+| Domínio AM | `amconsultoria.tech` (DNS Hostinger → VPS `217.196.61.190`) |
 
 **Na máquina do Alan** — `Documents\00 - 2026\35.1 PROJETOS PARTICULARES\ESTEIRA-IA-CONTEUDO\`
 
@@ -195,13 +196,18 @@ portfólio empresarial verificado, que a AM Consultoria já tem.
 | Portfólio | AM Gestão De Tráfego E-Commerce (verificado) |
 | Escopos | `instagram_business_basic`, `instagram_business_content_publish` |
 
-Endereços cadastrados no passo 4 da tela do Instagram:
+Endereços no passo 4 da tela do Instagram — **cadastrar os dois hosts** (novo + legado):
 
 ```
+https://postei.amconsultoria.tech/api/instagram/retorno
+https://postei.amconsultoria.tech/api/instagram/desconectar
+https://postei.amconsultoria.tech/exclusao-de-dados
 https://postei.srv1121163.hstgr.cloud/api/instagram/retorno
 https://postei.srv1121163.hstgr.cloud/api/instagram/desconectar
 https://postei.srv1121163.hstgr.cloud/exclusao-de-dados
 ```
+
+`NEXT_PUBLIC_SITE_URL` em produção: `https://postei.amconsultoria.tech` (Traefik: `/docker/n8n/dinamico/postei.yml`).
 
 ### Como a publicação funciona
 
