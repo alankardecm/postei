@@ -12,20 +12,16 @@ import { criativos, type Criativo } from "@/lib/conteudo";
  * mostra so exemplos na esteira.
  */
 export function Heroi() {
-  // Rodizio entre os ramos da galeria de vitrine (mostra/): os arquivos vem
-  // agrupados; intercalar evita parecer que o produto so atende um ramo.
+  // Poucos criativos na esteira: 1 com foto por ramo (no max. 6 no total).
+  // Duas faixas cheias com 12 artes pesavam a pagina e competiam com o resto.
   const porNicho = new Map<string, Criativo[]>();
   for (const c of criativos) {
-    porNicho.set(c.nichoId, [...(porNicho.get(c.nichoId) ?? []), c]);
+    if (!c.comFoto) continue;
+    const lista = porNicho.get(c.nichoId) ?? [];
+    if (lista.length === 0) lista.push(c);
+    porNicho.set(c.nichoId, lista);
   }
-  const filas = [...porNicho.values()];
-  const intercalado: Criativo[] = [];
-  for (let i = 0; intercalado.length < criativos.length; i += 1) {
-    for (const fila of filas) if (fila[i]) intercalado.push(fila[i]);
-  }
-
-  const faixaA = intercalado.filter((_, i) => i % 2 === 0);
-  const faixaB = intercalado.filter((_, i) => i % 2 === 1);
+  const amostra = [...porNicho.values()].flat().slice(0, 6);
 
   return (
     <section className="relative overflow-hidden pt-16 pb-14 sm:pt-24">
@@ -72,11 +68,9 @@ export function Heroi() {
         </p>
       </div>
 
-      {/* A esteira. Duas faixas em sentidos opostos: le como linha de
-          producao, e nao como carrossel de depoimento. */}
-      <div className="mt-16 flex flex-col gap-4" aria-label="Exemplos de posts gerados pelo Postei">
-        <Esteira itens={faixaA} sentido="esquerda" duracao={110} />
-        <Esteira itens={faixaB} sentido="direita" duracao={125} />
+      {/* Uma faixa só, com amostra enxuta — prova visual sem poluir. */}
+      <div className="mt-16" aria-label="Exemplos de posts gerados pelo Postei">
+        <Esteira itens={amostra} sentido="esquerda" duracao={90} />
       </div>
     </section>
   );
