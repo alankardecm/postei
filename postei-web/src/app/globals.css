@@ -129,20 +129,23 @@
   }
 }
 /* ==========================================================================
-   Postei — identidade
-   Cores da AM Consultoria (grafite, off-white, verde-limao, areia).
-   A pagina e CLARA de proposito: o limao entra como bloco de cor chapada,
-   nunca como texto neon sobre fundo escuro.
+   Postei — identidade (tema escuro + verde AM)
+   Paleta oficial AM Consultoria:
+     limão #9FE870 (preenchimento/CTA)
+     ink   #101010 (texto sobre limão / blocos chapados)
+     areia #E9D8A6
+   Superfícies escuras: página, cards elevados, bordas suaves.
    ========================================================================== */
 :root {
-  --tinta:   #101010;  /* grafite AM */
-  --papel:   #F3F2ED;  /* off-white, levemente quente */
-  --limao:   #9FE870;  /* verde-limao AM — preenchimento */
-  --folha:   #38661A;  /* verde escuro — texto e CTA sobre fundo claro */
-  --areia:   #E9D8A6;  /* areia AM — segundo preenchimento */
-  --cinza:   #6E6E68;
-  --linha:   #DEDDD5;
-  --branco:  #FFFFFF;
+  --tinta:   #F2F4EE;  /* texto principal (claro) */
+  --papel:   #12141A;  /* fundo da página */
+  --branco:  #1A1C18;  /* superfície elevada (cards) */
+  --limao:   #9FE870;  /* verde-limão AM — CTA e acento */
+  --folha:   #9FE870;  /* links/ênfase no escuro (= limão) */
+  --ink:     #101010;  /* grafite — texto SOBRE limão e botões escuros */
+  --areia:   #E9D8A6;  /* areia AM — chips e destaques secundários */
+  --cinza:   #9B9B93;  /* texto secundário */
+  --linha:   #2E322B;  /* bordas */
 }
 
 @theme inline {
@@ -150,6 +153,7 @@
   --color-papel:  var(--papel);
   --color-limao:  var(--limao);
   --color-folha:  var(--folha);
+  --color-ink:    var(--ink);
   --color-areia:  var(--areia);
   --color-cinza:  var(--cinza);
   --color-linha:  var(--linha);
@@ -161,6 +165,7 @@ body {
   background: var(--papel);
   color: var(--tinta);
   font-family: var(--font-instrument), system-ui, sans-serif;
+  color-scheme: dark;
 }
 
 .fonte-display { font-family: var(--font-bricolage), system-ui, sans-serif; }
@@ -216,9 +221,18 @@ body {
   flex: none;
   overflow: hidden;
   border-radius: 12px;
-  border: 1px solid rgb(16 16 16 / 0.10);
+  border: 1px solid rgb(242 244 238 / 0.10);
   background: var(--branco);
-  box-shadow: 0 1px 2px rgb(16 16 16 / .05);
+  box-shadow: 0 8px 24px rgb(0 0 0 / .35);
+}
+
+/* Botão primário padrão no tema escuro: limão AM + texto grafite. */
+.btn-primario {
+  background: var(--limao);
+  color: var(--ink);
+}
+.btn-primario:hover {
+  filter: brightness(1.05);
 }
 
 @media (min-width: 640px) {

@@ -37,9 +37,9 @@ export function PedirRecuperacao() {
 
   if (enviado) {
     return (
-      <div className="rounded-2xl bg-limao px-5 py-6 text-tinta">
+      <div className="rounded-2xl bg-limao px-5 py-6 text-ink">
         <strong className="fonte-display block text-lg">Link enviado</strong>
-        <p className="mt-1 text-sm text-tinta/80">
+        <p className="mt-1 text-sm text-ink/80">
           Se existir uma conta com <strong>{email}</strong>, o link chega em instantes. Vale
           conferir a caixa de spam.
         </p>
@@ -63,7 +63,7 @@ export function PedirRecuperacao() {
       </label>
 
       {erro && (
-        <p role="alert" className="rounded-xl bg-tinta px-4 py-3 text-sm text-papel">
+        <p role="alert" className="rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
           {erro}
         </p>
       )}
@@ -71,7 +71,7 @@ export function PedirRecuperacao() {
       <button
         type="submit"
         disabled={ocupado}
-        className="mt-1 rounded-full bg-tinta px-5 py-3.5 font-medium text-papel transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+        className="mt-1 rounded-full bg-limao px-5 py-3.5 font-medium text-ink transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
       >
         {ocupado ? "Enviando…" : "Enviar link"}
       </button>

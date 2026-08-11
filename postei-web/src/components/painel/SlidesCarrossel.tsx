@@ -75,7 +75,7 @@ export function SlidesCarrossel({
               className="h-auto w-40 rounded-lg border border-linha transition-colors group-hover:border-folha"
               unoptimized
             />
-            <span className="absolute left-2 top-2 rounded-full bg-tinta/85 px-2 py-0.5 text-[.68rem] font-medium text-papel tabular-nums">
+            <span className="absolute left-2 top-2 rounded-full bg-ink/85 px-2 py-0.5 text-[.68rem] font-medium text-tinta tabular-nums">
               {s + 1}/{arquivos.length}
             </span>
           </button>
@@ -89,13 +89,13 @@ export function SlidesCarrossel({
           aria-label={`Slide ${aberto + 1} de ${arquivos.length}`}
           // Clicar no fundo fecha; o clique na imagem não sobe até aqui.
           onClick={() => setAberto(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-tinta/85 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/85 p-4 backdrop-blur-sm"
         >
           <button
             ref={fecharRef}
             type="button"
             onClick={() => setAberto(null)}
-            className="absolute right-4 top-4 rounded-full bg-papel/15 px-3 py-1.5 text-sm text-papel hover:bg-papel/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-papel"
+            className="absolute right-4 top-4 rounded-full bg-tinta/15 px-3 py-1.5 text-sm text-tinta hover:bg-tinta/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta"
           >
             Fechar ✕
           </button>
@@ -109,7 +109,7 @@ export function SlidesCarrossel({
                   andar(-1);
                 }}
                 aria-label="Slide anterior"
-                className="absolute left-3 rounded-full bg-papel/15 px-3 py-4 text-papel hover:bg-papel/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-papel"
+                className="absolute left-3 rounded-full bg-tinta/15 px-3 py-4 text-tinta hover:bg-tinta/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta"
               >
                 ‹
               </button>
@@ -120,7 +120,7 @@ export function SlidesCarrossel({
                   andar(1);
                 }}
                 aria-label="Próximo slide"
-                className="absolute right-3 rounded-full bg-papel/15 px-3 py-4 text-papel hover:bg-papel/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-papel"
+                className="absolute right-3 rounded-full bg-tinta/15 px-3 py-4 text-tinta hover:bg-tinta/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta"
               >
                 ›
               </button>
@@ -136,7 +136,7 @@ export function SlidesCarrossel({
               className="max-h-[80vh] w-auto rounded-xl"
               unoptimized
             />
-            <figcaption className="text-sm text-papel/80 tabular-nums">
+            <figcaption className="text-sm text-tinta/80 tabular-nums">
               {aberto + 1} de {arquivos.length} · use ← → para navegar, Esc para fechar
             </figcaption>
           </figure>

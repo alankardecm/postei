@@ -166,7 +166,7 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
                         })}
                       </p>
                       {lote.parcial && (
-                        <p className="mt-1.5 inline-block rounded-full bg-areia px-2 py-0.5 text-xs text-tinta">
+                        <p className="mt-1.5 inline-block rounded-full bg-areia px-2 py-0.5 text-xs text-ink">
                           pacote parcial
                         </p>
                       )}

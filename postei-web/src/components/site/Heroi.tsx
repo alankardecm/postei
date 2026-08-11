@@ -51,7 +51,7 @@ export function Heroi() {
         <div className="mt-9 flex flex-wrap items-center gap-3">
           <Link
             href="/criar-conta"
-            className="rounded-full bg-tinta px-6 py-3.5 font-medium text-papel transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            className="rounded-full bg-limao px-6 py-3.5 font-medium text-ink transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             Começar agora
           </Link>

@@ -430,13 +430,25 @@ testar rotação nelas dá falso negativo. Usar `/lotes` para verificar.
 
 ## Mídia própria (foto + Reels)
 
-Implementado em 2026-08-11 (código local; **sem push/deploy até autorização**).
-
 - Trocar foto (Pexels) ou enviar foto própria → re-render da arte (card/carrossel)
 - Anexar MP4 e publicar como Reel
 - Backup automático em `saida/.../_backup_arte_<timestamp>/`
 
-Detalhes, contrato de API e **ponto de recuperação**: [`docs/MIDIA-FOTO-VIDEO.md`](docs/MIDIA-FOTO-VIDEO.md).
+Detalhes: [`docs/MIDIA-FOTO-VIDEO.md`](docs/MIDIA-FOTO-VIDEO.md).
+
+## Identidade visual (tema escuro AM)
+
+Tema **escuro** com verde-limão AM `#9FE870` (tokens em `postei-web/src/app/globals.css`):
+
+| Token | Hex | Uso |
+|---|---|---|
+| limão | `#9FE870` | CTA, acento |
+| ink | `#101010` | texto sobre limão |
+| papel | `#12141A` | fundo da página |
+| branco | `#1A1C18` | cards |
+| tinta | `#F2F4EE` | texto principal |
+
+Landing não lista inventário de nichos — “vários ramos + muitos mais”.
 
 ---
 

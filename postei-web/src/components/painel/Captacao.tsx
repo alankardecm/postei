@@ -84,7 +84,7 @@ export function Captacao({ links, base }: { links: LinkResumo[]; base: string })
         </div>
 
         {erro && (
-          <p role="alert" className="mt-4 rounded-xl bg-tinta px-4 py-3 text-sm text-papel">
+          <p role="alert" className="mt-4 rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
             {erro}
           </p>
         )}
@@ -92,7 +92,7 @@ export function Captacao({ links, base }: { links: LinkResumo[]; base: string })
         <button
           type="submit"
           disabled={criando}
-          className="mt-5 rounded-full bg-tinta px-5 py-3 font-medium text-papel transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          className="mt-5 rounded-full bg-limao px-5 py-3 font-medium text-ink transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
         >
           {criando ? "Criando…" : "Criar link"}
         </button>

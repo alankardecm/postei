@@ -80,14 +80,14 @@ export function Assinatura({
       <h2 className="rotulo mb-4">Assinatura</h2>
 
       {pendente && (
-        <p className="mb-4 rounded-xl bg-areia px-4 py-3 text-sm text-tinta">
+        <p className="mb-4 rounded-xl bg-areia px-4 py-3 text-sm text-ink">
           Seu pagamento está sendo confirmado. Assim que o Mercado Pago autorizar, o plano é
           liberado automaticamente — pode levar alguns minutos.
         </p>
       )}
 
       {erro && (
-        <p role="alert" className="mb-4 rounded-xl bg-tinta px-4 py-3 text-sm text-papel">
+        <p role="alert" className="mb-4 rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
           {erro}
         </p>
       )}
@@ -112,7 +112,7 @@ export function Assinatura({
                 type="button"
                 onClick={cancelar}
                 disabled={ocupado === "cancelar"}
-                className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+                className="rounded-full bg-limao px-4 py-2 text-sm font-medium text-ink disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
               >
                 {ocupado === "cancelar" ? "Cancelando…" : "Confirmar cancelamento"}
               </button>
@@ -156,7 +156,7 @@ export function Assinatura({
                   type="button"
                   onClick={() => assinar(id)}
                   disabled={Boolean(ocupado)}
-                  className="mt-4 rounded-full bg-tinta px-4 py-2.5 text-sm font-medium text-papel transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+                  className="mt-4 rounded-full bg-limao px-4 py-2.5 text-sm font-medium text-ink transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
                 >
                   {ocupado === id ? "Abrindo…" : "Assinar"}
                 </button>

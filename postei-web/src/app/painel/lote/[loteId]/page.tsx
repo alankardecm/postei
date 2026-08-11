@@ -117,7 +117,7 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-[.68rem] uppercase tracking-wider ${
                         post.formato === "carrossel"
-                          ? "bg-limao text-tinta"
+                          ? "bg-limao text-ink"
                           : "border border-linha text-cinza"
                       }`}
                     >

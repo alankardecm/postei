@@ -40,9 +40,9 @@ export function FormularioContato({
 
   if (situacao === "pronto") {
     return (
-      <p className="rounded-2xl bg-limao px-5 py-6 text-center text-tinta">
+      <p className="rounded-2xl bg-limao px-5 py-6 text-center text-ink">
         <strong className="fonte-display block text-lg">Contato recebido.</strong>
-        <span className="mt-1 block text-sm text-tinta/75">
+        <span className="mt-1 block text-sm text-ink/75">
           {destino ? "Levando você para o próximo passo…" : "Em breve entram em contato."}
         </span>
       </p>
@@ -76,7 +76,7 @@ export function FormularioContato({
       </label>
 
       {erro && (
-        <p role="alert" className="rounded-xl bg-tinta px-4 py-3 text-sm text-papel">
+        <p role="alert" className="rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
           {erro}
         </p>
       )}
@@ -84,7 +84,7 @@ export function FormularioContato({
       <button
         type="submit"
         disabled={situacao === "enviando"}
-        className="mt-1 rounded-full bg-tinta px-5 py-3.5 font-medium text-papel transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+        className="mt-1 rounded-full bg-limao px-5 py-3.5 font-medium text-ink transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
       >
         {situacao === "enviando" ? "Enviando…" : "Enviar"}
       </button>

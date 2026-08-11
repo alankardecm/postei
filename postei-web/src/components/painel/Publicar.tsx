@@ -75,7 +75,7 @@ export function Publicar({
 
   if (situacao === "agendado") {
     return (
-      <p className="rounded-full bg-areia px-4 py-2 text-center text-sm font-medium text-tinta">
+      <p className="rounded-full bg-areia px-4 py-2 text-center text-sm font-medium text-ink">
         Agendado para {new Date(quando).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
       </p>
     );
@@ -83,7 +83,7 @@ export function Publicar({
 
   if (situacao === "publicado") {
     return (
-      <p className="rounded-full bg-limao px-4 py-2 text-center text-sm font-medium text-tinta">
+      <p className="rounded-full bg-limao px-4 py-2 text-center text-sm font-medium text-ink">
         Publicado no Instagram{modoConfirm === "reels" ? " (Reel)" : ""}
       </p>
     );
@@ -106,7 +106,7 @@ export function Publicar({
             type="button"
             onClick={agendar}
             disabled={situacao === "publicando"}
-            className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            className="rounded-full bg-limao px-4 py-2 text-sm font-medium text-ink disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             {situacao === "publicando" ? "Agendando…" : "Confirmar agendamento"}
           </button>
@@ -119,7 +119,7 @@ export function Publicar({
           </button>
         </div>
         {erro && (
-          <p role="alert" className="rounded-xl bg-tinta px-3 py-2 text-xs text-papel">
+          <p role="alert" className="rounded-xl bg-ink px-3 py-2 text-xs text-tinta">
             {erro}
           </p>
         )}
@@ -137,7 +137,7 @@ export function Publicar({
             type="button"
             onClick={() => void publicar(modoConfirm)}
             disabled={situacao === "publicando"}
-            className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            className="rounded-full bg-limao px-4 py-2 text-sm font-medium text-ink disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             {situacao === "publicando"
               ? "Publicando…"
@@ -162,7 +162,7 @@ export function Publicar({
               setModoConfirm("feed");
               setConfirmando(true);
             }}
-            className="rounded-full border border-tinta px-4 py-2 text-sm font-medium transition-colors hover:bg-tinta hover:text-papel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            className="rounded-full border border-tinta px-4 py-2 text-sm font-medium transition-colors hover:bg-limao hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             Publicar agora
           </button>
@@ -173,7 +173,7 @@ export function Publicar({
                 setModoConfirm("reels");
                 setConfirmando(true);
               }}
-              className="rounded-full border border-folha px-4 py-2 text-sm font-medium text-folha transition-colors hover:bg-folha hover:text-papel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+              className="rounded-full border border-limao px-4 py-2 text-sm font-medium text-limao transition-colors hover:bg-limao hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
             >
               Publicar como Reel
             </button>
@@ -189,7 +189,7 @@ export function Publicar({
       )}
 
       {erro && (
-        <p role="alert" className="rounded-xl bg-tinta px-3 py-2 text-xs text-papel">
+        <p role="alert" className="rounded-xl bg-ink px-3 py-2 text-xs text-tinta">
           {erro}
         </p>
       )}

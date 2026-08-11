@@ -40,7 +40,7 @@ export function ExcluirConta({ email }: { email: string }) {
         <button
           type="button"
           onClick={() => setAberto(true)}
-          className="rounded-full border border-tinta px-5 py-3 font-medium text-tinta transition-colors hover:bg-tinta hover:text-papel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          className="rounded-full border border-tinta px-5 py-3 font-medium text-tinta transition-colors hover:bg-limao hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
         >
           Quero apagar minha conta
         </button>
@@ -63,7 +63,7 @@ export function ExcluirConta({ email }: { email: string }) {
       />
 
       {erro && (
-        <p role="alert" className="mt-4 rounded-xl bg-tinta px-4 py-3 text-sm text-papel">
+        <p role="alert" className="mt-4 rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
           {erro}
         </p>
       )}
@@ -73,7 +73,7 @@ export function ExcluirConta({ email }: { email: string }) {
           type="button"
           onClick={apagar}
           disabled={!confere || situacao === "apagando"}
-          className="rounded-full bg-tinta px-5 py-3 font-medium text-papel disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          className="rounded-full bg-limao px-5 py-3 font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
         >
           {situacao === "apagando" ? "Apagando…" : "Apagar tudo definitivamente"}
         </button>

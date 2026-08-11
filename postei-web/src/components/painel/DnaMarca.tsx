@@ -232,7 +232,7 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
           </div>
 
           {problema && (
-            <div role="alert" className="mt-3 rounded-lg bg-areia px-3 py-2.5 text-sm text-tinta">
+            <div role="alert" className="mt-3 rounded-lg bg-areia px-3 py-2.5 text-sm text-ink">
               <p>{problema}</p>
               {podeAjustar && (
                 <>
@@ -264,7 +264,7 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
             type="button"
             onClick={salvar}
             disabled={salvando || carregando || Boolean(problema)}
-            className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            className="rounded-full bg-limao px-4 py-2 text-sm font-medium text-ink disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             {salvando ? "Salvando…" : "Salvar DNA"}
           </button>

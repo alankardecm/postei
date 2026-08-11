@@ -31,7 +31,7 @@ export function Instagram({ conta, aviso }: { conta: ContaIg; aviso?: string }) 
         <p
           role="status"
           className={`mb-4 rounded-xl px-4 py-3 text-sm ${
-            aviso === "conectado" ? "bg-limao text-tinta" : "bg-tinta text-papel"
+            aviso === "conectado" ? "bg-limao text-ink" : "bg-ink text-tinta"
           }`}
         >
           {mensagens[aviso]}
@@ -72,7 +72,7 @@ export function Instagram({ conta, aviso }: { conta: ContaIg; aviso?: string }) 
             </p>
             <a
               href="/api/instagram/conectar"
-              className="mt-5 inline-block rounded-full bg-tinta px-5 py-3 font-medium text-papel transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+              className="mt-5 inline-block rounded-full bg-limao px-5 py-3 font-medium text-ink transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
             >
               Conectar Instagram
             </a>

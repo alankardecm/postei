@@ -25,7 +25,7 @@ export function Cabecalho() {
           </Link>
           <Link
             href="/criar-conta"
-            className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel transition-transform hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            className="rounded-full bg-limao px-4 py-2 text-sm font-medium text-ink transition-transform hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
             Criar conta
           </Link>

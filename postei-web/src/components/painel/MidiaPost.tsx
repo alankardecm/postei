@@ -161,7 +161,7 @@ export function MidiaPost({
       )}
       {ok && <p className="text-xs text-folha">{ok}</p>}
       {erro && (
-        <p role="alert" className="rounded-lg bg-tinta px-2 py-1.5 text-xs text-papel">
+        <p role="alert" className="rounded-lg bg-ink px-2 py-1.5 text-xs text-tinta">
           {erro}
         </p>
       )}

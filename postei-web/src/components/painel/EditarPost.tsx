@@ -142,7 +142,7 @@ export function EditarPost({
       </p>
 
       {erro && (
-        <p role="alert" className="rounded-lg bg-tinta px-3 py-2 text-xs text-papel">
+        <p role="alert" className="rounded-lg bg-ink px-3 py-2 text-xs text-tinta">
           {erro}
         </p>
       )}
@@ -152,7 +152,7 @@ export function EditarPost({
           type="button"
           onClick={salvar}
           disabled={salvando || !mudou}
-          className="rounded-full bg-tinta px-4 py-2 text-sm font-medium text-papel disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          className="rounded-full bg-limao px-4 py-2 text-sm font-medium text-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
         >
           {salvando ? "Salvando…" : "Salvar"}
         </button>

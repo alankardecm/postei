@@ -100,7 +100,7 @@ export function ComoFunciona() {
 
 export function Numeros() {
   return (
-    <section className="bg-tinta py-16 text-papel sm:py-20">
+    <section className="border-y border-linha bg-branco py-16 text-tinta sm:py-20">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:grid-cols-3">
         <Numero valor={30} sufixo=" posts" texto="entregues de uma vez, no plano de entrada." />
         <div>
@@ -108,7 +108,7 @@ export function Numeros() {
             <span className="text-limao">vários</span>
             <span className="text-limao"> ramos</span>
           </p>
-          <p className="mt-2 max-w-xs leading-relaxed text-papel/65">
+          <p className="mt-2 max-w-xs leading-relaxed text-cinza">
             cada um com tom e regras — a lista no app cresce sem travar a landing.
           </p>
         </div>
@@ -125,7 +125,7 @@ function Numero({ valor, sufixo, texto }: { valor: number; sufixo: string; texto
         <CountUp to={valor} duration={1.4} className="text-limao" />
         <span className="text-limao">{sufixo}</span>
       </p>
-      <p className="mt-2 max-w-xs leading-relaxed text-papel/65">{texto}</p>
+      <p className="mt-2 max-w-xs leading-relaxed text-cinza">{texto}</p>
     </div>
   );
 }
@@ -146,14 +146,14 @@ export function Planos() {
               spotlightColor="rgba(159, 232, 112, 0.30)"
               className={`flex flex-col rounded-2xl border p-7 ${
                 plano.destaque
-                  ? "border-tinta bg-tinta text-papel"
+                  ? "border-limao/60 bg-branco text-tinta ring-1 ring-limao/30"
                   : "border-linha bg-papel text-tinta"
               }`}
             >
               <div className="flex items-center justify-between gap-3">
                 <h3 className="fonte-display text-lg font-bold tracking-tight">{plano.nome}</h3>
                 {plano.destaque && (
-                  <span className="rounded-full bg-limao px-2.5 py-1 text-[.68rem] font-semibold uppercase tracking-wider text-tinta">
+                  <span className="rounded-full bg-limao px-2.5 py-1 text-[.68rem] font-semibold uppercase tracking-wider text-ink">
                     Recomendado
                   </span>
                 )}
@@ -162,25 +162,19 @@ export function Planos() {
               <p className={`mt-5 fonte-display text-4xl font-extrabold tracking-tight tabular-nums`}>
                 <span className="align-top text-lg font-semibold">R$ </span>
                 {plano.preco}
-                <span className={`text-base font-normal ${plano.destaque ? "text-papel/55" : "text-cinza"}`}>
-                  /mês
-                </span>
+                <span className="text-base font-normal text-cinza">/mês</span>
               </p>
 
-              <p className={`mt-3 text-sm leading-relaxed ${plano.destaque ? "text-papel/70" : "text-cinza"}`}>
-                {plano.resumo}
-              </p>
+              <p className="mt-3 text-sm leading-relaxed text-cinza">{plano.resumo}</p>
 
               <ul className="mt-6 flex flex-1 flex-col gap-2.5 text-sm">
                 {plano.itens.map((item) => (
                   <li key={item} className="flex gap-2.5">
                     <span
-                      className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${
-                        plano.destaque ? "bg-limao" : "bg-folha"
-                      }`}
+                      className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-limao"
                       aria-hidden="true"
                     />
-                    <span className={plano.destaque ? "text-papel/85" : ""}>{item}</span>
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
@@ -188,7 +182,7 @@ export function Planos() {
               <Link
                 href="/criar-conta"
                 className={`mt-7 rounded-full px-5 py-3 text-center font-medium transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha ${
-                  plano.destaque ? "bg-limao text-tinta" : "bg-tinta text-papel"
+                  plano.destaque ? "bg-limao text-ink" : "border border-linha bg-branco text-tinta hover:border-limao/50"
                 }`}
               >
                 Começar
@@ -234,16 +228,16 @@ export function Perguntas() {
 export function ChamadaFinal() {
   return (
     <section className="px-5 pb-20">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl bg-limao px-7 py-16 text-tinta sm:px-14">
+      <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl bg-limao px-7 py-16 text-ink sm:px-14">
         <h2 className="fonte-display max-w-2xl text-[clamp(2rem,4.5vw,3.4rem)] font-extrabold leading-[1.02] tracking-[-.03em] text-balance">
           Semana que vem seu feed já pode estar pronto.
         </h2>
-        <p className="mt-5 max-w-lg text-lg text-tinta/75">
+        <p className="mt-5 max-w-lg text-lg text-ink/75">
           Crie sua conta e gere o primeiro pacote. Sem cartão e sem compromisso.
         </p>
         <Link
           href="/criar-conta"
-          className="mt-9 inline-block rounded-full bg-tinta px-7 py-3.5 font-medium text-papel transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta"
+          className="mt-9 inline-block rounded-full bg-ink px-7 py-3.5 font-medium text-tinta transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         >
           Criar minha conta
         </Link>

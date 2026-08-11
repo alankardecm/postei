@@ -84,7 +84,7 @@ export function DefinirSenha() {
       </label>
 
       {erro && (
-        <p role="alert" className="rounded-xl bg-tinta px-4 py-3 text-sm text-papel">
+        <p role="alert" className="rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
           {erro}
         </p>
       )}
@@ -92,7 +92,7 @@ export function DefinirSenha() {
       <button
         type="submit"
         disabled={ocupado}
-        className="mt-1 rounded-full bg-tinta px-5 py-3.5 font-medium text-papel transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+        className="mt-1 rounded-full bg-limao px-5 py-3.5 font-medium text-ink transition-transform hover:-translate-y-0.5 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
       >
         {ocupado ? "Salvando…" : "Salvar e entrar"}
       </button>

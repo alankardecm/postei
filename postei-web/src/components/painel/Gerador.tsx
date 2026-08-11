@@ -135,8 +135,8 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
               aria-pressed={quantidade === v}
               className={`rounded-full border px-4 py-2 text-sm transition-colors ${
                 quantidade === v
-                  ? "border-tinta bg-tinta text-papel"
-                  : "border-linha hover:border-tinta/40"
+                  ? "border-limao bg-limao text-ink"
+                  : "border-linha hover:border-limao/40"
               } disabled:opacity-60`}
             >
               {v}
@@ -155,7 +155,7 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
       <button
         type="submit"
         disabled={ocupado}
-        className="mt-7 rounded-full bg-tinta px-6 py-3.5 font-medium text-papel transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+        className="mt-7 rounded-full bg-limao px-6 py-3.5 font-medium text-ink transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
       >
         {situacao === "gerando"
           ? `Gerando… ${segundos}s`
@@ -175,7 +175,7 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
         <p
           role="status"
           className={`mt-4 rounded-xl px-4 py-3 text-sm ${
-            situacao === "erro" ? "bg-tinta text-papel" : "bg-limao text-tinta"
+            situacao === "erro" ? "bg-ink text-tinta" : "bg-limao text-ink"
           }`}
         >
           {mensagem}

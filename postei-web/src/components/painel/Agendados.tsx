@@ -58,7 +58,7 @@ export function Agendados({ itens }: { itens: Agendado[] }) {
               <div className="flex items-center gap-3">
                 <span
                   className={`rounded-full px-3 py-1 text-xs uppercase tracking-wider ${
-                    falhou ? "bg-tinta text-papel" : "bg-areia text-tinta"
+                    falhou ? "bg-ink text-tinta" : "bg-areia text-ink"
                   }`}
                 >
                   {falhou ? "falhou" : item.situacao}
