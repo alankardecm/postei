@@ -12,16 +12,21 @@ import { criativos, type Criativo } from "@/lib/conteudo";
  * mostra so exemplos na esteira.
  */
 export function Heroi() {
-  // Poucos criativos na esteira: 1 com foto por ramo (no max. 6 no total).
-  // Duas faixas cheias com 12 artes pesavam a pagina e competiam com o resto.
+  // Galeria completa intercalada por ramo (receitas/financas/nutricao...).
+  // A esteira duplica a lista no CSS para o laco sem salto — por isso precisa
+  // de VARIOS itens distintos; com 3 cards parece "o mesmo post repetindo".
   const porNicho = new Map<string, Criativo[]>();
   for (const c of criativos) {
-    if (!c.comFoto) continue;
-    const lista = porNicho.get(c.nichoId) ?? [];
-    if (lista.length === 0) lista.push(c);
-    porNicho.set(c.nichoId, lista);
+    porNicho.set(c.nichoId, [...(porNicho.get(c.nichoId) ?? []), c]);
   }
-  const amostra = [...porNicho.values()].flat().slice(0, 6);
+  const filas = [...porNicho.values()];
+  const intercalado: Criativo[] = [];
+  for (let i = 0; intercalado.length < criativos.length; i += 1) {
+    for (const fila of filas) if (fila[i]) intercalado.push(fila[i]);
+  }
+
+  const faixaA = intercalado.filter((_, i) => i % 2 === 0);
+  const faixaB = intercalado.filter((_, i) => i % 2 === 1);
 
   return (
     <section className="relative overflow-hidden pt-16 pb-14 sm:pt-24">
@@ -59,18 +64,17 @@ export function Heroi() {
           </a>
         </div>
 
-        {/* Exemplos, nao catalogo: o motor pode ganhar nicho sem redeploy da capa. */}
         <p className="mt-10 max-w-2xl text-sm leading-relaxed text-cinza">
-          Serve para <span className="text-tinta">vários ramos</span> — de receitas e
-          finanças a fé, bem-estar, nutrição, consultoria e{" "}
-          <span className="text-tinta">muito mais</span>. O tom e as regras mudam com o
-          seu negócio; se o seu ainda não estiver na lista, a gente inclui.
+          Serve para <span className="text-tinta">vários ramos</span> — receitas, finanças,
+          nutrição e <span className="text-tinta">muito mais</span>. O tom muda com o seu
+          negócio.
         </p>
       </div>
 
-      {/* Uma faixa só, com amostra enxuta — prova visual sem poluir. */}
-      <div className="mt-16" aria-label="Exemplos de posts gerados pelo Postei">
-        <Esteira itens={amostra} sentido="esquerda" duracao={90} />
+      {/* Duas faixas em sentidos opostos = linha de produção, não carrossel. */}
+      <div className="mt-16 flex flex-col gap-4" aria-label="Exemplos de posts gerados pelo Postei">
+        <Esteira itens={faixaA} sentido="esquerda" duracao={110} />
+        <Esteira itens={faixaB} sentido="direita" duracao={125} />
       </div>
     </section>
   );

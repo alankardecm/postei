@@ -1,19 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import AnimatedContent from "@/components/AnimatedContent";
 import SpotlightCard from "@/components/SpotlightCard";
 import CountUp from "@/components/CountUp";
-import { nichos, passos, planos, perguntas } from "@/lib/conteudo";
+import { criativos, nichos, passos, planos, perguntas } from "@/lib/conteudo";
 
 /**
- * Seção leve: prova multi-ramo sem grade de cards (a esteira do hero já
- * mostra criativos). Evita inventário de nichos e excesso de cartões.
+ * Três exemplos visuais (um por ramo da vitrine) — não é o catálogo do app.
  */
 export function Nichos() {
+  const exemplos = nichos.filter((n) => criativos.some((c) => c.nichoId === n.id));
+
   return (
     <section id="nichos" className="border-t border-linha bg-branco py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5">
-        <p className="rotulo mb-4">Para o seu ramo</p>
+        <p className="rotulo mb-4">Um tom para cada ramo</p>
         <h2 className="fonte-display max-w-2xl text-[clamp(1.9rem,4vw,3rem)] font-bold leading-[1.06] tracking-[-.025em] text-balance">
           O mesmo sistema, com a voz do seu negócio.
         </h2>
@@ -22,26 +25,42 @@ export function Nichos() {
           cor: muda o jeito de falar, os assuntos e o que nunca pode ser dito.
         </p>
 
-        <ul className="mt-10 flex flex-wrap gap-2.5">
-          {nichos.map((n) => (
-            <li
-              key={n.id}
-              className="flex items-center gap-2 rounded-full border border-linha bg-papel px-4 py-2 text-sm text-cinza"
-            >
-              <span
-                className="h-2 w-2 shrink-0 rounded-full"
-                style={{ backgroundColor: n.cor }}
-                aria-hidden="true"
-              />
-              {n.nome}
-            </li>
-          ))}
-          <li className="rounded-full border border-limao/40 bg-limao/10 px-4 py-2 text-sm font-medium text-limao">
-            + o seu
-          </li>
-        </ul>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {exemplos.map((n, i) => {
+            const exemplo =
+              criativos.find((c) => c.nichoId === n.id && c.comFoto) ??
+              criativos.find((c) => c.nichoId === n.id);
+            return (
+              <AnimatedContent key={n.id} distance={40} duration={0.7} delay={i * 0.08} threshold={0.15}>
+                <article className="overflow-hidden rounded-2xl border border-linha bg-papel">
+                  {exemplo && (
+                    <Image
+                      src={`/mostra/${exemplo.arquivo}`}
+                      alt={`Exemplo de post: ${exemplo.titulo}`}
+                      width={1080}
+                      height={1350}
+                      className="block h-auto w-full"
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                    />
+                  )}
+                  <div className="flex items-start gap-3 p-5">
+                    <span
+                      className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: n.cor }}
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <h3 className="fonte-display font-bold tracking-tight">{n.nome}</h3>
+                      <p className="mt-1 text-sm leading-snug text-cinza">{n.publico}</p>
+                    </div>
+                  </div>
+                </article>
+              </AnimatedContent>
+            );
+          })}
+        </div>
 
-        <p className="mt-8 max-w-xl text-sm text-cinza">
+        <p className="mt-8 text-sm text-cinza">
           Não encontrou o seu ramo?{" "}
           <a href="#perguntas" className="text-folha underline underline-offset-4">
             Fale com a gente — incluímos sob medida.
