@@ -17,14 +17,11 @@ export type Criativo = {
 export const criativos = mostra as Criativo[];
 
 /**
- * Nichos exibidos na landing (hero + seção Nichos).
+ * Exemplos de ramos na seção de vitrine da landing (com arte em /mostra).
  *
- * ⚠️ Precisa acompanhar os JSON em `postei/nichos/` — o motor lista o que
- * existe no disco; a capa só mostra o que está AQUI. Se adicionar nicho no
- * motor e esquecer este arquivo, a landing fica desatualizada (já aconteceu).
- *
- * Nomes curtos de propósito: na faixa "Já disponível para" cabem vários chips.
- * O nome longo do JSON do motor vale no painel de geração.
+ * NÃO e o catalogo do produto. O motor (`postei/nichos/*.json`) e a fonte
+ * de verdade do painel. Aqui só o que queremos mostrar como amostra —
+ * a capa fala "esses e muitos mais" e nao lista o inventario completo.
  */
 export const nichos = [
   {
@@ -47,27 +44,6 @@ export const nichos = [
     publico: "Alimentação do dia a dia, com cuidado profissional",
     cor: "#7ED957",
     fundo: "#14251C",
-  },
-  {
-    id: "fe-crista",
-    nome: "Fé cristã",
-    publico: "Criadores de conteúdo de fé, sem jargão de púlpito",
-    cor: "#E0B15C",
-    fundo: "#161B33",
-  },
-  {
-    id: "espiritualidade-bem-estar",
-    nome: "Espiritualidade e bem-estar",
-    publico: "Terapeutas e práticas de calma, sem misticismo vago",
-    cor: "#D98E63",
-    fundo: "#2C2622",
-  },
-  {
-    id: "ia-para-empresas",
-    nome: "IA para empresas",
-    publico: "Consultoria de IA para PMEs, sem hype",
-    cor: "#9FE870",
-    fundo: "#101010",
   },
 ];
 

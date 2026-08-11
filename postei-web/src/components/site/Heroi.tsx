@@ -3,17 +3,17 @@
 import Link from "next/link";
 import SplitText from "@/components/SplitText";
 import { Esteira } from "@/components/site/Esteira";
-import { criativos, nichos, type Criativo } from "@/lib/conteudo";
+import { criativos, type Criativo } from "@/lib/conteudo";
 
 /**
  * A tese da pagina e o proprio produto: em vez de descrever o que sai, a
- * faixa abaixo do titulo mostra criativos reais, gerados pelo Postei, dos
- * nichos ativos. Por isso a esteira vem antes de qualquer explicacao.
+ * faixa abaixo do titulo mostra criativos reais. Nao listamos o catalogo de
+ * nichos na capa — catalogo muda no motor; a landing fala em "seu ramo" e
+ * mostra so exemplos na esteira.
  */
 export function Heroi() {
-  // Rodizio entre os nichos: os arquivos vem agrupados por ramo (todos os de
-  // receitas, depois financas...), e exibir nessa ordem faria a faixa parecer
-  // que o produto so atende um ramo por vez.
+  // Rodizio entre os ramos da galeria de vitrine (mostra/): os arquivos vem
+  // agrupados; intercalar evita parecer que o produto so atende um ramo.
   const porNicho = new Map<string, Criativo[]>();
   for (const c of criativos) {
     porNicho.set(c.nichoId, [...(porNicho.get(c.nichoId) ?? []), c]);
@@ -63,17 +63,13 @@ export function Heroi() {
           </a>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-x-2.5 gap-y-2">
-          <span className="rotulo mr-1">Já disponível para</span>
-          {nichos.map((n) => (
-            <span
-              key={n.id}
-              className="rounded-full border border-tinta/12 bg-branco px-3 py-1 text-sm text-cinza"
-            >
-              {n.nome}
-            </span>
-          ))}
-        </div>
+        {/* Exemplos, nao catalogo: o motor pode ganhar nicho sem redeploy da capa. */}
+        <p className="mt-10 max-w-2xl text-sm leading-relaxed text-cinza">
+          Serve para <span className="text-tinta">vários ramos</span> — de receitas e
+          finanças a fé, bem-estar, nutrição, consultoria e{" "}
+          <span className="text-tinta">muito mais</span>. O tom e as regras mudam com o
+          seu negócio; se o seu ainda não estiver na lista, a gente inclui.
+        </p>
       </div>
 
       {/* A esteira. Duas faixas em sentidos opostos: le como linha de

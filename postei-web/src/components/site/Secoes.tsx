@@ -7,24 +7,32 @@ import SpotlightCard from "@/components/SpotlightCard";
 import CountUp from "@/components/CountUp";
 import { criativos, nichos, passos, planos, perguntas } from "@/lib/conteudo";
 
-/** Prova de que o produto e multi-nicho: um exemplo real de cada ramo. */
+/**
+ * Vitrine de EXEMPLOS (só ramos com criativo em /mostra).
+ * Nao e o catalogo completo — o motor tem mais, e a lista cresce sem
+ * obrigar a reescrever a landing.
+ */
 export function Nichos() {
+  // So mostra o que tem arte de demo; evita cards vazios de nichos novos.
+  const exemplos = nichos.filter((n) => criativos.some((c) => c.nichoId === n.id));
+
   return (
     <section id="nichos" className="border-t border-linha bg-branco py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5">
-        <p className="rotulo mb-4">Um tom para cada ramo</p>
+        <p className="rotulo mb-4">Exemplos de ramos</p>
         <h2 className="fonte-display max-w-2xl text-[clamp(1.9rem,4vw,3rem)] font-bold leading-[1.06] tracking-[-.025em] text-balance">
           O mesmo sistema, com a voz do seu negócio.
         </h2>
         <p className="mt-5 max-w-xl text-cinza">
-          Cada ramo tem seu público, seu vocabulário e suas regras. O Postei não troca só a
-          cor: muda o jeito de falar, os assuntos e o que nunca pode ser dito.
+          Abaixo, só alguns exemplos. Cada ramo tem público, vocabulário e regras próprias —
+          e a lista no app é maior (e continua crescendo).
         </p>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {nichos.map((n, i) => {
-            const exemplo = criativos.find((c) => c.nichoId === n.id && c.comFoto)
-              ?? criativos.find((c) => c.nichoId === n.id);
+          {exemplos.map((n, i) => {
+            const exemplo =
+              criativos.find((c) => c.nichoId === n.id && c.comFoto) ??
+              criativos.find((c) => c.nichoId === n.id);
             return (
               <AnimatedContent key={n.id} distance={40} duration={0.7} delay={i * 0.08} threshold={0.15}>
                 <article className="overflow-hidden rounded-2xl border border-linha bg-papel">
@@ -56,9 +64,9 @@ export function Nichos() {
         </div>
 
         <p className="mt-8 text-sm text-cinza">
-          Seu ramo não está aqui?{" "}
+          Não viu o seu ramo?{" "}
           <a href="#perguntas" className="text-folha underline underline-offset-4">
-            Adicionar um nicho leva um dia, não um mês.
+            A gente inclui — e a landing não precisa listar um a um.
           </a>
         </p>
       </div>
@@ -95,11 +103,15 @@ export function Numeros() {
     <section className="bg-tinta py-16 text-papel sm:py-20">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:grid-cols-3">
         <Numero valor={30} sufixo=" posts" texto="entregues de uma vez, no plano de entrada." />
-        <Numero
-          valor={nichos.length}
-          sufixo=" nichos"
-          texto="prontos hoje, com tom e regras próprios."
-        />
+        <div>
+          <p className="fonte-display text-5xl font-extrabold tracking-tight sm:text-6xl">
+            <span className="text-limao">vários</span>
+            <span className="text-limao"> ramos</span>
+          </p>
+          <p className="mt-2 max-w-xs leading-relaxed text-papel/65">
+            cada um com tom e regras — a lista no app cresce sem travar a landing.
+          </p>
+        </div>
         <Numero valor={10} sufixo=" min" texto="é o tempo que sobra pra você: revisar e publicar." />
       </div>
     </section>
