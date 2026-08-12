@@ -9,9 +9,10 @@ do painel, no Instagram conectado.
 
 ---
 
-> ⚠️ **O piloto ainda não validou o produto.** A primeira usuária revisou os 30 posts,
-> deu retorno detalhado e **não publicou nenhum**. Tudo o que está descrito abaixo funciona
-> tecnicamente; nada disso prova que alguém quer o produto.
+> ⚠️ **Validação de mercado ainda em aberto.** A primeira usuária (piloto) revisou 30 posts e
+> não publicou. O dono do produto já publicou no Instagram e validou qualidade técnica.
+> Domínio oficial, pagamento (webhook MP) e OAuth Instagram no ar em **postei.amconsultoria.tech**
+> (2026-08-11). Detalhes em `docs/CONHECIMENTO.md`.
 
 ## Sumário
 
@@ -24,6 +25,14 @@ do painel, no Instagram conectado.
 7. [Decisões que valem entender](#decisões-que-valem-entender)
 8. [Armadilhas conhecidas](#armadilhas-conhecidas)
 9. [O que falta](#o-que-falta)
+
+### Documentos irmãos (pasta `docs/`)
+
+| Arquivo | Uso |
+|---|---|
+| [`docs/CONHECIMENTO.md`](docs/CONHECIMENTO.md) | **Memória viva** — tudo que vamos aprendendo |
+| [`docs/DOMINIO-PRODUCAO.md`](docs/DOMINIO-PRODUCAO.md) | DNS, Traefik, MP, Instagram (passo a passo) |
+| [`docs/MIDIA-FOTO-VIDEO.md`](docs/MIDIA-FOTO-VIDEO.md) | Foto própria, re-render, Reels |
 
 ---
 
