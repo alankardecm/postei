@@ -6,11 +6,51 @@
  * a autorização falhar sem mensagem útil.
  */
 
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+
 const APP_ID = process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID!;
 const APP_SECRET = process.env.INSTAGRAM_APP_SECRET;
 const GRAFO = "https://graph.instagram.com/v23.0";
 
 export const ESCOPOS = ["instagram_business_basic", "instagram_business_content_publish"];
+
+/**
+ * State OAuth assinado e amarrado ao usuario.
+ *
+ * Antes bastava um cookie `ig_estado`. Depois da troca de dominio (e se a
+ * pessoa comeca no host legado enquanto o redirect_uri e o novo), o cookie
+ * fica num host e a volta chega noutro — "autorizacao nao conferiu".
+ * O state assinado valida sem depender do cookie; o cookie continua como
+ * reforco quando os dois hosts coincidem.
+ */
+export function criarEstadoOAuth(usuarioId: string) {
+  if (!APP_SECRET) throw new Error("INSTAGRAM_APP_SECRET não configurada.");
+  const nonce = randomBytes(16).toString("hex");
+  const expira = String(Date.now() + 15 * 60 * 1000);
+  const carga = `${nonce}.${usuarioId}.${expira}`;
+  const sig = createHmac("sha256", APP_SECRET).update(carga).digest("base64url");
+  return `${carga}.${sig}`;
+}
+
+export function validarEstadoOAuth(estado: string, usuarioId: string) {
+  if (!APP_SECRET || !estado) return false;
+  const partes = estado.split(".");
+  if (partes.length !== 4) return false;
+  const [nonce, uid, expira, sig] = partes;
+  if (!nonce || !uid || !expira || !sig) return false;
+  if (uid !== usuarioId) return false;
+  if (Number(expira) < Date.now()) return false;
+
+  const carga = `${nonce}.${uid}.${expira}`;
+  const esperada = createHmac("sha256", APP_SECRET).update(carga).digest("base64url");
+  try {
+    const a = Buffer.from(sig);
+    const b = Buffer.from(esperada);
+    return a.length === b.length && timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
 
 export function urlDeAutorizacao({ redirect, estado }: { redirect: string; estado: string }) {
   const url = new URL("https://www.instagram.com/oauth/authorize");

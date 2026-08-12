@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { usuarioAtual } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { trocarCodigo, tokenLongo, perfil } from "@/lib/instagram";
+import { trocarCodigo, tokenLongo, perfil, validarEstadoOAuth } from "@/lib/instagram";
 
 /** Volta do Instagram: troca o código por um token de 60 dias e guarda. */
 export async function GET(request: Request) {
@@ -16,15 +16,32 @@ export async function GET(request: Request) {
   if (url.searchParams.get("error")) return painel("recusado");
 
   const codigo = url.searchParams.get("code");
+  // Instagram às vezes devolve o code com #_ no final do URL; o searchParam
+  // em geral já vem limpo, mas garantimos.
+  const codigoLimpo = codigo?.replace(/#$/, "") ?? null;
   const estado = url.searchParams.get("state");
-  const esperado = request.headers.get("cookie")?.match(/ig_estado=([a-f0-9]+)/)?.[1];
 
-  if (!codigo || !estado || estado !== esperado) return painel("estado_invalido");
+  // Cookie (quando o host de ida e volta e o mesmo) OU state assinado
+  // amarrado ao usuario logado — cobre troca de dominio e cookie perdido.
+  const cookieEstado = request.headers.get("cookie")?.match(/ig_estado=([^;]+)/)?.[1];
+  const estadoOk =
+    Boolean(estado) &&
+    (estado === cookieEstado || validarEstadoOAuth(estado!, user.id));
+
+  if (!codigoLimpo || !estado || !estadoOk) {
+    console.error("[postei][ig] estado_invalido", {
+      temCodigo: Boolean(codigoLimpo),
+      temEstado: Boolean(estado),
+      cookieBate: estado === cookieEstado,
+      assinadoOk: estado ? validarEstadoOAuth(estado, user.id) : false,
+    });
+    return painel("estado_invalido");
+  }
 
   try {
     const redirect = `${base}/api/instagram/retorno`;
 
-    const curto = await trocarCodigo({ codigo, redirect });
+    const curto = await trocarCodigo({ codigo: codigoLimpo, redirect });
     const longo = await tokenLongo(curto.access_token);
     const dados = await perfil(longo.access_token);
 

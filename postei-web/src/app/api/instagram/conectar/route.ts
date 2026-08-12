@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { randomBytes } from "node:crypto";
 import { usuarioAtual } from "@/lib/motor";
-import { urlDeAutorizacao } from "@/lib/instagram";
+import { urlDeAutorizacao, criarEstadoOAuth } from "@/lib/instagram";
 
 const RETORNO = "/api/instagram/retorno";
 
@@ -11,14 +10,22 @@ export async function GET(request: Request) {
   // redirecionar com ele manda o visitante para um endereco inexistente.
   // O endereco publico vem sempre da configuracao.
   const base = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  const hostPublico = new URL(base).host;
+
+  // Se a pessoa abriu o painel no host legado (ou www) e clicou Conectar,
+  // o cookie ficaria nesse host e a volta do OAuth cai no SITE_URL — state
+  // nao confere. Forca o fluxo a comecar no host oficial.
+  const hostPedido =
+    request.headers.get("x-forwarded-host") || request.headers.get("host") || "";
+  if (hostPedido && hostPedido !== hostPublico && !hostPedido.startsWith("127.0.0.1")) {
+    return NextResponse.redirect(`${base}/api/instagram/conectar`);
+  }
 
   const user = await usuarioAtual();
   if (!user) return NextResponse.redirect(`${base}/entrar?de=/painel`);
 
-  // `state` guardado em cookie e conferido na volta: sem isso, alguém poderia
-  // induzir você a concluir a autorização de OUTRA conta do Instagram na sua
-  // sessão (CSRF), e o painel passaria a publicar no perfil do atacante.
-  const estado = randomBytes(16).toString("hex");
+  // State assinado com o id do usuario (CSRF + dominio). Cookie e reforco.
+  const estado = criarEstadoOAuth(user.id);
 
   const redirect = `${base}${RETORNO}`;
   const resposta = NextResponse.redirect(urlDeAutorizacao({ redirect, estado }));
@@ -27,7 +34,7 @@ export async function GET(request: Request) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 600,
+    maxAge: 900,
   });
   return resposta;
 }
