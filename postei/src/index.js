@@ -6,6 +6,7 @@ import { listarNichos, carregarNicho } from './nichos.js';
 import { pastaDoAssinante } from './gerador.js';
 import { criarTarefa, verTarefa, retomarPendentes, encerrarInsistentes } from './tarefas.js';
 import { refazerArte, gravarVideoPost } from './refazer-arte.js';
+import { montarEntrega, nomeDoZip } from './entrega.js';
 
 const app = express();
 // Upload de foto/video precisa de teto maior. O parser global de 1mb
@@ -145,6 +146,25 @@ app.get('/lotes/:loteId', exigirChave, exigirAssinante, async (req, res) => {
     res.json(JSON.parse(bruto));
   } catch {
     res.status(404).json({ erro: 'Lote não encontrado.' });
+  }
+});
+
+app.get('/lotes/:loteId/zip', exigirChave, exigirAssinante, async (req, res) => {
+  const loteId = String(req.params.loteId).replace(/[^a-zA-Z0-9._-]/g, '');
+  const dir = path.join(config.saida, req.assinante, loteId);
+  try {
+    const pacote = JSON.parse(await fs.readFile(path.join(dir, 'pacote.json'), 'utf8'));
+    const zip = await montarEntrega(dir, pacote);
+    const nome = nomeDoZip(pacote);
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${nome}"`);
+    res.setHeader('Content-Length', zip.length);
+    res.end(zip);
+  } catch (erro) {
+    if (erro.code === 'ENOENT' || erro.codigo === 404) {
+      return res.status(404).json({ erro: erro.message || 'Lote não encontrado.' });
+    }
+    res.status(500).json({ erro: erro.message });
   }
 });
 

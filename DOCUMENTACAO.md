@@ -148,6 +148,7 @@ Todas exigem `x-postei-chave` e `x-postei-assinante`.
 | `GET /tarefas/:id` | andamento |
 | `GET /lotes` · `GET /lotes/:id` | pacotes do assinante |
 | `GET /lotes/:id/imagem/:arquivo` | a arte |
+| `GET /lotes/:id/zip` | zip de entrega (imagens + legendas) |
 | `DELETE /assinante` | apaga tudo do assinante |
 
 ### Scripts
@@ -480,7 +481,7 @@ Landing não lista inventário de nichos — “vários ramos + muitos mais”.
 
 **Curto prazo**
 - ~~Trocar a foto que não casou com o tema~~ (feito — ver mídia própria)
-- Baixar o zip do pacote pelo painel
+- ~~Baixar o zip do pacote pelo painel~~ (imagens + LEGENDAS.txt)
 - ~~Reels~~ (upload + publicar; geração automática Ken Burns ainda não)
 
 **O que o piloto revelou**

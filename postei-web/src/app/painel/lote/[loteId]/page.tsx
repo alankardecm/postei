@@ -87,15 +87,23 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
           <h1 className="fonte-display mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
             {pacote.nicho.nome}
           </h1>
-          <p className="mt-2 text-cinza">
-            {pacote.marca} · {pacote.posts.length} posts ·{" "}
-            {pacote.rede === "linkedin"
-              ? "LinkedIn"
-              : pacote.rede === "ambos"
-                ? "Instagram e LinkedIn"
-                : "Instagram"}{" "}
-            · {new Date(pacote.geradoEm).toLocaleDateString("pt-BR")}
-          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <p className="text-cinza">
+              {pacote.marca} · {pacote.posts.length} posts ·{" "}
+              {pacote.rede === "linkedin"
+                ? "LinkedIn"
+                : pacote.rede === "ambos"
+                  ? "Instagram e LinkedIn"
+                  : "Instagram"}{" "}
+              · {new Date(pacote.geradoEm).toLocaleDateString("pt-BR")}
+            </p>
+            <a
+              href={`/api/lotes/${encodeURIComponent(loteId)}/zip`}
+              className="rounded-full border border-tinta/20 px-4 py-1.5 text-sm transition-colors hover:border-tinta/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            >
+              Baixar zip
+            </a>
+          </div>
 
           {mencionarMarca && (
             <p className="mt-4 rounded-2xl border border-linha bg-papel px-4 py-3 text-sm text-cinza">

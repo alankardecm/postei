@@ -267,7 +267,14 @@ o lote parece spam para o Instagram.
 Teto: 10 no Instagram, 5 no LinkedIn. Banco vive no JSON do nicho (`hashtags.nicho`
 / `hashtags.comunidade`). Sem o campo, cai no fallback do arquivo.
 
-## 12. Marca d'água do teste grátis
+## 12. Zip do pacote
+
+No lote, **Baixar zip**. Motor monta na hora (`GET /lotes/:id/zip`): imagens
+numeradas + `LEGENDAS.txt` (e pasta `linkedin/` se o pacote for das duas
+redes). Marca própria já sai com `@cliqueipostei.app` no txt. Sem gravar o
+zip no disco.
+
+## 13. Marca d'água do teste grátis
 
 Plano `teste` (2 posts): cada arte sai com um selo pequeno `P postei` no canto
 inferior direito, opacidade baixa. Plano pago e cortesia não levam. O flag
@@ -275,7 +282,7 @@ fica em `pacote.marcaDagua` — trocar foto no teste reaplica o selo.
 
 ---
 
-## 13. Deploy e caminhos
+## 14. Deploy e caminhos
 
 ```bash
 # Na pasta do repo (Git Bash / WSL)
@@ -295,7 +302,7 @@ Deploy envia **só o que o git rastreia**. Arquivo novo sem `git add` não sobe.
 
 ---
 
-## 14. Armadilhas (além da DOCUMENTACAO.md)
+## 15. Armadilhas (além da DOCUMENTACAO.md)
 
 1. **PowerShell + backticks** ao escrever YAML no SSH — quebra `Host(\`...\`)` do Traefik; preferir `scp` de arquivo local.  
 2. **Cookie OAuth entre domínios** — state assinado (já corrigido).  
@@ -306,7 +313,7 @@ Deploy envia **só o que o git rastreia**. Arquivo novo sem `git add` não sobe.
 
 ---
 
-## 15. Checklist “pronto para cliente pagar e conectar IG”
+## 16. Checklist “pronto para cliente pagar e conectar IG”
 
 - [x] DNS postei.amconsultoria.tech → VPS  
 - [x] Traefik + SSL nos dois hosts  
