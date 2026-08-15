@@ -3,13 +3,14 @@
 > **Este arquivo é a “memória” do projeto.**  
 > Tudo que formos descobrindo, decidindo e operando deve ser registrado aqui (e, se for
 > procedimento longo, em um doc dedicado com link neste índice).  
-> Data de criação: 2026-08-11 · Última atualização: 2026-08-14
+> Data de criação: 2026-08-11 · Última atualização: 2026-08-15
 
 Leia também:
 
 | Documento | Conteúdo |
 |---|---|
 | [`DOCUMENTACAO.md`](../DOCUMENTACAO.md) | Arquitetura, rotas, armadilhas técnicas |
+| [`APRENDIZAGEM.md`](APRENDIZAGEM.md) | **Caderno de aprendizagem** — decisões e o que não esquecer |
 | [`MIDIA-FOTO-VIDEO.md`](MIDIA-FOTO-VIDEO.md) | Upload de foto, re-render, Reels |
 | [`DOMINIO-PRODUCAO.md`](DOMINIO-PRODUCAO.md) | DNS, Traefik, domínio novo, MP, Instagram (passo a passo) |
 | [`PLANO.md`](../PLANO.md) | Rascunho de negócio (pode divergir do business plan) |

@@ -31,6 +31,7 @@ do painel, no Instagram conectado.
 | Arquivo | Uso |
 |---|---|
 | [`docs/CONHECIMENTO.md`](docs/CONHECIMENTO.md) | **Memória viva** — tudo que vamos aprendendo |
+| [`docs/APRENDIZAGEM.md`](docs/APRENDIZAGEM.md) | **Caderno de aprendizagem** — decisões (acesso, @, hashtag, teste, zip) |
 | [`docs/DOMINIO-PRODUCAO.md`](docs/DOMINIO-PRODUCAO.md) | DNS, Traefik, MP, Instagram (passo a passo) |
 | [`docs/MIDIA-FOTO-VIDEO.md`](docs/MIDIA-FOTO-VIDEO.md) | Foto própria, re-render, Reels |
 
@@ -396,6 +397,16 @@ alcance (nicho médio + comunidade, sem mega-tag) é código, em `hashtags.js`.
 
 **Teste grátis leva marca d'água.** Selo sutil da Postei no canto da arte.
 Quem paga, não.
+
+**Marca própria em outro Instagram leva o @.** Se o destino não é
+`@cliqueipostei.app`, a legenda (e o zip) incluem `Siga o Postei: @cliqueipostei.app`.
+
+**Cortesia ≠ dono da marca.** Juliana tem Estúdio de graça. Só Alan e Junior
+geram o nicho interno e gastam a xAI. Duas listas em `planos.ts`.
+
+**Zip pelo painel.** Imagens + `LEGENDAS.txt`, montado na hora, sem gravar no disco.
+
+O detalhe dessas decisões, com o porquê, está em [`docs/APRENDIZAGEM.md`](docs/APRENDIZAGEM.md).
 
 ---
 
