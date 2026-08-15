@@ -11,6 +11,7 @@ const INTERVALO_CONSULTA_MS = 4000;
 
 export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[] }) {
   const router = useRouter();
+  const [rede, setRede] = useState<"instagram" | "linkedin" | "ambos">("instagram");
   const [nicho, setNicho] = useState(nichos[0]?.id ?? "");
   const [marca, setMarca] = useState("");
   const [quantidade, setQuantidade] = useState(volumes[volumes.length - 1] ?? 2);
@@ -62,7 +63,7 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
     const resposta = await fetch("/api/tarefas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nicho, marca, quantidade }),
+      body: JSON.stringify({ nicho, marca, quantidade, rede }),
     });
     const dados = await resposta.json();
 
@@ -90,10 +91,40 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
     <form onSubmit={gerar} className="rounded-2xl border border-linha bg-branco p-6 sm:p-7">
       <h2 className="fonte-display text-lg font-bold tracking-tight">Gerar um pacote</h2>
       <p className="mt-1 text-sm text-cinza">
-        Escolha o ramo e o nome do perfil. O resto é com o Postei.
+        Primeiro a rede. Depois o ramo e o nome do perfil.
       </p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      <fieldset className="mt-6" disabled={ocupado}>
+        <legend className="rotulo mb-2">Onde vai postar</legend>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {(
+            [
+              { id: "instagram" as const, nome: "Instagram", desc: "Card 4:5, legenda curta" },
+              { id: "linkedin" as const, nome: "LinkedIn", desc: "Card 1:1, texto de feed" },
+              { id: "ambos" as const, nome: "Os dois", desc: "As duas artes e legendas" },
+            ] as const
+          ).map((opcao) => (
+            <button
+              key={opcao.id}
+              type="button"
+              onClick={() => setRede(opcao.id)}
+              aria-pressed={rede === opcao.id}
+              className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
+                rede === opcao.id
+                  ? "border-limao bg-limao text-ink"
+                  : "border-linha hover:border-limao/40"
+              } disabled:opacity-60`}
+            >
+              <span className="block font-semibold">{opcao.nome}</span>
+              <span className={`mt-0.5 block text-xs ${rede === opcao.id ? "text-ink/70" : "text-cinza"}`}>
+                {opcao.desc}
+              </span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5">
           <span className="rotulo">Ramo</span>
           <select
@@ -118,7 +149,7 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
             disabled={ocupado}
             required
             maxLength={40}
-            placeholder="@seuperfil"
+            placeholder={rede === "linkedin" ? "Seu nome no LinkedIn" : "@seuperfil"}
             className="rounded-xl border border-linha bg-papel px-4 py-3 outline-none focus:border-folha focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-folha disabled:opacity-60"
           />
         </label>

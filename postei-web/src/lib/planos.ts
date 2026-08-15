@@ -71,6 +71,52 @@ export function ehCortesia(email: string | null | undefined) {
   return (CORTESIAS as readonly string[]).includes(email.trim().toLowerCase());
 }
 
+/**
+ * Marca própria da Postei (nicho `postei-marca` + Imagine da xAI).
+ *
+ * Só Alan e Junior. Cortesia de piloto não entra: Juliana testa o produto
+ * do cliente, não o feed da casa, e a chave da xAI não deve ser queimada
+ * fora desse uso. Lista curta em código, pelo mesmo motivo da cortesia.
+ */
+export const DONOS_MARCA = [
+  "alankardecm@gmail.com", // Alan — dono
+  "juniorreinoo@gmail.com", // Junior — comercial
+] as const;
+
+export function ehAcessoMarcaPropria(email: string | null | undefined) {
+  if (!email) return false;
+  return (DONOS_MARCA as readonly string[]).includes(email.trim().toLowerCase());
+}
+
+export const NICHO_MARCA_PROPRIA = "postei-marca";
+export const INSTAGRAM_MARCA = "cliqueipostei.app";
+export const MENCAO_INSTAGRAM_MARCA = `Siga o Postei: @${INSTAGRAM_MARCA}`;
+
+export function jaMencionaMarca(texto: string) {
+  return new RegExp(`@${INSTAGRAM_MARCA}\\b`, "i").test(texto);
+}
+
+export function ehNichoMarcaPropria(nichoId: string | null | undefined) {
+  return nichoId === NICHO_MARCA_PROPRIA;
+}
+
+/** Sem username, não dá para cravar que é o feed oficial — trata como outro. */
+export function ehInstagramDaMarca(username: string | null | undefined) {
+  if (!username) return false;
+  return username.replace(/^@/, "").trim().toLowerCase() === INSTAGRAM_MARCA;
+}
+
+/**
+ * Marca própria num Instagram que não é o da casa: a legenda precisa do
+ * @ oficial para o toque redirecionar ao perfil da Postei.
+ */
+export function deveMencionarMarca(
+  nichoId: string | null | undefined,
+  usernameIg: string | null | undefined,
+) {
+  return ehNichoMarcaPropria(nichoId) && !ehInstagramDaMarca(usernameIg);
+}
+
 /** Volumes que a pessoa pode pedir de uma vez, conforme o plano. */
 export function volumesDe(plano: Plano) {
   const limite = PLANOS[plano].posts;

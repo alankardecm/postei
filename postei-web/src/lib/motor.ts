@@ -65,6 +65,8 @@ async function chamar<T>(
   return dados as T;
 }
 
+export type Rede = "instagram" | "linkedin" | "ambos";
+
 export type Lote = {
   loteId: string;
   nicho: { id: string; nome: string };
@@ -72,6 +74,7 @@ export type Lote = {
   geradoEm: string;
   posts: number;
   parcial: boolean;
+  rede?: Rede;
   capa: string | null;
 };
 
@@ -82,10 +85,13 @@ export type Tarefa = {
   erro: string | null;
 };
 
-export type Nicho = { id: string; nome: string; publico: string };
+export type Nicho = { id: string; nome: string; publico: string; interno?: boolean };
 
 export const motor = {
-  nichos: (assinanteId: string) => chamar<Nicho[]>("/nichos", assinanteId),
+  nichos: (assinanteId: string, opts?: { internos?: boolean }) =>
+    chamar<Nicho[]>("/nichos", assinanteId, {
+      headers: opts?.internos ? { "x-postei-internos": "1" } : {},
+    }),
 
   lotes: (assinanteId: string) => chamar<Lote[]>("/lotes", assinanteId),
 
@@ -94,11 +100,20 @@ export const motor = {
 
   criarTarefa: (
     assinanteId: string,
-    pedido: { nicho: string; marca: string; quantidade: number; ciclo?: string },
+    pedido: {
+      nicho: string;
+      marca: string;
+      quantidade: number;
+      ciclo?: string;
+      rede?: Rede;
+      marcaDagua?: boolean;
+    },
+    opts?: { internos?: boolean },
   ) =>
     chamar<{ id: string; situacao: string }>("/tarefas", assinanteId, {
       method: "POST",
       body: JSON.stringify(pedido),
+      headers: opts?.internos ? { "x-postei-internos": "1" } : {},
     }),
 
   tarefa: (assinanteId: string, id: string) =>

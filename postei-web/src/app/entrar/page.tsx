@@ -1,4 +1,4 @@
-import { Cabecalho } from "@/components/site/Cabecalho";
+import { Venda } from "@/components/site/Venda";
 import { FormularioAcesso } from "@/components/site/FormularioAcesso";
 
 export const metadata = { title: "Entrar — Postei" };
@@ -9,8 +9,7 @@ export default async function Entrar({ searchParams }: PageProps<"/entrar">) {
   const destino = typeof de === "string" ? de : undefined;
 
   return (
-    <>
-      <Cabecalho />
+    <Venda>
       <main className="flex flex-1 items-center justify-center px-5 py-20">
         <div className="w-full max-w-sm">
           <h1 className="fonte-display text-3xl font-extrabold tracking-tight">Entrar</h1>
@@ -18,6 +17,6 @@ export default async function Entrar({ searchParams }: PageProps<"/entrar">) {
           <FormularioAcesso modo="entrar" destino={destino} />
         </div>
       </main>
-    </>
+    </Venda>
   );
 }

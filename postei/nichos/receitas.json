@@ -20,5 +20,19 @@
     "texto": "#F7F3E8",
     "destaque": "#C6D64B"
   },
+  "hashtags": {
+    "nicho": [
+      "receitafacil",
+      "receitarapida",
+      "comidacaseira",
+      "cozinhapratica",
+      "jantarrapido",
+      "almocopratico",
+      "marmitada",
+      "receitabarata",
+      "aproveitamentosobras"
+    ],
+    "comunidade": ["comidabrasileira", "cozinhandoemcasa"]
+  },
   "observacoes": "Nicho saturado — o diferencial precisa estar na especificidade (ingrediente, tempo, situação), nunca em 'receita deliciosa'."
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Publicar } from "@/components/painel/Publicar";
+import { PublicarLinkedin } from "@/components/painel/PublicarLinkedin";
 import { MidiaPost } from "@/components/painel/MidiaPost";
 
 /**
@@ -16,8 +17,12 @@ export function EditarPost({
   loteId,
   indice,
   conectado,
+  conectadoLinkedin = false,
   podeEditar,
   temVideo = false,
+  permiteFoto = true,
+  podePublicarInstagram = true,
+  podePublicarLinkedin = false,
   legenda: legendaInicial,
   cta: ctaInicial,
   hashtags: hashtagsIniciais,
@@ -25,8 +30,12 @@ export function EditarPost({
   loteId: string;
   indice: number;
   conectado: boolean;
+  conectadoLinkedin?: boolean;
   podeEditar: boolean;
   temVideo?: boolean;
+  permiteFoto?: boolean;
+  podePublicarInstagram?: boolean;
+  podePublicarLinkedin?: boolean;
   legenda: string;
   cta: string | null;
   hashtags: string[];
@@ -76,14 +85,23 @@ export function EditarPost({
   if (!editando) {
     return (
       <div className="flex flex-col gap-3">
-        <MidiaPost loteId={loteId} indice={indice} temVideo={temVideo} />
+        <MidiaPost loteId={loteId} indice={indice} temVideo={temVideo} permiteFoto={permiteFoto} />
         <div className="flex flex-wrap items-center gap-3">
-          <Publicar
-            loteId={loteId}
-            indice={indice}
-            conectado={conectado}
-            temVideo={temVideo}
-          />
+          {podePublicarInstagram && (
+            <Publicar
+              loteId={loteId}
+              indice={indice}
+              conectado={conectado}
+              temVideo={temVideo}
+            />
+          )}
+          {podePublicarLinkedin && (
+            <PublicarLinkedin
+              loteId={loteId}
+              indice={indice}
+              conectado={conectadoLinkedin}
+            />
+          )}
           {podeEditar ? (
             <button
               type="button"

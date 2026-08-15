@@ -44,6 +44,16 @@ export const config = {
       .map((m) => m.trim())
       .filter(Boolean),
     timeoutMs: Number(process.env.LLM_TIMEOUT_MS || 90000),
+
+    timeoutImagemMs: Number(process.env.LLM_TIMEOUT_IMAGEM_MS || 120000),
+  },
+
+  // Imagine da xAI — só o nicho interno da Postei. Sem chave, o anuncioIa
+  // cai no template. Texto do cliente continua no LiteLLM/Gemini.
+  xai: {
+    apiKey: process.env.XAI_API_KEY || null,
+    baseUrl: process.env.XAI_BASE_URL || 'https://api.x.ai/v1',
+    modeloImagem: process.env.XAI_MODELO_IMAGEM || 'grok-imagine-image',
   },
 
   criativo: {

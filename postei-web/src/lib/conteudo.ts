@@ -49,19 +49,19 @@ export const nichos = [
 
 export const passos = [
   {
-    titulo: "Você diz o seu ramo",
+    titulo: "Diz o ramo",
     texto:
-      "Escolhe o nicho e o nome do seu perfil. Só isso. Nada de briefing, planilha ou reunião de alinhamento.",
+      "Escolhe o nicho e o nome do perfil. Sem briefing, sem reunião, sem planilha de conteúdo.",
   },
   {
     titulo: "O Postei monta o mês",
     texto:
-      "Em poucos minutos ele escreve os textos, escolhe as fotos e monta as artes — todas com a sua assinatura.",
+      "Textos, fotos e artes com a sua assinatura. Em poucos minutos, não em algumas noites.",
   },
   {
     titulo: "Você revisa e publica",
     texto:
-      "Recebe as imagens e as legendas prontas para copiar e colar. Você aprova o que gostou e descarta o resto.",
+      "No painel: aprova, descarta ou ajusta. Publica ou agenda no Instagram, no LinkedIn, ou nos dois — ou baixa as artes se preferir o app.",
   },
 ];
 
@@ -73,7 +73,7 @@ export const planos = [
     itens: [
       "30 posts por mês",
       "1 marca",
-      "Artes com foto e tipográficas",
+      "Publicar e agendar no Instagram, LinkedIn ou nos dois",
       "Editar o texto antes de publicar",
     ],
     destaque: false,
@@ -86,6 +86,7 @@ export const planos = [
       "90 posts por mês",
       "Até 3 marcas",
       "Carrosséis e posts únicos",
+      "Publicar e agendar no Instagram, LinkedIn ou nos dois",
       "Link de captação de contatos",
     ],
     // Marcado como recomendado, NAO como "mais escolhido": nao existe venda
@@ -104,7 +105,7 @@ export const planos = [
     itens: [
       "300 posts por mês",
       "Até 10 marcas",
-      "Agendamento do mês inteiro",
+      "Publicar e agendar no Instagram, LinkedIn ou nos dois",
       "Nicho sob medida para cada cliente",
     ],
     destaque: false,
@@ -118,7 +119,15 @@ export const perguntas = [
   },
   {
     p: "Preciso saber design?",
-    r: "Não. As artes já saem prontas no formato do feed, com a sua assinatura. Você recebe as imagens e o texto de cada uma para colar direto no Instagram.",
+    r: "Não. As artes já saem prontas no formato do feed, com a sua assinatura. Você publica pelo painel ou baixa as imagens — sem abrir o Canva.",
+  },
+  {
+    p: "Publico no Instagram, no LinkedIn ou nos dois?",
+    r: "Você escolhe antes de gerar o pacote. No painel conecta cada rede uma vez e publica ou agenda — Instagram, LinkedIn ou os dois. Sem baixar arquivo se não quiser.",
+  },
+  {
+    p: "Preciso de cartão para começar?",
+    r: "Não. A conta nasce no plano de teste, sem cartão. Você gera um primeiro pacote, sente o ciclo e só assina se quiser o mês inteiro.",
   },
   {
     p: "O conteúdo é meu?",
@@ -130,6 +139,6 @@ export const perguntas = [
   },
   {
     p: "Meu ramo não está na lista.",
-    r: "Fale com a gente. Adicionar um nicho novo não exige desenvolvimento: é uma configuração de tom de voz, público e temas.",
+    r: "Escreva para comercial@amconsultoria.tech. Incluir um ramo novo é configuração de tom, público e temas — não é um projeto de desenvolvimento.",
   },
 ];

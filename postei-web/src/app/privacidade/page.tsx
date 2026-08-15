@@ -1,4 +1,4 @@
-import { Cabecalho } from "@/components/site/Cabecalho";
+import { Venda } from "@/components/site/Venda";
 import { Rodape } from "@/components/site/Secoes";
 import { Documento, Secao, Tabela } from "@/components/site/Documento";
 import { CONTROLADOR, ATUALIZADO_EM } from "@/lib/juridico";
@@ -10,8 +10,7 @@ export const metadata = {
 
 export default function Privacidade() {
   return (
-    <>
-      <Cabecalho />
+    <Venda>
       <Documento titulo="Política de Privacidade" atualizado={ATUALIZADO_EM}>
         <p>
           Esta política explica quais dados o Postei coleta, para que usa, com quem compartilha
@@ -169,6 +168,6 @@ export default function Privacidade() {
         </Secao>
       </Documento>
       <Rodape />
-    </>
+    </Venda>
   );
 }

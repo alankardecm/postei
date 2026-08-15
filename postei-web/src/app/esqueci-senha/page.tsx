@@ -1,12 +1,11 @@
-import { Cabecalho } from "@/components/site/Cabecalho";
+import { Venda } from "@/components/site/Venda";
 import { PedirRecuperacao } from "@/components/site/PedirRecuperacao";
 
 export const metadata = { title: "Recuperar senha — Postei" };
 
 export default function EsqueciSenha() {
   return (
-    <>
-      <Cabecalho />
+    <Venda>
       <main className="flex flex-1 items-center justify-center px-5 py-20">
         <div className="w-full max-w-sm">
           <h1 className="fonte-display text-3xl font-extrabold tracking-tight">
@@ -18,6 +17,6 @@ export default function EsqueciSenha() {
           <PedirRecuperacao />
         </div>
       </main>
-    </>
+    </Venda>
   );
 }

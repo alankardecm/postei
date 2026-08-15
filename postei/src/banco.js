@@ -85,7 +85,7 @@ export async function temGeracaoEmAndamento(usuarioId) {
 export async function geracoesOrfas(tentativasMax) {
   return chamar(
     `geracoes?situacao=eq.gerando&tentativas=lt.${tentativasMax}` +
-      '&select=id,usuario_id,nicho,marca,quantidade,ciclo,tentativas&order=criado_em.asc&limit=10',
+      '&select=id,usuario_id,nicho,marca,quantidade,ciclo,tentativas,resultado&order=criado_em.asc&limit=10',
   );
 }
 

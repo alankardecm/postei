@@ -3,7 +3,7 @@
 > **Este arquivo é a “memória” do projeto.**  
 > Tudo que formos descobrindo, decidindo e operando deve ser registrado aqui (e, se for
 > procedimento longo, em um doc dedicado com link neste índice).  
-> Data de criação: 2026-08-11 · Última atualização: 2026-08-11
+> Data de criação: 2026-08-11 · Última atualização: 2026-08-14
 
 Leia também:
 
@@ -217,10 +217,65 @@ Ver [`MIDIA-FOTO-VIDEO.md`](MIDIA-FOTO-VIDEO.md).
 | estudio | 300 | 199,90 |
 
 Cortesia Estúdio: e-mails em código (Alan, Juliana, Junior).
+Marca própria + xAI: só Alan e Junior (`DONOS_MARCA` em `planos.ts`).
 
 ---
 
-## 10. Deploy e caminhos
+## 10. Marca própria (feed da Postei)
+
+O motor gera **conteúdo de nicho** (foto + título) para o cliente. O Instagram da
+Postei precisa de **anúncio de produto** (headline + mockup + CTA). São layouts
+diferentes.
+
+| | |
+|---|---|
+| Nicho | `postei/nichos/postei-marca.json` (`interno: true`) |
+| Layouts | `anuncioIa` (xAI Imagine `grok-imagine-image`) + templates `anuncioProduto` / `anuncioCta` |
+| Quem vê no painel | só Alan e Junior (`DONOS_MARCA`) |
+| Perfil oficial | [@cliqueipostei.app](https://www.instagram.com/cliqueipostei.app) |
+| Preview sem LLM | `node scripts/preview-anuncio.mjs` → `postei/validacao/anuncio/` |
+
+### Ligar e gerar
+
+1. Entrar no painel com a conta do Alan ou do Junior.
+2. Ramo: **Postei — marca própria**. Nome do perfil: `Postei` (ou `@cliqueipostei.app`).
+3. Gerar 10 ou 30. A maior parte sai anúncio; o resto é destaque/lista sobre o problema.
+4. Em **Conectar Instagram**, autorizar `@cliqueipostei.app` (conta profissional).
+5. Publicar ou agendar no próprio painel.
+
+A maior parte do lote sai em `anuncioIa` (Imagine da xAI). Sem `XAI_API_KEY` ou se
+a chamada falhar, cai no template `anuncioProduto` e o lote segue.
+Custo: US$ 0,02/imagem × 30 ≈ US$ 0,60/mês da marca. Texto do cliente continua no
+LiteLLM/Gemini. Chave só no `/opt/postei/.env` (`XAI_API_KEY`).
+
+Não colocar esse nicho na landing. Cliente pagante não deve gerar anúncio da Postei.
+
+Se o Instagram conectado **não** for `@cliqueipostei.app`, a publicação (e o
+agendador) acrescentam `Siga o Postei: @cliqueipostei.app` na legenda — sem
+duplicar se o texto já tiver o @. No feed oficial da casa, a menção não entra.
+
+---
+
+## 11. Hashtags de alcance
+
+Não é o modelo que escolhe o bloco final. Ele só manda 3–5 tags do **assunto
+deste post**. O código (`postei/src/hashtags.js`) completa com banco de nicho
+(tamanho médio, PT-BR) + 1–2 de comunidade, filtra mega/spam (`#viral`,
+`#brasil`, `#dicas`) e varia o conjunto pelo título — o mesmo bloco em todo
+o lote parece spam para o Instagram.
+
+Teto: 10 no Instagram, 5 no LinkedIn. Banco vive no JSON do nicho (`hashtags.nicho`
+/ `hashtags.comunidade`). Sem o campo, cai no fallback do arquivo.
+
+## 12. Marca d'água do teste grátis
+
+Plano `teste` (2 posts): cada arte sai com um selo pequeno `P postei` no canto
+inferior direito, opacidade baixa. Plano pago e cortesia não levam. O flag
+fica em `pacote.marcaDagua` — trocar foto no teste reaplica o selo.
+
+---
+
+## 13. Deploy e caminhos
 
 ```bash
 # Na pasta do repo (Git Bash / WSL)
@@ -240,7 +295,7 @@ Deploy envia **só o que o git rastreia**. Arquivo novo sem `git add` não sobe.
 
 ---
 
-## 11. Armadilhas (além da DOCUMENTACAO.md)
+## 14. Armadilhas (além da DOCUMENTACAO.md)
 
 1. **PowerShell + backticks** ao escrever YAML no SSH — quebra `Host(\`...\`)` do Traefik; preferir `scp` de arquivo local.  
 2. **Cookie OAuth entre domínios** — state assinado (já corrigido).  
@@ -251,7 +306,7 @@ Deploy envia **só o que o git rastreia**. Arquivo novo sem `git add` não sobe.
 
 ---
 
-## 12. Checklist “pronto para cliente pagar e conectar IG”
+## 15. Checklist “pronto para cliente pagar e conectar IG”
 
 - [x] DNS postei.amconsultoria.tech → VPS  
 - [x] Traefik + SSL nos dois hosts  

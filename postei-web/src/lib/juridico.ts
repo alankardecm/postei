@@ -13,9 +13,7 @@ export const CONTROLADOR = {
   nome: "AM Consultoria",
   razaoSocial: "Alan Kardec Moreira",
   cnpj: "43.947.919/0001-08",
-  // Provisorio ate o dominio proprio existir. O endereco precisa FUNCIONAR:
-  // ele e o canal de exercicio de direitos da LGPD publicado nas politicas.
-  email: "alanmoreiraconsultoria@gmail.com",
+  email: "alan.moreira@amconsultoria.tech",
 };
 
-export const ATUALIZADO_EM = "8 de agosto de 2026";
+export const ATUALIZADO_EM = "13 de agosto de 2026";

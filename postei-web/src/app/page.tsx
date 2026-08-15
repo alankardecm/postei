@@ -1,9 +1,9 @@
-import { Cabecalho } from "@/components/site/Cabecalho";
+import { Venda } from "@/components/site/Venda";
 import { Heroi } from "@/components/site/Heroi";
 import {
+  Problema,
   Nichos,
   ComoFunciona,
-  Numeros,
   Planos,
   Perguntas,
   ChamadaFinal,
@@ -12,18 +12,17 @@ import {
 
 export default function Home() {
   return (
-    <>
-      <Cabecalho />
+    <Venda barra>
       <main className="flex-1">
         <Heroi />
-        <Nichos />
+        <Problema />
         <ComoFunciona />
-        <Numeros />
+        <Nichos />
         <Planos />
         <Perguntas />
         <ChamadaFinal />
       </main>
       <Rodape />
-    </>
+    </Venda>
   );
 }

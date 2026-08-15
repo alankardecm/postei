@@ -2,6 +2,7 @@ import { motor } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { gerarUrlPublica } from "@/lib/imagem-publica";
 import { publicarImagem, publicarCarrossel, publicarReels } from "@/lib/instagram";
+import { MENCAO_INSTAGRAM_MARCA, deveMencionarMarca, jaMencionaMarca } from "@/lib/planos";
 
 /**
  * Publicação de um post no Instagram.
@@ -33,10 +34,12 @@ export class ErroPublicacao extends Error {
 }
 
 /** Monta a legenda final. A fonte vai antes das hashtags: depois ninguém lê. */
-export function montarLegenda(post: Post) {
+export function montarLegenda(post: Post, opts?: { mencionarMarca?: boolean }) {
+  const jaTem = jaMencionaMarca([post.legenda, post.cta ?? ""].join("\n"));
   return [
     post.legenda,
     post.cta,
+    opts?.mencionarMarca && !jaTem ? MENCAO_INSTAGRAM_MARCA : null,
     post.fonte &&
       `Fonte: ${post.fonte.titulo} (${post.fonte.revista}, ${post.fonte.ano}) — ${post.fonte.url}`,
     post.hashtags.map((h) => `#${h}`).join(" "),
@@ -49,7 +52,7 @@ export async function contaConectada(usuarioId: string) {
   const admin = criarClienteAdmin();
   const { data } = await admin
     .from("contas_instagram")
-    .select("id, ig_user_id, token, expira_em")
+    .select("id, ig_user_id, token, expira_em, username")
     .eq("usuario_id", usuarioId)
     .maybeSingle();
   return data;
@@ -92,11 +95,15 @@ export async function publicarAgora({
 
     // O conteúdo vem do motor, sempre: assim a edição feita pelo assinante
     // depois do agendamento é respeitada na hora de publicar.
-    const pacote = (await motor.lote(usuarioId, loteId)) as { posts?: Post[] };
+    const pacote = (await motor.lote(usuarioId, loteId)) as {
+      posts?: Post[];
+      nicho?: { id?: string };
+    };
     const post = pacote.posts?.[indice];
     if (!post) throw new ErroPublicacao("Post não encontrado.", 404);
 
-    const legenda = montarLegenda(post);
+    const mencionarMarca = deveMencionarMarca(pacote.nicho?.id, conta.username);
+    const legenda = montarLegenda(post, { mencionarMarca });
 
     // Reel: só se o assinante pediu e existe MP4 no post. Nunca promove
     // imagem a Reel automaticamente — evita surpresa no feed.

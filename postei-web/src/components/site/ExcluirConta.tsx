@@ -63,7 +63,7 @@ export function ExcluirConta({ email }: { email: string }) {
       />
 
       {erro && (
-        <p role="alert" className="mt-4 rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
+        <p role="alert" className="mt-4 rounded-xl bg-ink px-4 py-3 text-sm text-[#F2F4EE]">
           {erro}
         </p>
       )}

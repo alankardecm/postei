@@ -1,4 +1,4 @@
-import { Cabecalho } from "@/components/site/Cabecalho";
+import { Venda } from "@/components/site/Venda";
 import { Rodape } from "@/components/site/Secoes";
 import { Documento, Secao } from "@/components/site/Documento";
 import { ExcluirConta } from "@/components/site/ExcluirConta";
@@ -16,8 +16,7 @@ export default async function ExclusaoDeDados() {
   const user = await usuarioAtual();
 
   return (
-    <>
-      <Cabecalho />
+    <Venda>
       <Documento titulo="Exclusão de dados" atualizado={ATUALIZADO_EM}>
         <p>
           Você pode apagar sua conta e tudo que guardamos, a qualquer momento e sem precisar
@@ -64,6 +63,6 @@ export default async function ExclusaoDeDados() {
         </Secao>
       </Documento>
       <Rodape />
-    </>
+    </Venda>
   );
 }

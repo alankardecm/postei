@@ -92,7 +92,7 @@ export function FormularioAcesso({ modo, destino }: { modo: Modo; destino?: stri
       </label>
 
       {erro && (
-        <p role="alert" className="rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
+        <p role="alert" className="rounded-xl bg-ink px-4 py-3 text-sm text-[#F2F4EE]">
           {erro}
         </p>
       )}
@@ -102,7 +102,7 @@ export function FormularioAcesso({ modo, destino }: { modo: Modo; destino?: stri
         disabled={ocupado}
         className="mt-1 rounded-full bg-limao px-5 py-3.5 font-medium text-ink transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
       >
-        {ocupado ? "Um instante…" : criando ? "Criar conta" : "Entrar"}
+        {ocupado ? "Um instante…" : criando ? "Começar grátis" : "Entrar"}
       </button>
 
       {!criando && (

@@ -1,0 +1,56 @@
+{
+  "id": "postei-marca",
+  "nome": "Postei — marca própria",
+  "interno": true,
+  "semFoto": true,
+  "iaImagem": true,
+  "publico": "Dono de pequeno negócio no Brasil que sabe que precisa aparecer no Instagram e no LinkedIn, mas trava na tela em branco, não quer pagar social media caro e não vai passar a noite no Canva.",
+  "tomDeVoz": "Direto, concreto e sem hype de startup. Fala do problema (sumir do feed, tela em branco, noite no Canva) e da saída (mês pronto, revisa e publica). Nunca soa como guru, nunca inventa depoimento. O Postei é o produto — escreva anúncio, não dica genérica de marketing.",
+  "temas": [
+    "tela em branco toda semana na hora de postar",
+    "mês de posts pronto em minutos sem abrir o Canva",
+    "sumiu do Instagram e o cliente esqueceu de você",
+    "pagar social media caro versus gerar o mês sozinho",
+    "noite no Canva depois do expediente",
+    "dois posts de teste sem cartão de crédito",
+    "publicar no Instagram e no LinkedIn pelo mesmo painel",
+    "constância vende mais do que um post bonito isolado",
+    "revisar e publicar em vez de criar do zero",
+    "feed profissional sem saber design",
+    "agendar a semana e parar de improvisar sexta à noite",
+    "o preço de um freelancer por um post versus o mês inteiro",
+    "vitrine no ar enquanto você atende o cliente",
+    "três marcas no mesmo lugar sem trocar de ferramenta",
+    "cancela quando quiser, sem fidelidade",
+    "o que o Postei monta: imagem, legenda e chamada",
+    "quem some uma semana some da cabeça do cliente",
+    "parar de copiar concorrente porque não tem ideia",
+    "o teste de dois posts já mostra o tom do seu ramo",
+    "LinkedIn e Instagram com a mesma ideia, arte certa para cada um",
+    "não é falta de ideia, é falta de um mês pronto",
+    "o cliente escolhe o ramo, o Postei escreve e desenha",
+    "publicar agora ou agendar — sem baixar arquivo",
+    "descartar o post ruim e ficar com o que presta"
+  ],
+  "formatosCriativo": ["anuncioIa", "anuncioProduto", "anuncioCta", "destaque", "lista", "citacao"],
+  "produtoFim": "Teste grátis — 2 posts, sem cartão",
+  "paleta": {
+    "fundo": "#F4F1EA",
+    "texto": "#141414",
+    "destaque": "#15803D"
+  },
+  "hashtags": {
+    "nicho": [
+      "conteudoparainstagram",
+      "instagramparanegocio",
+      "socialmedianapratica",
+      "donodenegocio",
+      "marketinglocal",
+      "semcanva",
+      "conteudopratico",
+      "feedprofissional"
+    ],
+    "comunidade": ["pequenosnegocios", "empreendedordigital"]
+  },
+  "observacoes": "ESTE NICHO VENDE O POSTEI. Não escreva dica de finança, receita ou nutrição — isso é o que o app gera PARA o cliente, não o que a marca Postei posta. Headline de anúncio, não título de blog. FATOS que pode citar, e só esses: 30 posts no mês no plano de entrada; 2 posts de teste; sem cartão; cancela quando quiser; Instagram e LinkedIn; R$ 39,90 o Essencial; gera em minutos (pode dizer 'menos de 2 minutos'). PROIBIDO: inventar percentual de venda, número de clientes, depoimento, 'já são X empresas', tempo de geração diferente disso, 'revolucionário', 'o futuro'. CTA do anúncio é o texto do BOTÃO, curto: 'Começar teste grátis' ou 'Experimentar grátis'. Legenda vende o teste e manda para o link na bio (postei.amconsultoria.tech) — aqui 'link na bio' é permitido porque é o Instagram da própria marca. Não invente @ errado: o perfil é @cliqueipostei.app. Não fale de Canva como se o Postei fosse editor — o ponto é NÃO precisar dele."
+}

@@ -11,10 +11,12 @@ export function MidiaPost({
   loteId,
   indice,
   temVideo,
+  permiteFoto = true,
 }: {
   loteId: string;
   indice: number;
   temVideo: boolean;
+  permiteFoto?: boolean;
 }) {
   const router = useRouter();
   const inputFoto = useRef<HTMLInputElement>(null);
@@ -107,23 +109,27 @@ export function MidiaPost({
     <div className="flex flex-col gap-2 rounded-xl border border-linha bg-papel px-3 py-3">
       <span className="rotulo">Mídia</span>
       <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => void pexels()}
-          className="rounded-full border border-linha px-3 py-1.5 text-xs font-medium transition-colors hover:border-tinta/50 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
-        >
-          {ocupado === "pexels" ? "Buscando…" : "Outra foto (banco)"}
-        </button>
+        {permiteFoto && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void pexels()}
+            className="rounded-full border border-linha px-3 py-1.5 text-xs font-medium transition-colors hover:border-tinta/50 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          >
+            {ocupado === "pexels" ? "Buscando…" : "Outra foto (banco)"}
+          </button>
+        )}
 
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => inputFoto.current?.click()}
-          className="rounded-full border border-linha px-3 py-1.5 text-xs font-medium transition-colors hover:border-tinta/50 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
-        >
-          {ocupado === "foto" ? "Aplicando…" : "Enviar minha foto"}
-        </button>
+        {permiteFoto && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => inputFoto.current?.click()}
+            className="rounded-full border border-linha px-3 py-1.5 text-xs font-medium transition-colors hover:border-tinta/50 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          >
+            {ocupado === "foto" ? "Aplicando…" : "Enviar minha foto"}
+          </button>
+        )}
 
         <button
           type="button"
@@ -166,7 +172,9 @@ export function MidiaPost({
         </p>
       )}
       <p className="text-[0.65rem] leading-snug text-cinza">
-        A arte antiga fica em backup no servidor. Foto até 8 MB · vídeo MP4 até 80 MB.
+        {permiteFoto
+          ? "A arte antiga fica em backup no servidor. Foto até 8 MB · vídeo MP4 até 80 MB."
+          : "Anúncio de produto não troca foto. Você pode anexar um MP4 para Reel."}
       </p>
     </div>
   );

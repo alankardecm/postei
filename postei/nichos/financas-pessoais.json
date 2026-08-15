@@ -20,5 +20,18 @@
     "texto": "#F2F6FA",
     "destaque": "#4ADE80"
   },
+  "hashtags": {
+    "nicho": [
+      "organizacaofinanceira",
+      "controlargastos",
+      "reservadeemergencia",
+      "sairdasdividas",
+      "educacaofinanceira",
+      "orcamentodomes",
+      "dinheironamesa",
+      "primeiroinvestimento"
+    ],
+    "comunidade": ["financaspessoais", "vidafinanceira"]
+  },
   "observacoes": "ATENÇÃO REGULATÓRIA: nunca gerar promessa de rendimento, recomendação de ativo específico ou 'ganhe R$ X'. Isso é o que derruba conta em gateway de pagamento (§7.6 do PLANO)."
 }

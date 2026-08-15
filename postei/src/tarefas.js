@@ -21,7 +21,7 @@ import {
  *  Sem teto, uma que sempre quebra ficaria em laço consumindo cota. */
 const TENTATIVAS_MAX = 3;
 
-export async function criarTarefa({ nichoId, marca, quantidade, assinanteId, ciclo }) {
+export async function criarTarefa({ nichoId, marca, quantidade, assinanteId, ciclo, rede, marcaDagua }) {
   if (await temGeracaoEmAndamento(assinanteId)) {
     const erro = new Error('Você já tem um pacote sendo gerado. Aguarde ele terminar.');
     erro.codigo = 'ja_em_andamento';
@@ -30,15 +30,20 @@ export async function criarTarefa({ nichoId, marca, quantidade, assinanteId, cic
 
   const id = randomUUID();
   await criarGeracao({ id, usuarioId: assinanteId, nicho: nichoId, marca, quantidade, ciclo });
+  // Rede e marca d'água no resultado provisório: a tabela não tem coluna
+  // para isso, e a retomada após queda precisa dos dois.
+  await atualizarGeracao(id, {
+    resultado: { rede: rede || 'instagram', marcaDagua: Boolean(marcaDagua) },
+  }).catch(() => {});
 
-  processar({ id, nichoId, marca, quantidade, assinanteId });
+  processar({ id, nichoId, marca, quantidade, assinanteId, rede, marcaDagua });
 
   return { id, situacao: 'gerando' };
 }
 
 /** Roda solta: quem chamou já recebeu o id e vai perguntar o andamento. */
-function processar({ id, nichoId, marca, quantidade, assinanteId }) {
-  gerarPacote({ nichoId, marca, quantidade, assinanteId })
+function processar({ id, nichoId, marca, quantidade, assinanteId, rede, marcaDagua }) {
+  gerarPacote({ nichoId, marca, quantidade, assinanteId, rede, marcaDagua })
     .then((pacote) =>
       atualizarGeracao(id, {
         situacao: 'pronta',
@@ -100,6 +105,8 @@ export async function retomarPendentes() {
       marca: g.marca,
       quantidade: g.quantidade,
       assinanteId: g.usuario_id,
+      rede: g.resultado?.rede,
+      marcaDagua: g.resultado?.marcaDagua,
     });
   }
 

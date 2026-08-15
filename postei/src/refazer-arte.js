@@ -2,11 +2,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { config } from './config.js';
 import { carregarNicho } from './nichos.js';
-import { gerarCriativo, gerarCarrossel } from './criativo.js';
 import { buscarFoto, prepararFotoDeBytes } from './foto.js';
 import { dnaDaMarca } from './banco.js';
 import { paletaDaMarca } from './paleta.js';
-import { pastaDoAssinante } from './gerador.js';
+import { pastaDoAssinante, gravarArtes } from './gerador.js';
 
 /**
  * Re-renderiza a arte de UM post do pacote com nova foto (upload ou Pexels).
@@ -165,58 +164,56 @@ export async function refazerArte({ assinanteId, loteId, indice, fonte, imagemBa
   const backup = await backupDoPost(dir, post);
 
   const numero = String(indice + 1).padStart(2, '0');
-  // Guarda a foto original do assinante (se upload) para auditoria / re-uso.
   let origemFoto = post.origemFoto || null;
   if (fonte === 'upload' && foto.bytes) {
     origemFoto = `origem-${numero}.jpg`;
     await fs.writeFile(path.join(dir, origemFoto), foto.bytes);
   }
 
-  // Para re-render, carrossel continua carrossel; lista vira layout com foto
-  // (a lista tipografica nao tem area de imagem — o assinante pediu foto).
   const ehCarrossel =
     post.formato === 'carrossel' ||
     (Array.isArray(post.imagens) && post.imagens.length > 1);
 
-  let arquivo;
-  let imagens = null;
-  let formato;
+  const postParaArte = ehCarrossel
+    ? {
+        ...post,
+        formato: 'carrossel',
+        slides:
+          Array.isArray(post.slides) && post.slides.length >= 2
+            ? post.slides
+            : [
+                { titulo: post.titulo, texto: post.subtitulo || post.legenda?.slice(0, 120) || '' },
+                { titulo: 'Na prática', texto: post.cta || post.legenda?.slice(0, 120) || '' },
+              ],
+      }
+    : {
+        ...post,
+        formato:
+          post.formato === 'lista'
+            ? 'destaque'
+            : post.formato?.startsWith('anuncio')
+              ? post.formato
+              : post.formato,
+      };
 
-  if (ehCarrossel) {
-    // Garante slides no post: sem miolo o gerador de carrossel fica pobre.
-    const postCarrossel = {
-      ...post,
-      formato: 'carrossel',
-      slides:
-        Array.isArray(post.slides) && post.slides.length >= 2
-          ? post.slides
-          : [
-              { titulo: post.titulo, texto: post.subtitulo || post.legenda?.slice(0, 120) || '' },
-              { titulo: 'Na prática', texto: post.cta || post.legenda?.slice(0, 120) || '' },
-            ],
-    };
-    const r = await gerarCarrossel({ post: postCarrossel, nicho, marca, foto, paleta });
-    formato = r.formato;
-    imagens = [];
-    for (const [s, img] of r.imagens.entries()) {
-      const nome = `post-${numero}-${String(s + 1).padStart(2, '0')}.${r.extensao}`;
-      await fs.writeFile(path.join(dir, nome), img);
-      imagens.push(nome);
-    }
-    arquivo = imagens[0];
-  } else {
-    // Força layout com foto: citacao/destaque/lista + foto viram "foto".
-    const postUnico = { ...post, formato: post.formato === 'lista' ? 'destaque' : post.formato };
-    const r = await gerarCriativo({ post: postUnico, nicho, marca, foto, paleta });
-    formato = r.formato;
-    arquivo = `post-${numero}.${r.extensao}`;
-    await fs.writeFile(path.join(dir, arquivo), r.imagem);
-    imagens = null;
-  }
+  const artes = await gravarArtes({
+    dir,
+    numero,
+    post: postParaArte,
+    nicho,
+    marca,
+    foto,
+    paleta,
+    rede: pacote.rede || 'instagram',
+    assinanteId,
+    marcaDagua: Boolean(pacote.marcaDagua),
+  });
 
-  post.formato = formato;
-  post.imagem = arquivo;
-  post.imagens = imagens;
+  post.formato = artes.formato;
+  post.imagem = artes.arquivo;
+  post.imagens = artes.imagens;
+  post.imagemLinkedin = artes.arquivoLinkedin;
+  post.imagensLinkedin = artes.imagensLinkedin;
   post.origemFoto = origemFoto;
   post.foto = {
     autor: foto.autor,

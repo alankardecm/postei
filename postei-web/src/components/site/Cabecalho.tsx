@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export function Cabecalho() {
+export function Cabecalho({ venda = false }: { venda?: boolean }) {
   return (
     <header className="sticky top-0 z-50 border-b border-linha bg-papel/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-3.5">
@@ -9,12 +9,31 @@ export function Cabecalho() {
           <span className="fonte-display text-xl font-bold tracking-tight">Postei</span>
         </Link>
 
-        <nav className="hidden items-center gap-7 text-sm text-cinza md:flex">
-          <a href="#nichos" className="transition-colors hover:text-tinta">Nichos</a>
-          <a href="#como" className="transition-colors hover:text-tinta">Como funciona</a>
-          <a href="#planos" className="transition-colors hover:text-tinta">Planos</a>
-          <a href="#perguntas" className="transition-colors hover:text-tinta">Dúvidas</a>
-        </nav>
+        {venda ? (
+          <nav className="hidden items-center gap-7 text-sm text-cinza md:flex">
+            <a href="#como" className="transition-colors hover:text-tinta">
+              Como funciona
+            </a>
+            <a href="#nichos" className="transition-colors hover:text-tinta">
+              Exemplos
+            </a>
+            <a href="#planos" className="transition-colors hover:text-tinta">
+              Preços
+            </a>
+          </nav>
+        ) : (
+          <nav className="hidden items-center gap-7 text-sm text-cinza md:flex">
+            <a href="/#nichos" className="transition-colors hover:text-tinta">
+              Nichos
+            </a>
+            <a href="/#como" className="transition-colors hover:text-tinta">
+              Como funciona
+            </a>
+            <a href="/#planos" className="transition-colors hover:text-tinta">
+              Planos
+            </a>
+          </nav>
+        )}
 
         <div className="flex items-center gap-2">
           <Link
@@ -25,9 +44,9 @@ export function Cabecalho() {
           </Link>
           <Link
             href="/criar-conta"
-            className="rounded-full bg-limao px-4 py-2 text-sm font-medium text-ink transition-transform hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            className="rounded-full bg-limao px-4 py-2 text-sm font-semibold text-ink transition-transform hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
           >
-            Criar conta
+            {venda ? "Começar grátis" : "Criar conta"}
           </Link>
         </div>
       </div>

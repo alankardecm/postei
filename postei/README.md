@@ -37,7 +37,14 @@ Sem ele o budget por plano deixa de existir, então a rota falha de propósito.
 
 Solte um `.json` em `nichos/`. **Não precisa de deploy nem de código** — nicho é conteúdo.
 Campos obrigatórios: `id`, `nome`, `publico`, `tomDeVoz`, `temas`, `paleta{fundo,texto,destaque}`.
-Opcionais: `observacoes` (vai para o prompt — use para travas regulatórias) e `produtoFim`.
+Opcionais: `observacoes` (vai para o prompt — use para travas regulatórias), `produtoFim`,
+`interno` (só Alan e Junior vêem no painel), `semFoto` (não busca Pexels) e
+`hashtags` (`nicho` + `comunidade`) — banco de alcance, o modelo não escolhe
+isso sozinho.
+O nicho `postei-marca` é o feed da própria Postei: maioria `anuncioIa`
+(xAI Imagine, `grok-imagine-image`), com `anuncioProduto` / `anuncioCta` no
+meio e como fallback se a chave faltar ou a chamada falhar. Cliente pagante
+continua só no template.
 
 ## Decisões técnicas que valem saber
 

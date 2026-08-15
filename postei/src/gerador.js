@@ -8,6 +8,9 @@ import { buscarFoto } from './foto.js';
 import { buscarEvidencia } from './ciencia.js';
 import { dnaDaMarca } from './banco.js';
 import { paletaDaMarca } from './paleta.js';
+import { normalizarRede, telasDaRede, sufixoArquivo, incluiLinkedin } from './rede.js';
+import { FORMATOS_ANUNCIO } from './anuncio.js';
+import { montarHashtags } from './hashtags.js';
 
 /**
  * M1 - Nucleo de geracao.
@@ -15,7 +18,7 @@ import { paletaDaMarca } from './paleta.js';
  * (imagem + legenda + hashtags + CTA).
  */
 
-const SISTEMA = `Voce e redator de social media brasileiro, especialista em conteudo curto para Instagram.
+const SISTEMA = `Voce e redator de social media brasileiro, especialista em conteudo curto para Instagram e LinkedIn.
 Escreve em portugues do Brasil, no tom exato pedido, sempre de forma concreta e especifica.
 
 AS DUAS REGRAS QUE MAIS IMPORTAM:
@@ -186,6 +189,55 @@ ainda que combine com o perfil. Para dar concretude, use o metodo e os
 exemplos ja descritos acima, ou fale na forma geral e reconhecivel.`;
 }
 
+function formatosDoNicho(nicho) {
+  const lista = Array.isArray(nicho.formatosCriativo) ? nicho.formatosCriativo.filter(Boolean) : [];
+  return lista.length ? lista : ['citacao', 'destaque', 'lista', 'carrossel'];
+}
+
+function blocoFormatos(nicho) {
+  const formatos = formatosDoNicho(nicho);
+  const temAnuncio = formatos.some((f) => FORMATOS_ANUNCIO.has(f));
+  if (!temAnuncio) return '';
+
+  return `
+FORMATOS DE ANUNCIO DESTE NICHO:
+- "anuncioIa": peca gerada por IA (cena nova a cada post: mockup 3D, dashboard,
+  antes/depois, mesa de trabalho). Titulo ate 12 palavras, pode ter ponto.
+  subtitulo ate 16 palavras. cta e o TEXTO DO BOTAO, 3 a 4 palavras
+  ("Começar teste grátis", "Experimentar grátis").
+  "visual": 1 frase descrevendo a CENA da arte, em portugues, sem repetir o
+  titulo. Varie: celular 3D, cards flutuando, tela em branco, calendario de
+  30 dias, dashboard do app. Nunca peca foto de banco.
+- "anuncioProduto": peca hero fixa (headline + celular com grade + botao).
+- "anuncioCta": headline + 3 provas + botao. Use "itens" com 3 frases curtas.
+Use anuncioIa na MAIORIA (cerca de 3 a cada 5). Intercale anuncioProduto e
+anuncioCta para o feed nao ficar so IA. destaque/lista/citacao so de vez em
+quando, ainda vendendo o produto. NAO use carrossel neste nicho.
+`;
+}
+
+function blocoRede(rede) {
+  if (rede === 'linkedin') {
+    return `
+REDE: LinkedIn (nao e Instagram).
+A legenda e um post profissional: 5 a 8 frases curtas, primeira linha e o gancho
+(completa o titulo, nao o repete). Depois ensina ou provoca. Tom de conversa
+entre pares, nao de guru. Sem "link na bio", sem emoji em excesso, sem
+"arrasta pro lado".
+O campo "legendaLinkedin" pode ficar vazio -- use so "legenda".`;
+  }
+  if (rede === 'ambos') {
+    return `
+REDE: Instagram E LinkedIn. Escreva as DUAS legendas.
+"legenda": Instagram -- no maximo 4 frases, gancho + ancora concreta.
+"legendaLinkedin": LinkedIn -- 5 a 8 frases, gancho na primeira linha, tom
+profissional. Sem "link na bio".`;
+  }
+  return `
+REDE: Instagram.
+"legenda": NO MAXIMO 4 FRASES. A primeira completa o gancho.`;
+}
+
 function montarPrompt({
   nicho,
   marca,
@@ -194,8 +246,10 @@ function montarPrompt({
   temas = [],
   evidencias = null,
   dna = null,
+  rede = 'instagram',
 }) {
-  return `Gere ${quantidade} posts de Instagram para a marca "${marca}", no nicho "${nicho.nome}".
+  return `Gere ${quantidade} posts para a marca "${marca}", no nicho "${nicho.nome}".
+${blocoRede(rede)}
 
 ${blocoIdentidade({ nicho, dna })}
 TEMAS DESTE BLOCO - use EXATAMENTE um post por tema, na ordem abaixo:
@@ -210,19 +264,21 @@ ${artigos.map((a, j) => `   [${j + 1}] ${a.titulo} (${a.revista}, ${a.ano})\n   
   })
   .join('\\n')}
 ${nicho.observacoes ? `\nATENCAO ESPECIFICA DESTE NICHO: ${nicho.observacoes}` : ''}
-
+${blocoFormatos(nicho)}
 Responda APENAS um objeto JSON, sem texto em volta, neste formato:
 {
   "posts": [
     {
-      "formato": "citacao" | "destaque" | "lista" | "carrossel",
-      "titulo": "O GANCHO, que vai na imagem. Maximo 10 palavras. Faz parar de rolar, nao descreve o assunto. Sem ponto final. ACENTUACAO OBRIGATORIA tambem aqui: 'alimentação', 'criança', 'você' -- o titulo vai impresso na arte, sem acento fica visivelmente errado.",
+      "formato": ${formatosDoNicho(nicho).map((f) => `"${f}"`).join(' | ')},
+      "titulo": "O GANCHO, que vai na imagem. Maximo 10 palavras (12 no anuncio). Faz parar de rolar, nao descreve o assunto. Anuncio pode ter ponto. ACENTUACAO OBRIGATORIA tambem aqui: 'alimentação', 'criança', 'você' -- o titulo vai impresso na arte, sem acento fica visivelmente errado.",
       "subtitulo": "1 linha de apoio na imagem, max 12 palavras. Use so no formato destaque.",
       "itens": ["usado SO no formato lista: 3 a 4 itens, max 8 palavras cada"],
       "slides": [{"titulo": "max 6 palavras", "texto": "1 a 2 frases curtas, com a ancora concreta"}],
-      "legenda": "NO MAXIMO 4 FRASES. Conte antes de responder: mais de 4 esta errado. A primeira completa o gancho (nao repete o titulo). As outras entregam a ancora concreta - o alimento, a medida, o momento ou o passo. Legenda longa nao e lida: corte tudo que nao ensina.",
-      "hashtags": ["7 a 10 hashtags em minusculo, sem #, misturando amplas e especificas"],
+      "legenda": "Texto principal da rede pedida. Instagram: no maximo 4 frases. LinkedIn: 5 a 8 frases. A primeira completa o gancho (nao repete o titulo).",
+      "legendaLinkedin": "SO quando a rede for ambos: versao LinkedIn da legenda. Senao, string vazia.",
+      "hashtags": ["3 a 5 tags ESPECIFICAS DESTE POST, minusculo, sem #. Sao as palavras que alguem buscaria para ACHAR ESTE assunto, nao o nicho inteiro. BOM (marmita de frango): marmitadefrango, almocopratico, prepararsemana. RUIM: receitas, comida, saude, dicas, brasil, viral. Nao use tag de milhoes de posts. O sistema completa com tags de nicho -- voce so entrega o recorte."],
       "cta": "1 frase curta de chamada para acao, natural, sem 'link na bio'",
+      "visual": "SO no formato anuncioIa: 1 frase da cena da arte. Senao, string vazia.",
       "buscaCientifica": "OBRIGATORIO neste nicho -- nunca deixe nulo. 3 a 6 palavras EM INGLES para achar o estudo no PubMed. Termos tecnicos, nao coloquiais. Bom: 'added sugar infants complementary feeding'. Ruim: 'is sugar bad for babies'.",
       "buscaImagem": "UMA unica busca de 2 a 4 palavras EM INGLES, sem virgula e sem alternativas. Descreva o OBJETO concreto, nunca o conceito. Bom: 'school lunchbox fruit'. Ruim: 'healthy lifestyle' ou 'eggs, lentils, sardines'.",
       "artigo": "SO quando o tema trouxer ESTUDOS DISPONIVEIS: o numero do estudo em que baseou o post, ou 0 se nenhum servir. Diga apenas o que esta no resumo."
@@ -234,36 +290,15 @@ O campo "slides" e usado SO no formato carrossel: 3 a 4 slides de miolo, um
 por ideia, em ordem que faca sentido lido em sequencia. A capa e o fechamento
 sao montados automaticamente a partir do titulo e do cta -- NAO os inclua.
 
-Distribua os formatos ao longo do lote. Use "carrossel" em cerca de 1 a cada 4
-posts: ele da mais alcance, mas exige assunto que se desdobre em etapas.${
+Distribua os formatos ao longo do lote. Se "carrossel" estiver na lista, use
+em cerca de 1 a cada 4 posts: ele da mais alcance, mas exige assunto que se
+desdobre em etapas. Se a lista nao tiver carrossel, nao use.${
     jaGerados.length
       ? `\n\nJA FORAM GERADOS os titulos abaixo neste mesmo pacote. NAO repita o
 assunto nem a estrutura de frase de nenhum deles:
 ${jaGerados.map((p) => `- ${p.titulo}`).join('\n')}`
       : ''
   }`;
-}
-
-/**
- * Hashtag com espaco quebra no Instagram: "#receita rapida" registra so
- * "#receita" e joga o resto como texto solto. O modelo devolve com espaco
- * mesmo instruido a nao fazer, entao a normalizacao tem que ser codigo.
- * Acento tambem sai -- o padrao de mercado no BR e sem.
- */
-function normalizarHashtags(lista) {
-  const vistas = new Set();
-  const saida = [];
-  for (const bruta of lista) {
-    const tag = String(bruta)
-      .normalize('NFD') // separa a letra do acento para o filtro abaixo
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '');
-    if (tag.length < 3 || vistas.has(tag)) continue;
-    vistas.add(tag);
-    saida.push(tag);
-  }
-  return saida;
 }
 
 /**
@@ -301,24 +336,34 @@ export function pastaDoAssinante(id) {
   return limpo;
 }
 
-function validarPost(p, indice) {
+function validarPost(p, indice, formatosPermitidos, { nicho, rede }) {
   const erros = [];
   if (!p.titulo?.trim()) erros.push('titulo vazio');
   if (!p.legenda?.trim()) erros.push('legenda vazia');
-  if (!Array.isArray(p.hashtags) || p.hashtags.length === 0) erros.push('sem hashtags');
   if (erros.length) throw new Error(`Post ${indice + 1} invalido: ${erros.join(', ')}`);
 
-  const hashtags = normalizarHashtags(p.hashtags);
+  const hashtags = montarHashtags({
+    doModelo: p.hashtags,
+    nicho,
+    titulo: p.titulo,
+    rede,
+  });
   if (hashtags.length === 0) {
-    throw new Error(`Post ${indice + 1}: nenhuma hashtag sobreviveu a normalizacao.`);
+    throw new Error(`Post ${indice + 1}: nenhuma hashtag sobreviveu a montagem.`);
   }
 
   // Carrossel sem miolo nao e carrossel. Melhor virar post unico do que
   // gerar uma sequencia de capa + fechamento sem conteudo no meio.
-  const formato =
+  let formato =
     p.formato === 'carrossel' && !(Array.isArray(p.slides) && p.slides.length >= 2)
       ? 'destaque'
       : p.formato || 'destaque';
+
+  // Anúncio de produto só no nicho que pede — senão o feed do cliente
+  // sairia com logo e CTA da Postei.
+  if (FORMATOS_ANUNCIO.has(formato) && formatosPermitidos && !formatosPermitidos.has(formato)) {
+    formato = 'destaque';
+  }
 
   return {
     formato,
@@ -332,21 +377,69 @@ function validarPost(p, indice) {
           .map((s) => ({ titulo: String(s.titulo).trim(), texto: String(s.texto).trim() }))
       : [],
     legenda: p.legenda.trim(),
+    legendaLinkedin: p.legendaLinkedin?.trim() || null,
     hashtags,
     cta: p.cta?.trim() || null,
     buscaImagem: normalizarBusca(p.buscaImagem),
     buscaCientifica: p.buscaCientifica?.trim() || null,
+    visual: p.visual?.trim() || null,
     fonte: p._fonte ?? null,
   };
 }
 
-export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId, comFoto = true }) {
+export async function gravarArtes({
+  dir, numero, post, nicho, marca, foto, paleta, rede, assinanteId, marcaDagua = false,
+}) {
+  const telas = telasDaRede(rede);
+  let arquivo;
+  let imagens = null;
+  let arquivoLinkedin = null;
+  let imagensLinkedin = null;
+  let formato = post.formato;
+
+  for (const tela of telas) {
+    const suf = sufixoArquivo(tela, telas);
+    const paraLinkedin = tela.id === 'linkedin' && telas.length > 1;
+
+    if (post.formato === 'carrossel') {
+      const r = await gerarCarrossel({ post, nicho, marca, foto, paleta, tela, marcaDagua });
+      formato = r.formato;
+      const nomes = [];
+      for (const [s, img] of r.imagens.entries()) {
+        const nome = `post-${numero}-${String(s + 1).padStart(2, '0')}${suf}.${r.extensao}`;
+        await fs.writeFile(path.join(dir, nome), img);
+        nomes.push(nome);
+      }
+      if (paraLinkedin) {
+        imagensLinkedin = nomes;
+        arquivoLinkedin = nomes[0];
+      } else {
+        imagens = nomes;
+        arquivo = nomes[0];
+      }
+    } else {
+      const r = await gerarCriativo({ post, nicho, marca, foto, paleta, tela, assinanteId, marcaDagua });
+      formato = r.formato;
+      const nome = `post-${numero}${suf}.${r.extensao}`;
+      await fs.writeFile(path.join(dir, nome), r.imagem);
+      if (paraLinkedin) arquivoLinkedin = nome;
+      else arquivo = nome;
+    }
+  }
+
+  return { arquivo, imagens, arquivoLinkedin, imagensLinkedin, formato };
+}
+
+export async function gerarPacote({
+  nichoId, marca, quantidade = 5, assinanteId, comFoto = true, rede = 'instagram', marcaDagua = false,
+}) {
   if (!assinanteId) {
     // Sem isso o LiteLLM nao consegue atribuir o custo, e o teto por plano
     // deixa de existir. Falhar aqui e melhor do que gerar de graca.
     throw new Error('assinanteId e obrigatorio (e o que ancora o budget no LiteLLM).');
   }
 
+  rede = normalizarRede(rede);
   const qtd = Math.min(Math.max(1, Number(quantidade) || 1), config.maxPostsPorLote);
   const nicho = await carregarNicho(nichoId);
   const inicio = Date.now();
@@ -402,6 +495,7 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
           temas: temasDoBloco,
           evidencias,
           dna,
+          rede,
         }),
         assinanteId,
         json: true,
@@ -467,7 +561,8 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
   // O modelo entrega mais posts do que o pedido com frequencia. Como o plano
   // e vendido por volume (30/90/300 posts), entregar a mais e furo de cota --
   // o corte tem que ser no codigo, nao no prompt.
-  const posts = bruto.slice(0, qtd).map(validarPost);
+  const permitidos = new Set(formatosDoNicho(nicho));
+  const posts = bruto.slice(0, qtd).map((p, i) => validarPost(p, i, permitidos, { nicho, rede }));
 
 
   // Pasta por lote: o assinante recebe o mes inteiro de uma vez e precisa
@@ -486,53 +581,51 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
     // O formato lista nao usa foto (precisa dos itens legiveis), entao nem
     // buscamos -- evita chamada inutil a API e credito de fotografo em arte
     // que nao tem fotografia nenhuma.
-    const usaraFoto = comFoto && post.formato !== 'lista';  // carrossel usa foto so na capa
+    const usaraFoto =
+      comFoto &&
+      !nicho.semFoto &&
+      post.formato !== 'lista' &&
+      !FORMATOS_ANUNCIO.has(post.formato);
     const foto = usaraFoto ? await buscarFoto({ consulta: post.buscaImagem }) : null;
 
     const numero = String(i + 1).padStart(2, '0');
-    let arquivo;
-    let imagens = null;
-    let formato;
+    const artes = await gravarArtes({
+      dir: dirLote,
+      numero,
+      post,
+      nicho,
+      marca,
+      foto,
+      paleta,
+      rede,
+      assinanteId,
+      marcaDagua,
+    });
 
-    if (post.formato === 'carrossel') {
-      const r = await gerarCarrossel({ post, nicho, marca, foto, paleta });
-      formato = r.formato;
-      // Um arquivo por slide, numerado na ordem de exibicao. O primeiro
-      // tambem e a "capa" usada nas listagens.
-      imagens = [];
-      for (const [s, img] of r.imagens.entries()) {
-        const nome = `post-${numero}-${String(s + 1).padStart(2, '0')}.${r.extensao}`;
-        await fs.writeFile(path.join(dirLote, nome), img);
-        imagens.push(nome);
-      }
-      arquivo = imagens[0];
-    } else {
-      const r = await gerarCriativo({ post, nicho, marca, foto, paleta });
-      formato = r.formato;
-      arquivo = `post-${numero}.${r.extensao}`;
-      await fs.writeFile(path.join(dirLote, arquivo), r.imagem);
+    const tagsIg = post.hashtags.map((h) => `#${h}`).join(' ');
+    const tagsLi = post.hashtags.slice(0, 5).map((h) => `#${h}`).join(' ');
+    const fonteTxt =
+      post.fonte &&
+      `Fonte: ${post.fonte.titulo} (${post.fonte.revista}, ${post.fonte.ano}) - ${post.fonte.url}`;
+
+    if (artes.formato === 'anuncioIa' && i < posts.length - 1) {
+      await esperar(2000);
     }
 
     resultado.push({
       ...post,
-      formato,
-      // So registra a foto se o layout realmente a usou.
-      foto: (formato === 'foto' || formato === 'carrossel') && foto
+      formato: artes.formato,
+      foto: (artes.formato === 'foto' || artes.formato === 'carrossel') && foto
         ? { autor: foto.autor, origem: foto.origem }
         : null,
-      // Lista de slides do carrossel; nulo nos demais formatos.
-      imagens,
-      imagem: arquivo,
-      textoParaColar: [
-        post.legenda,
-        post.cta,
-        // A fonte vai ANTES das hashtags: depois delas ninguem le.
-        post.fonte &&
-          `Fonte: ${post.fonte.titulo} (${post.fonte.revista}, ${post.fonte.ano}) - ${post.fonte.url}`,
-        post.hashtags.map((h) => `#${h}`).join(' '),
-      ]
-        .filter(Boolean)
-        .join('\n\n'),
+      imagens: artes.imagens,
+      imagem: artes.arquivo,
+      imagemLinkedin: artes.arquivoLinkedin,
+      imagensLinkedin: artes.imagensLinkedin,
+      textoParaColar: [post.legenda, post.cta, fonteTxt, tagsIg].filter(Boolean).join('\n\n'),
+      textoParaColarLinkedin: incluiLinkedin(rede)
+        ? [post.legendaLinkedin || post.legenda, post.cta, fonteTxt, tagsLi].filter(Boolean).join('\n\n')
+        : null,
     });
   }
 
@@ -540,6 +633,8 @@ export async function gerarPacote({ nichoId, marca, quantidade = 5, assinanteId,
     loteId,
     nicho: { id: nicho.id, nome: nicho.nome },
     marca,
+    rede,
+    marcaDagua: Boolean(marcaDagua),
     assinanteId,
     geradoEm: new Date().toISOString(),
     duracaoMs: Date.now() - inicio,

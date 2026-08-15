@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { publicarAgora } from "@/lib/publicacao";
+import { publicarLinkedinAgora } from "@/lib/publicacao-linkedin";
 
 /**
  * Publica o que está vencido na fila.
@@ -64,6 +65,41 @@ export async function POST(request: Request) {
     } catch (erro) {
       // `publicarAgora` já gravou a falha no registro; aqui só contamos.
       console.error(`[postei][cron] ${item.lote_id}#${item.indice}:`, (erro as Error).message);
+      falhas += 1;
+    }
+  }
+
+  const { data: filaLi, error: erroLi } = await admin
+    .from("publicacoes_linkedin")
+    .select("id, usuario_id, lote_id, indice")
+    .eq("situacao", "agendada")
+    .lte("agendada_para", agora)
+    .order("agendada_para", { ascending: true })
+    .limit(MAX_POR_RODADA);
+
+  if (erroLi) return NextResponse.json({ erro: erroLi.message }, { status: 500 });
+
+  for (const item of filaLi ?? []) {
+    const { data: travou } = await admin
+      .from("publicacoes_linkedin")
+      .update({ situacao: "publicando", atualizado_em: new Date().toISOString() })
+      .eq("id", item.id)
+      .eq("situacao", "agendada")
+      .select("id");
+
+    if (!travou?.length) continue;
+
+    try {
+      await publicarLinkedinAgora({
+        usuarioId: item.usuario_id,
+        loteId: item.lote_id,
+        indice: item.indice,
+        registroId: item.id,
+        base,
+      });
+      publicados += 1;
+    } catch (erro) {
+      console.error(`[postei][cron-li] ${item.lote_id}#${item.indice}:`, (erro as Error).message);
       falhas += 1;
     }
   }

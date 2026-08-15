@@ -23,15 +23,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Postei — seu mês de conteúdo, pronto",
+  metadataBase: new URL("https://postei.amconsultoria.tech"),
+  title: {
+    default: "Postei — seu mês no Instagram, pronto",
+    template: "%s — Postei",
+  },
   description:
-    "Diga o ramo do seu negócio e receba o mês inteiro de posts pronto: imagem, legenda, hashtags e chamada. Sem começar do zero toda semana.",
+    "30 posts com imagem e legenda. Você escolhe Instagram, LinkedIn ou os dois — revisa e publica, sem design e sem cartão para testar.",
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Postei — seu mês de conteúdo, pronto",
+    title: "Postei — seu mês no Instagram, pronto",
     description:
-      "Diga o ramo do seu negócio e receba o mês inteiro de posts pronto.",
+      "30 posts prontos. Você revisa e publica. Sem Canva, sem cartão para começar.",
+    url: "/",
+    siteName: "Postei",
     type: "website",
     locale: "pt_BR",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Postei — seu mês de conteúdo, pronto" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Postei — seu mês de conteúdo, pronto",
+    description:
+      "Receba o mês de posts pronto. Revise e publique no Instagram.",
+    images: ["/og.jpg"],
   },
 };
 

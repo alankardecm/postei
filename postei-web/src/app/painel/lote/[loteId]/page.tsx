@@ -7,7 +7,13 @@ import { EditarPost } from "@/components/painel/EditarPost";
 import { motor, usuarioAtual, ErroMotor } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { assinaturaDe } from "@/lib/cota";
-import { PLANOS } from "@/lib/planos";
+import {
+  PLANOS,
+  deveMencionarMarca,
+  INSTAGRAM_MARCA,
+  MENCAO_INSTAGRAM_MARCA,
+  jaMencionaMarca,
+} from "@/lib/planos";
 
 export const metadata = { title: "Pacote — Postei" };
 export const dynamic = "force-dynamic";
@@ -23,6 +29,8 @@ type Post = {
   cta: string | null;
   hashtags: string[];
   imagem: string;
+  imagemLinkedin?: string | null;
+  textoParaColarLinkedin?: string | null;
   /** ISO da última re-render (troca de foto) — usado para bust de cache na UI */
   arteRefeitaEm?: string | null;
 };
@@ -30,8 +38,9 @@ type Post = {
 type Pacote = {
   loteId: string;
   marca: string;
-  nicho: { nome: string };
+  nicho: { id?: string; nome: string };
   geradoEm: string;
+  rede?: "instagram" | "linkedin" | "ambos";
   posts: Post[];
 };
 
@@ -58,6 +67,14 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
     .eq("usuario_id", user.id)
     .maybeSingle();
 
+  const { data: contaLi } = await admin
+    .from("contas_linkedin")
+    .select("nome")
+    .eq("usuario_id", user.id)
+    .maybeSingle();
+
+  const mencionarMarca = deveMencionarMarca(pacote.nicho.id, conta?.username);
+
   return (
     <>
       <Cabecalho />
@@ -72,8 +89,23 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
           </h1>
           <p className="mt-2 text-cinza">
             {pacote.marca} · {pacote.posts.length} posts ·{" "}
-            {new Date(pacote.geradoEm).toLocaleDateString("pt-BR")}
+            {pacote.rede === "linkedin"
+              ? "LinkedIn"
+              : pacote.rede === "ambos"
+                ? "Instagram e LinkedIn"
+                : "Instagram"}{" "}
+            · {new Date(pacote.geradoEm).toLocaleDateString("pt-BR")}
           </p>
+
+          {mencionarMarca && (
+            <p className="mt-4 rounded-2xl border border-linha bg-papel px-4 py-3 text-sm text-cinza">
+              {conta?.username
+                ? `O Instagram conectado é @${conta.username}, não @${INSTAGRAM_MARCA}. `
+                : `Em outro Instagram que não @${INSTAGRAM_MARCA}, `}
+              a publicação leva <span className="text-tinta">{MENCAO_INSTAGRAM_MARCA}</span>{" "}
+              para o toque ir ao perfil oficial.
+            </p>
+          )}
 
           <ul className="mt-10 flex flex-col gap-5">
             {pacote.posts.map((post, i) => (
@@ -94,6 +126,20 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                     className="h-auto w-full rounded-lg border border-linha"
                     unoptimized
                   />
+                  {post.imagemLinkedin && (
+                    <Image
+                      src={`/api/lotes/${encodeURIComponent(loteId)}/imagem/${encodeURIComponent(post.imagemLinkedin)}${
+                        post.arteRefeitaEm
+                          ? `?t=${encodeURIComponent(post.arteRefeitaEm)}`
+                          : ""
+                      }`}
+                      alt={`${post.titulo} — LinkedIn`}
+                      width={1080}
+                      height={1080}
+                      className="h-auto w-full rounded-lg border border-linha"
+                      unoptimized
+                    />
+                  )}
                   {post.imagens && post.imagens.length > 1 && (
                     <span className="rotulo text-center">
                       capa · {post.imagens.length} slides abaixo
@@ -121,7 +167,11 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                           : "border border-linha text-cinza"
                       }`}
                     >
-                      {post.formato}
+                      {String(post.formato || "").startsWith("anuncio")
+                        ? post.formato === "anuncioIa"
+                          ? "anúncio IA"
+                          : "anúncio"
+                        : post.formato}
                       {post.imagens && post.imagens.length > 1 && ` · ${post.imagens.length}`}
                     </span>
                   </div>
@@ -131,7 +181,18 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                   </h2>
 
                   <p className="text-sm leading-relaxed text-cinza">{post.legenda}</p>
+                  {post.textoParaColarLinkedin && pacote.rede === "ambos" && (
+                    <div className="rounded-xl border border-linha bg-papel px-3 py-2">
+                      <p className="rotulo mb-1">LinkedIn</p>
+                      <p className="text-sm leading-relaxed text-cinza whitespace-pre-wrap">
+                        {post.textoParaColarLinkedin}
+                      </p>
+                    </div>
+                  )}
                   {post.cta && <p className="text-sm font-medium text-folha">{post.cta}</p>}
+                  {mencionarMarca && !jaMencionaMarca(`${post.legenda}\n${post.cta ?? ""}`) && (
+                    <p className="text-sm font-medium text-tinta">{MENCAO_INSTAGRAM_MARCA}</p>
+                  )}
 
                   {post.fonte && (
                     <a
@@ -154,8 +215,12 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                       loteId={loteId}
                       indice={i}
                       conectado={Boolean(conta)}
+                      conectadoLinkedin={Boolean(contaLi)}
                       podeEditar={PLANOS[assinatura.plano].podeEditar}
                       temVideo={Boolean(post.video)}
+                      permiteFoto={!String(post.formato || "").startsWith("anuncio")}
+                      podePublicarInstagram={pacote.rede !== "linkedin"}
+                      podePublicarLinkedin={pacote.rede === "linkedin" || pacote.rede === "ambos"}
                       legenda={post.legenda}
                       cta={post.cta}
                       hashtags={post.hashtags}

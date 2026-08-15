@@ -335,6 +335,9 @@ Alan, Juliana e Junior têm o plano **Estúdio sem cobrança**. A lista é de e-
 `lib/planos.ts`, e por isso vale **antes do cadastro** — quem está nela já cria a conta com
 o acesso valendo, sem ninguém precisar liberar nada.
 
+O ramo **Postei — marca própria** (Imagine da xAI) é outra lista: só Alan e Junior
+(`DONOS_MARCA`). Cortesia de piloto não gera anúncio da casa nem gasta a chave da xAI.
+
 Fica em código e não numa tela de administração de propósito: conceder plano de graça pela
 interface é porta de entrada se alguém tomar uma conta.
 
@@ -386,6 +389,12 @@ tipográfico, senão aparece franja em volta das letras.
 **O que o modelo ignora vira código.** Repetição entre blocos, hashtag com espaço,
 quantidade acima do pedido, busca de foto com vírgula — todos foram instruídos no prompt,
 todos foram desobedecidos, todos hoje são tratados em código.
+
+**Hashtag não é enfeite.** O modelo só sugere o recorte deste post. O mix de
+alcance (nicho médio + comunidade, sem mega-tag) é código, em `hashtags.js`.
+
+**Teste grátis leva marca d'água.** Selo sutil da Postei no canto da arte.
+Quem paga, não.
 
 ---
 

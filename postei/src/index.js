@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { config } from './config.js';
-import { listarNichos } from './nichos.js';
+import { listarNichos, carregarNicho } from './nichos.js';
 import { pastaDoAssinante } from './gerador.js';
 import { criarTarefa, verTarefa, retomarPendentes, encerrarInsistentes } from './tarefas.js';
 import { refazerArte, gravarVideoPost } from './refazer-arte.js';
@@ -47,10 +47,20 @@ function exigirAssinante(req, res, next) {
 
 app.get('/saude', (_req, res) => res.json({ ok: true, versao: '0.2.0' }));
 
-app.get('/nichos', async (_req, res) => {
+app.get('/nichos', async (req, res) => {
   try {
     const nichos = await listarNichos();
-    res.json(nichos.map(({ id, nome, publico, produtoFim }) => ({ id, nome, publico, produtoFim })));
+    const incluirInternos = req.get('x-postei-internos') === '1';
+    const lista = incluirInternos ? nichos : nichos.filter((n) => !n.interno);
+    res.json(
+      lista.map(({ id, nome, publico, produtoFim, interno }) => ({
+        id,
+        nome,
+        publico,
+        produtoFim,
+        interno: Boolean(interno),
+      })),
+    );
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
   }
@@ -58,16 +68,22 @@ app.get('/nichos', async (_req, res) => {
 
 // Enfileira a geracao e devolve o id na hora. Nao espera os ~3 minutos.
 app.post('/tarefas', exigirChave, exigirAssinante, async (req, res) => {
-  const { nicho, marca, quantidade, ciclo } = req.body || {};
+  const { nicho, marca, quantidade, ciclo, rede, marcaDagua } = req.body || {};
   if (!nicho || !marca) {
     return res.status(400).json({ erro: "Campos obrigatórios: 'nicho' e 'marca'." });
   }
   try {
+    const definicao = await carregarNicho(nicho);
+    if (definicao.interno && req.get('x-postei-internos') !== '1') {
+      return res.status(403).json({ erro: 'Este ramo é interno da Postei.' });
+    }
     const tarefa = await criarTarefa({
       nichoId: nicho,
       marca,
       quantidade,
       ciclo,
+      rede,
+      marcaDagua: marcaDagua === true,
       assinanteId: req.assinante,
     });
     res.status(202).json({ id: tarefa.id, situacao: tarefa.situacao });
@@ -103,6 +119,7 @@ app.get('/lotes', exigirChave, exigirAssinante, async (req, res) => {
           geradoEm: pacote.geradoEm,
           posts: pacote.posts.length,
           parcial: Boolean(pacote.parcial),
+          rede: pacote.rede || 'instagram',
           capa: pacote.posts[0]?.imagem || null,
         });
       } catch {

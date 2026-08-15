@@ -1,4 +1,4 @@
-import { Cabecalho } from "@/components/site/Cabecalho";
+import { Venda } from "@/components/site/Venda";
 import { Rodape } from "@/components/site/Secoes";
 import { Documento, Secao } from "@/components/site/Documento";
 import { CONTROLADOR, ATUALIZADO_EM } from "@/lib/juridico";
@@ -10,8 +10,7 @@ export const metadata = {
 
 export default function Termos() {
   return (
-    <>
-      <Cabecalho />
+    <Venda>
       <Documento titulo="Termos de Uso" atualizado={ATUALIZADO_EM}>
         <p>
           O Postei é um produto da <strong>{CONTROLADOR.nome}</strong>, nome fantasia de{" "}
@@ -124,6 +123,6 @@ export default function Termos() {
         </Secao>
       </Documento>
       <Rodape />
-    </>
+    </Venda>
   );
 }

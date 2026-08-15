@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { motor, usuarioAtual, ErroMotor } from "@/lib/motor";
-import { reservar, devolver, SemCota } from "@/lib/cota";
+import { reservar, devolver, SemCota, assinaturaDe } from "@/lib/cota";
+import { ehAcessoMarcaPropria } from "@/lib/planos";
 
 /** Enfileira uma geração para o usuário da sessão. */
 export async function POST(request: Request) {
@@ -11,12 +12,21 @@ export async function POST(request: Request) {
   const nicho = typeof corpo?.nicho === "string" ? corpo.nicho : "";
   const marca = typeof corpo?.marca === "string" ? corpo.marca.trim() : "";
   const quantidade = Number(corpo?.quantidade) || 10;
+  const redeBruta = typeof corpo?.rede === "string" ? corpo.rede.trim().toLowerCase() : "instagram";
+  const rede =
+    redeBruta === "linkedin" || redeBruta === "ambos" || redeBruta === "instagram"
+      ? redeBruta
+      : "instagram";
 
   if (!nicho || !marca) {
     return NextResponse.json({ erro: "Escolha o nicho e informe o nome do perfil." }, { status: 400 });
   }
   if (marca.length > 40) {
     return NextResponse.json({ erro: "O nome do perfil está muito longo." }, { status: 400 });
+  }
+  const podeInterno = ehAcessoMarcaPropria(user.email);
+  if (nicho === "postei-marca" && !podeInterno) {
+    return NextResponse.json({ erro: "Este ramo é interno da Postei." }, { status: 403 });
   }
 
   // Reserva a cota ANTES de enfileirar. Se reservasse depois, duas
@@ -34,12 +44,19 @@ export async function POST(request: Request) {
 
   try {
     // O assinante vem da SESSÃO, nunca do corpo da requisição.
-    const tarefa = await motor.criarTarefa(user.id, {
-      nicho,
-      marca,
-      quantidade,
-      ciclo: reserva.ciclo,
-    });
+    const assinatura = await assinaturaDe(user.id);
+    const tarefa = await motor.criarTarefa(
+      user.id,
+      {
+        nicho,
+        marca,
+        quantidade,
+        rede,
+        ciclo: reserva.ciclo,
+        marcaDagua: assinatura.plano === "teste",
+      },
+      { internos: podeInterno },
+    );
     return NextResponse.json({ ...tarefa, restantes: reserva.restantes }, { status: 202 });
   } catch (erro) {
     // A geração não começou: devolver o que foi reservado, senão o assinante

@@ -63,7 +63,7 @@ export function PedirRecuperacao() {
       </label>
 
       {erro && (
-        <p role="alert" className="rounded-xl bg-ink px-4 py-3 text-sm text-tinta">
+        <p role="alert" className="rounded-xl bg-ink px-4 py-3 text-sm text-[#F2F4EE]">
           {erro}
         </p>
       )}

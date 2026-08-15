@@ -7,11 +7,12 @@ import { motor, usuarioAtual, type Lote, type Nicho } from "@/lib/motor";
 import { Captacao, type LinkResumo } from "@/components/painel/Captacao";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { consumoDe } from "@/lib/cota";
-import { volumesDe, PLANOS } from "@/lib/planos";
+import { volumesDe, PLANOS, ehAcessoMarcaPropria } from "@/lib/planos";
 import { Assinatura } from "@/components/painel/Assinatura";
 import { sincronizarAssinatura } from "@/lib/assinatura-sync";
 import { DnaMarca } from "@/components/painel/DnaMarca";
 import { Instagram, type ContaIg } from "@/components/painel/Instagram";
+import { LinkedIn } from "@/components/painel/LinkedIn";
 import { Agendados, type Agendado } from "@/components/painel/Agendados";
 
 export const metadata = { title: "Painel — Postei" };
@@ -40,7 +41,10 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
   let falha: string | null = null;
 
   try {
-    [nichos, lotes] = await Promise.all([motor.nichos(user.id), motor.lotes(user.id)]);
+    [nichos, lotes] = await Promise.all([
+      motor.nichos(user.id, { internos: ehAcessoMarcaPropria(user.email) }),
+      motor.lotes(user.id),
+    ]);
   } catch (erro) {
     falha = (erro as Error).message;
   }
@@ -83,7 +87,13 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
 
   const cota = await consumoDe(user.id);
 
-  const { ig } = await searchParams;
+  const { data: contaLi } = await admin
+    .from("contas_linkedin")
+    .select("nome, expira_em")
+    .eq("usuario_id", user.id)
+    .maybeSingle();
+
+  const { ig, li } = await searchParams;
 
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -160,6 +170,12 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
                       <p className="truncate text-sm text-cinza">{lote.marca}</p>
                       <p className="mt-2 text-sm tabular-nums text-cinza">
                         {lote.posts} posts ·{" "}
+                        {lote.rede === "linkedin"
+                          ? "LinkedIn"
+                          : lote.rede === "ambos"
+                            ? "IG + LinkedIn"
+                            : "Instagram"}{" "}
+                        ·{" "}
                         {new Date(lote.geradoEm).toLocaleDateString("pt-BR", {
                           day: "2-digit",
                           month: "short",
@@ -194,6 +210,7 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
           <Agendados itens={(fila ?? []) as Agendado[]} />
 
           <Instagram conta={conta as ContaIg} aviso={typeof ig === "string" ? ig : undefined} />
+          <LinkedIn conta={contaLi} aviso={typeof li === "string" ? li : undefined} />
 
           <Captacao links={links} base={base} />
         </div>
