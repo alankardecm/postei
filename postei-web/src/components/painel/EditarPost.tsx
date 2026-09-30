@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Publicar } from "@/components/painel/Publicar";
 import { PublicarLinkedin } from "@/components/painel/PublicarLinkedin";
 import { MidiaPost } from "@/components/painel/MidiaPost";
+import type { PublicacaoDoPost } from "@/lib/situacao-publicacao";
 
 /**
  * Revisão do texto antes de publicar.
@@ -20,9 +21,14 @@ export function EditarPost({
   conectadoLinkedin = false,
   podeEditar,
   temVideo = false,
+  videoPreview = null,
   permiteFoto = true,
+  podeGerarReel = false,
+  marcaReel = null,
   podePublicarInstagram = true,
   podePublicarLinkedin = false,
+  publicacaoIg = null,
+  publicacaoLi = null,
   legenda: legendaInicial,
   cta: ctaInicial,
   hashtags: hashtagsIniciais,
@@ -33,9 +39,14 @@ export function EditarPost({
   conectadoLinkedin?: boolean;
   podeEditar: boolean;
   temVideo?: boolean;
+  videoPreview?: string | null;
   permiteFoto?: boolean;
+  podeGerarReel?: boolean;
+  marcaReel?: "postei" | "am" | "cliente" | null;
   podePublicarInstagram?: boolean;
   podePublicarLinkedin?: boolean;
+  publicacaoIg?: PublicacaoDoPost | null;
+  publicacaoLi?: PublicacaoDoPost | null;
   legenda: string;
   cta: string | null;
   hashtags: string[];
@@ -85,7 +96,15 @@ export function EditarPost({
   if (!editando) {
     return (
       <div className="flex flex-col gap-3">
-        <MidiaPost loteId={loteId} indice={indice} temVideo={temVideo} permiteFoto={permiteFoto} />
+        <MidiaPost
+          loteId={loteId}
+          indice={indice}
+          temVideo={temVideo}
+          videoPreview={videoPreview}
+          permiteFoto={permiteFoto}
+          podeGerarReel={podeGerarReel}
+          marcaReel={marcaReel}
+        />
         <div className="flex flex-wrap items-center gap-3">
           {podePublicarInstagram && (
             <Publicar
@@ -93,6 +112,9 @@ export function EditarPost({
               indice={indice}
               conectado={conectado}
               temVideo={temVideo}
+              situacaoInicial={publicacaoIg?.situacao}
+              agendadaPara={publicacaoIg?.quando}
+              erroInicial={publicacaoIg?.erro}
             />
           )}
           {podePublicarLinkedin && (
@@ -100,6 +122,9 @@ export function EditarPost({
               loteId={loteId}
               indice={indice}
               conectado={conectadoLinkedin}
+              situacaoInicial={publicacaoLi?.situacao}
+              agendadaPara={publicacaoLi?.quando}
+              erroInicial={publicacaoLi?.erro}
             />
           )}
           {podeEditar ? (

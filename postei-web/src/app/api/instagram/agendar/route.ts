@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { usuarioAtual } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { contaConectada } from "@/lib/publicacao";
+import { contaConectada, registroAtivoInstagram } from "@/lib/publicacao";
 import { assinaturaDe } from "@/lib/cota";
 import { PLANOS } from "@/lib/planos";
 
@@ -32,6 +32,14 @@ export async function POST(request: Request) {
 
   const conta = await contaConectada(user.id);
   if (!conta) return NextResponse.json({ erro: "Conecte seu Instagram antes." }, { status: 400 });
+
+  const ja = await registroAtivoInstagram(user.id, loteId, indice);
+  if (ja?.situacao === "publicada") {
+    return NextResponse.json({ erro: "Esse post já foi publicado." }, { status: 409 });
+  }
+  if (ja?.situacao === "publicando") {
+    return NextResponse.json({ erro: "Esse post já está saindo." }, { status: 409 });
+  }
 
   const admin = criarClienteAdmin();
 

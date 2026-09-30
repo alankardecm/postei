@@ -94,5 +94,29 @@
     "formato": "foto",
     "titulo": "Fibras: o que comer para se sentir saciada?",
     "comFoto": true
+  },
+  {
+    "arquivo": "13-telecom-b2b.png",
+    "nicho": "Telecomunicações & Conectividade B2B",
+    "nichoId": "telecom-b2b",
+    "formato": "lista",
+    "titulo": "Link Dedicado vs Banda Larga Comum: Por que sua empresa não pode oscilar",
+    "comFoto": true
+  },
+  {
+    "arquivo": "14-telecom-b2b.png",
+    "nicho": "Telecomunicações & Conectividade B2B",
+    "nichoId": "telecom-b2b",
+    "formato": "lista",
+    "titulo": "NOC e SOC 24/7: Sua rede protegida e monitorada enquanto sua equipe descansa",
+    "comFoto": true
+  },
+  {
+    "arquivo": "15-telecom-b2b.png",
+    "nicho": "Telecomunicações & Conectividade B2B",
+    "nichoId": "telecom-b2b",
+    "formato": "lista",
+    "titulo": "Rede Lan2Lan: 3 sinais de que sua empresa precisa interligar filiais com segurança",
+    "comFoto": true
   }
 ]

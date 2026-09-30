@@ -11,16 +11,16 @@ const WHATS =
 
 const dores = [
   {
-    t: "Tela em branco",
-    d: "Toda semana a mesma coisa: sentar para postar e não sair nada. O feed some.",
+    t: "Feed e LinkedIn abandonados",
+    d: "Semanas sem postar. Quando clientes, parceiros ou talentos visitam sua página, parece que o negócio parou no tempo.",
   },
   {
-    t: "Someu do Instagram",
-    d: "Quem não aparece some da cabeça do cliente. Constância vende mais do que post bonito isolado.",
+    t: "Agência que não entende o seu ramo",
+    d: "Passar horas explicando termos técnicos para redatores que só sabem criar posts genéricos de feriado ou dia comemorativo.",
   },
   {
-    t: "Canva até tarde",
-    d: "Ou você paga designer, ou gasta a noite montando post. Os dois custam o tempo que deveria ir para o negócio.",
+    t: "Tempo roubado da operação",
+    d: "A diretoria ou a equipe perde dias cobrando designers, revisando peças e improvisando conteúdo que deveria estar rodando no piloto profissional.",
   },
 ];
 
@@ -66,7 +66,7 @@ export function Nichos() {
               criativos.find((c) => c.nichoId === n.id);
             return (
               <AnimatedContent key={n.id} distance={28} duration={0.55} delay={i * 0.06} threshold={0.15}>
-                <article>
+                <Link href={`/nichos/${n.id}`} className="group block">
                   {exemplo && (
                     <CartaoIg
                       arquivo={exemplo.arquivo}
@@ -74,9 +74,9 @@ export function Nichos() {
                       marca={n.id.replace(/-/g, "")}
                     />
                   )}
-                  <h3 className="fonte-display mt-4 text-lg font-bold tracking-tight">{n.nome}</h3>
+                  <h3 className="fonte-display mt-4 text-lg font-bold tracking-tight group-hover:text-folha">{n.nome}</h3>
                   <p className="mt-1 text-sm text-cinza">{n.publico}</p>
-                </article>
+                </Link>
               </AnimatedContent>
             );
           })}
@@ -179,6 +179,73 @@ export function Planos() {
             </SpotlightCard>
           ))}
         </div>
+
+        {/* Banner Plano Corporativo / Telecom B2B */}
+        <div className="mt-8 overflow-hidden rounded-3xl border border-linha bg-[#0A1926] p-7 text-white sm:p-10 shadow-xl">
+          <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
+            <div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="rounded-full bg-[#00D284]/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#00D284]">
+                  Corporativo & B2B
+                </span>
+                <span className="text-xs text-[#8EA9BF]">Para operadoras, ISPs, telecom e empresas de TI</span>
+              </div>
+              <h3 className="fonte-display mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Plano Corporativo / Enterprise
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#A6C2D6] sm:text-base">
+                Para negócios que exigem rigor técnico, conformidade de marca e presença executiva no LinkedIn e Instagram.
+              </p>
+
+              <div className="mt-6 grid gap-2.5 text-sm sm:grid-cols-2 text-[#E4EFF7]">
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#00D284]" />
+                  <span>Company Page no LinkedIn + Instagram</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#00D284]" />
+                  <span>Carrosséis técnicos em PDF para LinkedIn</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#00D284]" />
+                  <span>Manual de Marca integrado (Brandbook & cores)</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#00D284]" />
+                  <span>Glossário técnico (SLA, DDoS, Lan2Lan, NOC)</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#00D284]" />
+                  <span>Workflow com aprovação de múltiplos gestores</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#00D284]" />
+                  <span>Curadoria e suporte consultivo dedicado</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-start rounded-2xl border border-[#1F3C54] bg-[#0F2436] p-6 lg:items-center lg:text-center">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#00D284]">
+                Proposta Personalizada
+              </span>
+              <p className="fonte-display mt-2 text-2xl font-bold text-white sm:text-3xl">
+                Consulte condições
+              </p>
+              <p className="mt-1 text-xs text-[#8EA9BF]">
+                Demonstração técnica e alinhamento de escopo
+              </p>
+              <a
+                href={`${WHATS}%20Tenho%20interesse%20no%20Plano%20Corporativo%20B2B%20para%20minha%20empresa.`}
+                target="_blank"
+                rel="noopener"
+                className="mt-5 w-full rounded-full bg-[#00D284] px-6 py-3.5 text-center text-sm font-bold text-[#0A1926] shadow-lg transition-transform hover:-translate-y-0.5"
+              >
+                Falar com Especialista B2B
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -220,7 +287,7 @@ export function ChamadaFinal() {
           Semana que vem seu feed já pode estar no ar.
         </h2>
         <p className="mt-5 max-w-lg text-lg text-white/70">
-          Cria a conta, gera o teste, publica. Sem cartão e sem compromisso.
+          Cria a conta, cola o DNA, gera o teste, publica. Sem cartão e sem compromisso.
         </p>
         <div className="mt-9 flex flex-wrap gap-3">
           <Link
@@ -266,6 +333,9 @@ export function Rodape() {
             comercial@amconsultoria.tech
           </a>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:justify-end">
+            <Link href="/nichos" className="transition-colors hover:text-tinta">
+              Ramos
+            </Link>
             <Link href="/privacidade" className="transition-colors hover:text-tinta">
               Privacidade
             </Link>

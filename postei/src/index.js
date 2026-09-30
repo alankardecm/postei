@@ -5,15 +5,16 @@ import { config } from './config.js';
 import { listarNichos, carregarNicho } from './nichos.js';
 import { pastaDoAssinante } from './gerador.js';
 import { criarTarefa, verTarefa, retomarPendentes, encerrarInsistentes } from './tarefas.js';
-import { refazerArte, gravarVideoPost } from './refazer-arte.js';
+import { refazerArte, gravarVideoPost, gerarPreviewReel, decidirPreviewReel } from './refazer-arte.js';
 import { montarEntrega, nomeDoZip } from './entrega.js';
+import { importarArte } from './importar-arte.js';
 
 const app = express();
 // Upload de foto/video precisa de teto maior. O parser global de 1mb
 // NAO pode rodar nessas rotas — no Express o primeiro body parser
 // consome o stream; se ele estourar o limite, a rota dedicada nunca roda.
 app.use((req, res, next) => {
-  if (/\/posts\/[^/]+\/(arte|video)$/.test(req.path)) return next();
+  if (req.path === '/importacoes' || /\/posts\/[^/]+\/(arte|video)$/.test(req.path)) return next();
   return express.json({ limit: '1mb' })(req, res, next);
 });
 
@@ -48,6 +49,17 @@ function exigirAssinante(req, res, next) {
 
 app.get('/saude', (_req, res) => res.json({ ok: true, versao: '0.2.0' }));
 
+app.post('/importacoes', exigirChave, express.json({ limit: '12mb' }), exigirAssinante, async (req, res) => {
+  if (req.get('x-postei-internos') !== '1') return res.status(403).json({ erro: 'Importação disponível para a marca própria.' });
+  try {
+    const { marca, titulo, legenda, imagemBase64 } = req.body || {};
+    const pacote = await importarArte({ raiz: config.saida, assinanteId: req.assinante, marca, titulo, legenda, imagemBase64 });
+    res.status(201).json({ loteId: pacote.loteId });
+  } catch (erro) {
+    res.status(erro.codigo || 500).json({ erro: erro.codigo ? erro.message : 'Não consegui guardar a arte.' });
+  }
+});
+
 app.get('/nichos', async (req, res) => {
   try {
     const nichos = await listarNichos();
@@ -77,6 +89,10 @@ app.post('/tarefas', exigirChave, exigirAssinante, async (req, res) => {
     const definicao = await carregarNicho(nicho);
     if (definicao.interno && req.get('x-postei-internos') !== '1') {
       return res.status(403).json({ erro: 'Este ramo é interno da Postei.' });
+    }
+    if (nicho === 'am-consultoria' && definicao.direcaoVisual === 'editorial-am') {
+      if (!Number.isInteger(quantidade) || quantidade < 1 || quantidade > 5) return res.status(400).json({ erro: 'A direção editorial AM aceita de 1 a 5 posts.' });
+      if (!config.xai.apiKey) return res.status(503).json({ erro: 'A geração de imagens AM ainda não está configurada. Use Importar arte pronta.' });
     }
     const tarefa = await criarTarefa({
       nichoId: nicho,
@@ -258,6 +274,59 @@ app.post(
 );
 
 /**
+ * Gera a prévia do Reel. Cliente = Ken Burns; marca = Imagine.
+ * Só vira o vídeo do post depois de POST .../reel/decisao.
+ */
+app.post(
+  '/lotes/:loteId/posts/:indice/reel',
+  exigirChave,
+  exigirAssinante,
+  async (req, res) => {
+    const loteId = String(req.params.loteId).replace(/[^a-zA-Z0-9._-]/g, '');
+    const indice = Number(req.params.indice);
+    if (!Number.isInteger(indice) || indice < 0) {
+      return res.status(400).json({ erro: 'Índice de post inválido.' });
+    }
+    try {
+      const resultado = await gerarPreviewReel({
+        assinanteId: req.assinante,
+        loteId,
+        indice,
+      });
+      res.json({ ok: true, ...resultado });
+    } catch (erro) {
+      const status = erro.codigo && Number.isInteger(erro.codigo) ? erro.codigo : 500;
+      res.status(status >= 400 && status < 600 ? status : 500).json({ erro: erro.message });
+    }
+  },
+);
+
+app.post(
+  '/lotes/:loteId/posts/:indice/reel/decisao',
+  exigirChave,
+  exigirAssinante,
+  async (req, res) => {
+    const loteId = String(req.params.loteId).replace(/[^a-zA-Z0-9._-]/g, '');
+    const indice = Number(req.params.indice);
+    if (!Number.isInteger(indice) || indice < 0) {
+      return res.status(400).json({ erro: 'Índice de post inválido.' });
+    }
+    try {
+      const resultado = await decidirPreviewReel({
+        assinanteId: req.assinante,
+        loteId,
+        indice,
+        acao: req.body?.acao,
+      });
+      res.json({ ok: true, ...resultado });
+    } catch (erro) {
+      const status = erro.codigo && Number.isInteger(erro.codigo) ? erro.codigo : 500;
+      res.status(status >= 400 && status < 600 ? status : 500).json({ erro: erro.message });
+    }
+  },
+);
+
+/**
  * Apaga TODOS os pacotes do assinante.
  *
  * Existe para a exclusao de conta valer de verdade: sem isto, apagar o
@@ -299,7 +368,8 @@ app.patch('/lotes/:loteId/posts/:indice', exigirChave, exigirAssinante, async (r
         return res.status(400).json({ erro: 'A legenda ficou curta demais.' });
       }
       // O Instagram corta a legenda em 2.200 caracteres.
-      post.legenda = legenda.trim().slice(0, 2000);
+      if (post.formato === 'artePronta' && legenda.trim().length > 2200) return res.status(400).json({ erro: 'A legenda aceita até 2.200 caracteres.' });
+      post.legenda = legenda.trim().slice(0, post.formato === 'artePronta' ? 2200 : 2000);
     }
     if (typeof cta === 'string') post.cta = cta.trim().slice(0, 200) || null;
 
@@ -321,6 +391,9 @@ app.patch('/lotes/:loteId/posts/:indice', exigirChave, exigirAssinante, async (r
       .filter(Boolean)
       .join('\n\n');
 
+    if (post.formato === 'artePronta' && post.textoParaColar.length > 2200) {
+      return res.status(400).json({ erro: 'Legenda, chamada e hashtags juntas devem ter até 2.200 caracteres.' });
+    }
     post.editadoEm = new Date().toISOString();
 
     await fs.writeFile(alvo, JSON.stringify(pacote, null, 2), 'utf8');
@@ -331,7 +404,7 @@ app.patch('/lotes/:loteId/posts/:indice', exigirChave, exigirAssinante, async (r
   }
 });
 
-app.listen(config.porta, '127.0.0.1', async () => {
+app.listen(config.porta, process.env.HOST || '0.0.0.0', async () => {
   console.log(`[postei] motor no ar em http://127.0.0.1:${config.porta}`);
   console.log(`[postei] chave de API: ${config.chaveApi ? 'configurada' : 'AUSENTE'}`);
 

@@ -364,6 +364,7 @@ function validarPost(p, indice, formatosPermitidos, { nicho, rede }) {
   if (FORMATOS_ANUNCIO.has(formato) && formatosPermitidos && !formatosPermitidos.has(formato)) {
     formato = 'destaque';
   }
+  if (nicho.id === 'am-consultoria' && nicho.direcaoVisual === 'editorial-am') formato = 'destaque';
 
   return {
     formato,
@@ -608,7 +609,7 @@ export async function gerarPacote({
       post.fonte &&
       `Fonte: ${post.fonte.titulo} (${post.fonte.revista}, ${post.fonte.ano}) - ${post.fonte.url}`;
 
-    if (artes.formato === 'anuncioIa' && i < posts.length - 1) {
+    if (['anuncioIa', 'amEditorial'].includes(artes.formato) && i < posts.length - 1) {
       await esperar(2000);
     }
 

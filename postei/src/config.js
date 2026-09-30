@@ -54,6 +54,9 @@ export const config = {
     apiKey: process.env.XAI_API_KEY || null,
     baseUrl: process.env.XAI_BASE_URL || 'https://api.x.ai/v1',
     modeloImagem: process.env.XAI_MODELO_IMAGEM || 'grok-imagine-image',
+    modeloVideo: process.env.XAI_MODELO_VIDEO || 'grok-imagine-video-1.5',
+    // Imagine vídeo leva 1–3 min; o painel segura a requisição até aqui.
+    timeoutVideoMs: Number(process.env.XAI_TIMEOUT_VIDEO_MS || 8 * 60 * 1000),
   },
 
   criativo: {
@@ -73,6 +76,9 @@ export const config = {
   },
 
   saida: process.env.DIR_SAIDA || path.join(raiz, 'saida'),
+
+  // Reel do cliente (Ken Burns). No Windows/VPS precisa estar no PATH.
+  ffmpeg: process.env.FFMPEG || 'ffmpeg',
 
   // Teto de seguranca por requisicao. Impede que um bug (ou um cliente
   // curioso) peca 5000 posts e queime a cota do dia inteiro.

@@ -30,3 +30,7 @@ tmp/
 Thumbs.db
 *.log
 npm-debug.log*
+
+# ---- Credenciais soltas na raiz (movidas para ../_SEGREDOS) ------------------
+credenciais*.txt
+*credenciais*.txt

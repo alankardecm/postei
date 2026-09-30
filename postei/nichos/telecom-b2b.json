@@ -1,0 +1,43 @@
+{
+  "id": "telecom-b2b",
+  "nome": "Telecomunicações & Conectividade B2B",
+  "publico": "Diretores de TI, CIOs, CTOs, gerentes de infraestrutura de rede, engenheiros de telecom e líderes de empresas que dependem de conectividade contínua, redundância de link e segurança cibernética corporativa.",
+  "tomDeVoz": "Executivo, técnico, direto e confiável. Fala com propriedade sobre SLA, disponibilidade 99,9%, mitigação DDoS, banda simétrica, redes Lan2Lan, PABX em nuvem e monitoramento NOC 24/7. Transmite solidez de infraestrutura e engenharia de telecomunicações de ponta.",
+  "temas": [
+    "Diferença técnica entre banda larga convencional e Link Dedicado Corporativo",
+    "Como o monitoramento ativo do NOC 24/7 atua antes da equipe notar instabilidade",
+    "Ataques DDoS corporativos: como funciona a mitigação em camada de rede",
+    "Redes Lan2Lan: interligação segura e de baixa latência entre matriz e filiais",
+    "Telefonia corporativa em nuvem (PABX IP e 0800): mobilidade e redução de custos",
+    "O impacto direto do SLA de 99,9% no fechamento financeiro e operações críticas",
+    "Por que migrar servidores físicos locais para Colocation em data center seguro",
+    "Expansão de fibra óptica e infraestrutura própria na Região Metropolitana de Campinas",
+    "TurboCast: insights técnicos sobre tendências de telecomunicações e 5G corporativo",
+    "Continuidade de negócios: a importância de rotas redundantes de fibra óptica",
+    "Segurança da informação e conformidade LGPD no tráfego de dados empresariais",
+    "SD-WAN vs MPLS: quando modernizar a arquitetura de rede da sua empresa"
+  ],
+  "formatosCriativo": ["destaque", "lista", "citacao"],
+  "produtoFim": "Link Dedicado Corporativo, Lan2Lan e Soluções de Conectividade Gerenciada",
+  "paleta": {
+    "fundo": "#0A1926",
+    "texto": "#F0F6FC",
+    "destaque": "#00D284"
+  },
+  "hashtags": {
+    "nicho": [
+      "telecom",
+      "linkdedicado",
+      "conectividadeb2b",
+      "ti",
+      "infraestruturadeti",
+      "noc247",
+      "ciberseguranca",
+      "campinas",
+      "telecomunicacoes",
+      "redelan2lan"
+    ],
+    "comunidade": ["diretoriaeti", "gestaodeti", "ciobrasil"]
+  },
+  "observacoes": "NUNCA USAR TOM INFORMAL DE VAREJO. Nada de 'promoção relâmpago de internet', 'plano barato para sua casa'. O foco é estritamente B2B, empresas e operadoras corporativas. Enfatizar SLA garantido em contrato, estabilidade, suporte técnico com engenheiros de rede 24/7 e fibra própria com rotas redundantes."
+}

@@ -774,6 +774,11 @@ export async function gerarCriativo({
   marcaDagua = false,
 }) {
   const t = telaPadrao(tela);
+  if (nicho.id === 'am-consultoria' && nicho.direcaoVisual === 'editorial-am') {
+    let imagem = await gerarAnuncioIa({ post, tela: t, editorialAm: true });
+    if (marcaDagua) imagem = await aplicarMarcaDagua(imagem, t, { fundo: '#080c10' });
+    return { imagem, extensao: 'jpg', formato: 'amEditorial' };
+  }
   let formato = post.formato && (LAYOUTS[post.formato] || post.formato === 'anuncioIa')
     ? post.formato
     : 'destaque';

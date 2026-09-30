@@ -10,6 +10,7 @@ export type Agendado = {
   agendada_para: string;
   situacao: string;
   erro: string | null;
+  rede?: "instagram" | "linkedin";
 };
 
 export function Agendados({ itens }: { itens: Agendado[] }) {
@@ -20,7 +21,9 @@ export function Agendados({ itens }: { itens: Agendado[] }) {
 
   async function cancelar(id: string) {
     setCancelando(id);
-    await fetch(`/api/instagram/agendar?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    const item = itens.find((i) => i.id === id);
+    const rota = item?.rede === "linkedin" ? "/api/linkedin/agendar" : "/api/instagram/agendar";
+    await fetch(`${rota}?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     setCancelando(null);
     router.refresh();
   }
@@ -48,7 +51,8 @@ export function Agendados({ itens }: { itens: Agendado[] }) {
                   })}
                 </p>
                 <p className="truncate text-sm text-cinza">
-                  post {item.indice + 1} · {item.lote_id.split("_")[0]}
+                  {item.rede === "linkedin" ? "LinkedIn" : "Instagram"} · post {item.indice + 1} ·{" "}
+                  {item.lote_id.split("_")[0]}
                 </p>
                 {falhou && item.erro && (
                   <p className="mt-1 text-sm text-tinta">{item.erro}</p>

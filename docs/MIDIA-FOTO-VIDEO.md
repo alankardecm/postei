@@ -191,8 +191,32 @@ POST /api/instagram/publicar
 
 ### Ainda NÃO feito (de propósito)
 
-- Geração automática de vídeo (Ken Burns / ffmpeg)
 - Agendar Reel (só publicar agora com modo reels; agendamento continua feed)
+- Layout 9:16 nativo no satori (hoje o Ken Burns faz faixa na arte 4:5)
+
+### Fase 3 — Gerar Reel da marca (2026-08-16)
+
+Só Alan e Junior (`DONOS_MARCA`). Dois ramos internos:
+
+| Ramo | O que o botão faz |
+|---|---|
+| `postei-marca` | Imagine vídeo 6 s, câmera lenta no anúncio já pronto (letterbox 9:16 creme). Texto/logo parados. |
+| `am-consultoria` | Imagine 10 s, apresentador do `assets/am/canonico.jpg` fala o título+legenda em PT-BR. |
+
+Botão **Gerar Reel** no post. Motor `POST /lotes/:id/posts/:indice/reel`. Painel `/api/lotes/.../reel`. Juliana não vê o botão nem os ramos. Cliente pagante continua só com upload de MP4.
+
+Não gerar o lote inteiro: 3–4 Reels/semana. ~US$ 0,84 (6 s) a ~US$ 1,40 (10 s) em 720p.
+
+### Fase 4 — Ken Burns do cliente + prévia (2026-08-16)
+
+Todo plano, lote de Instagram. Sem API.
+
+1. **Gerar Reel** monta MP4 9:16 (8 s, zoom/pan no card) e grava `preview-XX.mp4`
+2. O painel mostra o vídeo. **Usar este Reel** vira `video-XX.mp4`. **Não usar** apaga a prévia
+3. **Publicar como Reel** só aparece depois de aceitar. Prévia não sobe na Meta
+
+Motor: `POST /lotes/:id/posts/:i/reel` (prévia) e `POST .../reel/decisao` `{ acao: aceitar|recusar }`.
+Requer `ffmpeg` no PATH do motor (local e VPS).
 
 ---
 

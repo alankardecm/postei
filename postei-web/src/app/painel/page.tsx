@@ -3,11 +3,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Cabecalho } from "@/components/site/Cabecalho";
 import { Gerador } from "@/components/painel/Gerador";
+import { ImportarArte } from "@/components/painel/ImportarArte";
 import { motor, usuarioAtual, type Lote, type Nicho } from "@/lib/motor";
 import { Captacao, type LinkResumo } from "@/components/painel/Captacao";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { consumoDe } from "@/lib/cota";
-import { volumesDe, PLANOS, ehAcessoMarcaPropria } from "@/lib/planos";
+import { volumesDe, ehAcessoMarcaPropria } from "@/lib/planos";
 import { Assinatura } from "@/components/painel/Assinatura";
 import { sincronizarAssinatura } from "@/lib/assinatura-sync";
 import { DnaMarca } from "@/components/painel/DnaMarca";
@@ -77,13 +78,29 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
 
   // Fila: o que está esperando o horário, mais as falhas recentes — sem
   // mostrar a falha, o assinante acha que publicou.
-  const { data: fila } = await admin
-    .from("publicacoes")
-    .select("id, lote_id, indice, agendada_para, situacao, erro")
-    .eq("usuario_id", user.id)
-    .in("situacao", ["agendada", "publicando", "falhou"])
-    .order("agendada_para", { ascending: true })
-    .limit(20);
+  const selFila = "id, lote_id, indice, agendada_para, situacao, erro";
+  const [{ data: filaIg }, { data: filaLi }] = await Promise.all([
+    admin
+      .from("publicacoes")
+      .select(selFila)
+      .eq("usuario_id", user.id)
+      .in("situacao", ["agendada", "publicando", "falhou"])
+      .order("agendada_para", { ascending: true })
+      .limit(20),
+    admin
+      .from("publicacoes_linkedin")
+      .select(selFila)
+      .eq("usuario_id", user.id)
+      .in("situacao", ["agendada", "publicando", "falhou"])
+      .order("agendada_para", { ascending: true })
+      .limit(20),
+  ]);
+  const fila: Agendado[] = [
+    ...((filaIg ?? []) as Agendado[]).map((i) => ({ ...i, rede: "instagram" as const })),
+    ...((filaLi ?? []) as Agendado[]).map((i) => ({ ...i, rede: "linkedin" as const })),
+  ]
+    .sort((a, b) => a.agendada_para.localeCompare(b.agendada_para))
+    .slice(0, 20);
 
   const cota = await consumoDe(user.id);
 
@@ -101,12 +118,12 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
     <>
       <Cabecalho />
       <main className="flex-1 px-5 py-14">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-6xl">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="rotulo mb-2">Painel</p>
+              <p className="rotulo mb-2">Postei / seu estúdio de conteúdo</p>
               <h1 className="fonte-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Seus pacotes
+                Da ideia ao próximo post.
               </h1>
               <p className="mt-2 text-sm text-cinza">{user.email}</p>
               <p className="mt-1 text-sm tabular-nums text-cinza">
@@ -127,6 +144,8 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
               </button>
             </form>
           </div>
+
+          {ehAcessoMarcaPropria(user.email) && <ImportarArte />}
 
           {falha ? (
             <p className="mt-10 rounded-2xl border border-linha bg-branco p-6 text-cinza">
@@ -207,7 +226,7 @@ export default async function Painel({ searchParams }: PageProps<"/painel">) {
             marcas={[...new Set([...lotes.map((l) => l.marca), ...cota.marcas])].sort()}
           />
 
-          <Agendados itens={(fila ?? []) as Agendado[]} />
+          <Agendados itens={fila} />
 
           <Instagram conta={conta as ContaIg} aviso={typeof ig === "string" ? ig : undefined} />
           <LinkedIn conta={contaLi} aviso={typeof li === "string" ? li : undefined} />

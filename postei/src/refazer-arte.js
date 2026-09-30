@@ -6,6 +6,8 @@ import { buscarFoto, prepararFotoDeBytes } from './foto.js';
 import { dnaDaMarca } from './banco.js';
 import { paletaDaMarca } from './paleta.js';
 import { pastaDoAssinante, gravarArtes } from './gerador.js';
+import { gerarReelIa, NICHOS_REEL_IA } from './video-ia.js';
+import { gerarKenBurns } from './ken-burns.js';
 
 /**
  * Re-renderiza a arte de UM post do pacote com nova foto (upload ou Pexels).
@@ -96,6 +98,12 @@ export async function refazerArte({ assinanteId, loteId, indice, fonte, imagemBa
   if (!post) {
     const e = new Error('Post não encontrado.');
     e.codigo = 404;
+    throw e;
+  }
+
+  if (['artePronta', 'amEditorial'].includes(post.formato)) {
+    const e = new Error('Esta composição está finalizada. Importe uma nova versão para alterar a arte.');
+    e.codigo = 400;
     throw e;
   }
 
@@ -230,14 +238,14 @@ export async function refazerArte({ assinanteId, loteId, indice, fonte, imagemBa
 }
 
 /**
- * Grava um MP4 no post (Fase 2). Nao gera video — so armazena o arquivo
- * do assinante para publicar como Reel.
+ * Grava bytes de MP4 no post. Upload do assinante ou Reel gerado pela IA.
  */
-export async function gravarVideoPost({
+export async function gravarVideoBytes({
   assinanteId,
   loteId,
   indice,
-  videoBase64,
+  bytes,
+  origem = 'upload',
 }) {
   const MAX = 80 * 1024 * 1024;
   const dir = dirLote(assinanteId, loteId);
@@ -262,18 +270,8 @@ export async function gravarVideoPost({
     throw e;
   }
 
-  if (!videoBase64 || typeof videoBase64 !== 'string') {
-    const e = new Error('Envie o vídeo em base64.');
-    e.codigo = 400;
-    throw e;
-  }
-
-  const puro = videoBase64.replace(/^data:video\/[a-zA-Z0-9.+-]+;base64,/, '');
-  let bytes;
-  try {
-    bytes = Buffer.from(puro, 'base64');
-  } catch {
-    const e = new Error('Vídeo base64 inválido.');
+  if (!Buffer.isBuffer(bytes)) {
+    const e = new Error('Vídeo inválido.');
     e.codigo = 400;
     throw e;
   }
@@ -314,8 +312,161 @@ export async function gravarVideoPost({
   await fs.writeFile(path.join(dir, nome), bytes);
   post.video = nome;
   post.videoEm = new Date().toISOString();
+  if (origem) post.videoOrigem = origem;
 
   await fs.writeFile(alvoPacote, JSON.stringify(pacote, null, 2), 'utf8');
 
   return { post };
 }
+
+export async function gravarVideoPost({
+  assinanteId,
+  loteId,
+  indice,
+  videoBase64,
+}) {
+  if (!videoBase64 || typeof videoBase64 !== 'string') {
+    const e = new Error('Envie o vídeo em base64.');
+    e.codigo = 400;
+    throw e;
+  }
+
+  const puro = videoBase64.replace(/^data:video\/[a-zA-Z0-9.+-]+;base64,/, '');
+  let bytes;
+  try {
+    bytes = Buffer.from(puro, 'base64');
+  } catch {
+    const e = new Error('Vídeo base64 inválido.');
+    e.codigo = 400;
+    throw e;
+  }
+
+  return gravarVideoBytes({ assinanteId, loteId, indice, bytes, origem: 'upload' });
+}
+
+async function lerPacote(assinanteId, loteId) {
+  const dir = dirLote(assinanteId, loteId);
+  const alvoPacote = path.join(dir, 'pacote.json');
+  let pacote;
+  try {
+    pacote = JSON.parse(await fs.readFile(alvoPacote, 'utf8'));
+  } catch (erro) {
+    if (erro.code === 'ENOENT') {
+      const e = new Error('Lote não encontrado.');
+      e.codigo = 404;
+      throw e;
+    }
+    throw erro;
+  }
+  return { dir, alvoPacote, pacote };
+}
+
+function nomePreview(indice) {
+  return `preview-${String(indice + 1).padStart(2, '0')}.mp4`;
+}
+
+/**
+ * Gera o Reel e grava como PRÉVIA. Não vira o vídeo do post até aceitar.
+ * Cliente: Ken Burns. Marca Postei/AM: Imagine.
+ */
+export async function gerarPreviewReel({ assinanteId, loteId, indice }) {
+  const { dir, alvoPacote, pacote } = await lerPacote(assinanteId, loteId);
+  const post = pacote.posts?.[indice];
+  if (!post) {
+    const e = new Error('Post não encontrado.');
+    e.codigo = 404;
+    throw e;
+  }
+
+  let imagemBytes = null;
+  if (post.imagem) {
+    try {
+      imagemBytes = await fs.readFile(path.join(dir, post.imagem));
+    } catch {
+      imagemBytes = null;
+    }
+  }
+
+  const nichoId = pacote.nicho?.id;
+  let bytes;
+  let origem;
+  if (NICHOS_REEL_IA.has(nichoId)) {
+    bytes = await gerarReelIa({ nichoId, post, imagemBytes });
+    origem = nichoId === 'am-consultoria' ? 'imagine-am' : 'imagine-postei';
+  } else {
+    bytes = await gerarKenBurns({ imagemBytes, variante: indice });
+    origem = 'kenburns';
+  }
+
+  const nome = nomePreview(indice);
+  if (post.videoPreview && post.videoPreview !== nome) {
+    await fs.unlink(path.join(dir, post.videoPreview)).catch(() => {});
+  }
+  await fs.writeFile(path.join(dir, nome), bytes);
+  post.videoPreview = nome;
+  post.videoPreviewEm = new Date().toISOString();
+  post.videoPreviewOrigem = origem;
+  await fs.writeFile(alvoPacote, JSON.stringify(pacote, null, 2), 'utf8');
+  return { post };
+}
+
+/**
+ * Aceita a prévia (vira o Reel do post) ou descarta.
+ */
+export async function decidirPreviewReel({ assinanteId, loteId, indice, acao }) {
+  const { dir, alvoPacote, pacote } = await lerPacote(assinanteId, loteId);
+  const post = pacote.posts?.[indice];
+  if (!post) {
+    const e = new Error('Post não encontrado.');
+    e.codigo = 404;
+    throw e;
+  }
+  if (!post.videoPreview) {
+    const e = new Error('Não há prévia para decidir. Gere o Reel primeiro.');
+    e.codigo = 400;
+    throw e;
+  }
+
+  const previewPath = path.join(dir, post.videoPreview);
+
+  if (acao === 'recusar') {
+    await fs.unlink(previewPath).catch(() => {});
+    delete post.videoPreview;
+    delete post.videoPreviewEm;
+    delete post.videoPreviewOrigem;
+    await fs.writeFile(alvoPacote, JSON.stringify(pacote, null, 2), 'utf8');
+    return { post };
+  }
+
+  if (acao !== 'aceitar') {
+    const e = new Error("Ação inválida. Use 'aceitar' ou 'recusar'.");
+    e.codigo = 400;
+    throw e;
+  }
+
+  const bytes = await fs.readFile(previewPath);
+  const origem = post.videoPreviewOrigem || 'kenburns';
+  const resultado = await gravarVideoBytes({
+    assinanteId,
+    loteId,
+    indice,
+    bytes,
+    origem,
+  });
+
+  const { pacote: deNovo } = await lerPacote(assinanteId, loteId);
+  const postNovo = deNovo.posts[indice];
+  await fs.unlink(previewPath).catch(() => {});
+  delete postNovo.videoPreview;
+  delete postNovo.videoPreviewEm;
+  delete postNovo.videoPreviewOrigem;
+  await fs.writeFile(
+    path.join(dirLote(assinanteId, loteId), 'pacote.json'),
+    JSON.stringify(deNovo, null, 2),
+    'utf8',
+  );
+  resultado.post = postNovo;
+  return resultado;
+}
+
+

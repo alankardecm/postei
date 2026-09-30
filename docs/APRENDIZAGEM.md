@@ -3,7 +3,7 @@
 O que decidimos, por quê, e o que não pode se perder na próxima sessão.
 Complementa a memória viva (`CONHECIMENTO.md`) e a arquitetura (`DOCUMENTACAO.md`).
 
-Última atualização: **2026-08-15**.
+Última atualização: **2026-08-19**.
 
 ---
 
@@ -118,6 +118,33 @@ Não versionar `credenciais linkedin.txt`.
 5. `assinanteId` sai da sessão (`getUser()`), nunca do body.
 6. Deploy só o que o git rastreia; `./deploy.sh` pelo Git Bash.
 7. VPS `217.196.61.190` é da AM / Postei — **nada da NetTurbo**.
+8. Reel por IA só em `postei-marca` e `am-consultoria`. Imagine não recebe card de cliente. AM não regenera cara: `assets/am/canonico.jpg`.
+9. Reel do cliente é Ken Burns (`ffmpeg`), custo zero. Sempre prévia: só vira `post.video` depois de aceitar. Sem aceitar, não publica.
+10. Hermes não lê `/opt/postei` e não publica sozinho. Painel: `https://hermes.amconsultoria.tech`. Sem `9119` em `0.0.0.0`. Sem WhatsApp do Hermes.
+11. Status de publicar/agendar vive no banco (`publicacoes` / `publicacoes_linkedin`). A tela não pode ser a única memória — F5 tem que reler.
+
+---
+
+## 9. LinkedIn: F5 não é cancelar (18/08)
+
+O lote de 10 cards (`ia-para-empresas_alan-moreira_1787083817957`) publicou o card 01 e agendou 03, 04, 06 e 07. Depois do F5 os botões voltaram. No LinkedIn e no banco estava tudo lá.
+
+Causa: `PublicarLinkedin` (e o do Instagram) guardava “publicado/agendado” no `useState`. A seção **Na fila** do painel só lia `publicacoes` (Instagram).
+
+No ar: fila mistura as duas redes; API não republica o mesmo card.  
+Ainda local: hidratar o selo no card do lote.
+
+**Aprendizado:** se o assinante dá F5 no meio do “Agendando…”, olhar o banco e a fila — não o botão.
+
+---
+
+## 10. Hermes na mesma VPS (18–19/08)
+
+Uma VPS só. O agente inteiro entra no container. Painel público com senha, não porta nua.
+
+Detalhe operacional: `Documents/00 - 2026/35.1 PROJETOS PARTICULARES/HERMES/DIA-2026-08-18.md`.
+
+**Aprendizado:** túnel SSH nesta Hostinger cai. Subdomínio + Traefik + senha é o caminho. DNS A precisa existir **antes** do Let’s Encrypt (senão fica o certificado `TRAEFIK DEFAULT CERT` até reiniciar o Traefik).
 
 ---
 
@@ -127,7 +154,11 @@ Não versionar `credenciais linkedin.txt`.
 - Cópia de backup fora do servidor.
 - Contrato de comissionamento do comercial.
 - Revisão jurídica dos docs.
-- Reels gerados (hoje só upload + publicar).
+- Agendar Reel (hoje só publicar na hora).
+- Layout 9:16 nativo no satori (Ken Burns ainda faz faixa no 4:5).
 - WhatsApp (Evolution já está no servidor).
+- Perfis Hermes (AM comercial / Postei) — combinados, não criados.
+- Telegram do Hermes.
+- Selo publicado/agendado no card do lote (código local, não no ar).
 
 Domínio, MP produção e Instagram no `amconsultoria.tech` já estavam feitos antes desta leva.

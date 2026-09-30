@@ -84,6 +84,14 @@ const FALLBACK = {
     ],
     comunidade: ['pequenosnegocios', 'empreendedordigital'],
   },
+  'am-consultoria': {
+    nicho: [
+      'gestaoempresarial', 'dadosparaempresas', 'paineldegestao',
+      'biparapme', 'operacaoempresarial', 'donodeempresa',
+      'gestaonapratica', 'clarezaoperacional',
+    ],
+    comunidade: ['pequenosnegocios', 'gestaopme'],
+  },
 };
 
 function hash(s) {

@@ -88,19 +88,19 @@ function Previa({ fundo, texto, destaque, marca }: Record<string, string>) {
 export function DnaMarca({ marcas }: { marcas: string[] }) {
   const [marca, setMarca] = useState(marcas[0] ?? "");
   const [dna, setDna] = useState<Dna>({});
-  const [carregando, setCarregando] = useState(false);
+  const [carregando, setCarregando] = useState(Boolean(marcas[0]));
   const [salvando, setSalvando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 
   useEffect(() => {
     if (!marca) return;
-    setCarregando(true);
-    setAviso(null);
+    let ativo = true;
     fetch(`/api/marcas/dna?marca=${encodeURIComponent(marca)}`)
       .then((r) => r.json())
-      .then((d) => setDna(d.dna ?? {}))
-      .catch(() => setAviso("Não consegui carregar."))
-      .finally(() => setCarregando(false));
+      .then((d) => { if (ativo) setDna(d.dna ?? {}); })
+      .catch(() => { if (ativo) setAviso("Não consegui carregar."); })
+      .finally(() => { if (ativo) setCarregando(false); });
+    return () => { ativo = false; };
   }, [marca]);
 
   async function salvar() {
@@ -149,7 +149,7 @@ export function DnaMarca({ marcas }: { marcas: string[] }) {
           <span className="rotulo">Marca</span>
           <select
             value={marca}
-            onChange={(e) => setMarca(e.target.value)}
+            onChange={(e) => { setMarca(e.target.value); setCarregando(true); setAviso(null); }}
             className="max-w-sm rounded-lg border border-linha bg-branco px-3 py-2 text-sm"
           >
             {marcas.map((m) => (

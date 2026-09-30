@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { usuarioAtual } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { contaLinkedin } from "@/lib/publicacao-linkedin";
+import { contaLinkedin, registroAtivoLinkedin } from "@/lib/publicacao-linkedin";
 import { assinaturaDe } from "@/lib/cota";
 import { PLANOS } from "@/lib/planos";
 
@@ -29,6 +29,14 @@ export async function POST(request: Request) {
 
   const conta = await contaLinkedin(user.id);
   if (!conta) return NextResponse.json({ erro: "Conecte seu LinkedIn antes." }, { status: 400 });
+
+  const ja = await registroAtivoLinkedin(user.id, loteId, indice);
+  if (ja?.situacao === "publicada") {
+    return NextResponse.json({ erro: "Esse post já foi publicado no LinkedIn." }, { status: 409 });
+  }
+  if (ja?.situacao === "publicando") {
+    return NextResponse.json({ erro: "Esse post já está saindo no LinkedIn." }, { status: 409 });
+  }
 
   const admin = criarClienteAdmin();
   const assinatura = await assinaturaDe(user.id);

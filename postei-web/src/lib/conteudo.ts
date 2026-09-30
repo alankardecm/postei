@@ -25,11 +25,11 @@ export const criativos = mostra as Criativo[];
  */
 export const nichos = [
   {
-    id: "receitas",
-    nome: "Receitas e culinária",
-    publico: "Quem cozinha em casa e quer praticidade",
-    cor: "#C6D64B",
-    fundo: "#1F2410",
+    id: "telecom-b2b",
+    nome: "Telecomunicações & TI Corporativa",
+    publico: "Operadoras, provedores e empresas com infraestrutura crítica",
+    cor: "#00D284",
+    fundo: "#0A1926",
   },
   {
     id: "financas-pessoais",
@@ -45,18 +45,25 @@ export const nichos = [
     cor: "#7ED957",
     fundo: "#14251C",
   },
+  {
+    id: "receitas",
+    nome: "Receitas e culinária",
+    publico: "Quem cozinha em casa e quer praticidade",
+    cor: "#C6D64B",
+    fundo: "#1F2410",
+  },
 ];
 
 export const passos = [
   {
-    titulo: "Diz o ramo",
+    titulo: "Diz o ramo — e quem você é",
     texto:
-      "Escolhe o nicho e o nome do perfil. Sem briefing, sem reunião, sem planilha de conteúdo.",
+      "Nicho, nome do perfil e o DNA: para quem fala, o que não aborda, o que vende. Sem briefing.",
   },
   {
     titulo: "O Postei monta o mês",
     texto:
-      "Textos, fotos e artes com a sua assinatura. Em poucos minutos, não em algumas noites.",
+      "Textos, fotos e artes com a sua assinatura. Se o DNA está preenchido, o texto deixa de parecer de agência.",
   },
   {
     titulo: "Você revisa e publica",
@@ -136,6 +143,18 @@ export const perguntas = [
   {
     p: "E se um post não ficar bom?",
     r: "Você descarta. O pacote é um mês de opções, não uma obrigação — a ideia é você nunca começar de uma tela em branco, não publicar tudo cegamente.",
+  },
+  {
+    p: "O Postei atende empresas B2B e telecomunicações com termos técnicos?",
+    r: "Sim. O motor trabalha com o DNA técnico da sua operação (SLA, mitigação DDoS, Lan2Lan, Cloud, PABX IP), evitando textos genéricos de agências que não dominam infraestrutura de TI.",
+  },
+  {
+    p: "Como funciona para Company Page no LinkedIn?",
+    r: "O Postei conecta tanto a perfis pessoais quanto à Company Page da sua empresa, gerando posts executivos com foco em tomadores de decisão e carrosséis estruturados.",
+  },
+  {
+    p: "Posso usar a identidade visual e cores da minha marca?",
+    r: "Sim. No plano corporativo integramos o manual de marca da sua empresa, aplicando a paleta exata de cores, tipografia e logomarca institucional.",
   },
   {
     p: "Meu ramo não está na lista.",

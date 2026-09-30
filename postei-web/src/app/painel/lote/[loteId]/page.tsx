@@ -13,7 +13,11 @@ import {
   INSTAGRAM_MARCA,
   MENCAO_INSTAGRAM_MARCA,
   jaMencionaMarca,
+  ehAcessoMarcaPropria,
+  ehNichoMarcaInterna,
+  NICHO_AM_CONSULTORIA,
 } from "@/lib/planos";
+import { situacaoPorIndice } from "@/lib/situacao-publicacao";
 
 export const metadata = { title: "Pacote — Postei" };
 export const dynamic = "force-dynamic";
@@ -23,6 +27,7 @@ type Post = {
   fonte: { titulo: string; revista: string; ano: string; url: string } | null;
   imagens: string[] | null;
   video?: string | null;
+  videoPreview?: string | null;
   titulo: string;
   subtitulo: string | null;
   legenda: string;
@@ -73,13 +78,40 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
     .eq("usuario_id", user.id)
     .maybeSingle();
 
+  const selPub = "indice, situacao, agendada_para, erro";
+  const [{ data: pubsIg }, { data: pubsLi }] = await Promise.all([
+    admin
+      .from("publicacoes")
+      .select(selPub)
+      .eq("usuario_id", user.id)
+      .eq("lote_id", loteId),
+    admin
+      .from("publicacoes_linkedin")
+      .select(selPub)
+      .eq("usuario_id", user.id)
+      .eq("lote_id", loteId),
+  ]);
+  const porIndiceIg = situacaoPorIndice(pubsIg ?? []);
+  const porIndiceLi = situacaoPorIndice(pubsLi ?? []);
+
   const mencionarMarca = deveMencionarMarca(pacote.nicho.id, conta?.username);
+  const loteInstagram = pacote.rede !== "linkedin";
+  const ehMarcaInterna = ehNichoMarcaInterna(pacote.nicho.id);
+  const podeGerarReel =
+    loteInstagram && (!ehMarcaInterna || ehAcessoMarcaPropria(user.email));
+  const marcaReel: "postei" | "am" | "cliente" | null = !podeGerarReel
+    ? null
+    : ehMarcaInterna
+      ? pacote.nicho.id === NICHO_AM_CONSULTORIA
+        ? "am"
+        : "postei"
+      : "cliente";
 
   return (
     <>
       <Cabecalho />
       <main className="flex-1 px-5 py-14">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-6xl">
           <Link href="/painel" className="rotulo transition-colors hover:text-tinta">
             ← Voltar ao painel
           </Link>
@@ -119,7 +151,7 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
             {pacote.posts.map((post, i) => (
               <li
                 key={post.imagem}
-                className="grid gap-5 rounded-2xl border border-linha bg-branco p-5 sm:grid-cols-[190px_1fr]"
+                className="grid gap-7 rounded-2xl border border-linha bg-branco p-5 md:grid-cols-[minmax(260px,0.85fr)_1fr]"
               >
                 <div className="flex flex-col gap-2">
                   <Image
@@ -153,13 +185,16 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                       capa · {post.imagens.length} slides abaixo
                     </span>
                   )}
-                  {post.video && (
+                  {post.video && !post.videoPreview && (
                     <video
                       src={`/api/lotes/${encodeURIComponent(loteId)}/video/${encodeURIComponent(post.video)}`}
                       controls
                       className="mt-1 w-full rounded-lg border border-linha"
                       preload="metadata"
                     />
+                  )}
+                  {post.videoPreview && (
+                    <p className="rotulo text-center">prévia do Reel abaixo, na mídia</p>
                   )}
                 </div>
 
@@ -226,9 +261,14 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                       conectadoLinkedin={Boolean(contaLi)}
                       podeEditar={PLANOS[assinatura.plano].podeEditar}
                       temVideo={Boolean(post.video)}
-                      permiteFoto={!String(post.formato || "").startsWith("anuncio")}
+                      videoPreview={post.videoPreview ?? null}
+                      permiteFoto={!["artePronta", "amEditorial"].includes(post.formato) && !String(post.formato || "").startsWith("anuncio")}
+                      podeGerarReel={podeGerarReel}
+                      marcaReel={marcaReel}
                       podePublicarInstagram={pacote.rede !== "linkedin"}
                       podePublicarLinkedin={pacote.rede === "linkedin" || pacote.rede === "ambos"}
+                      publicacaoIg={porIndiceIg.get(i) ?? null}
+                      publicacaoLi={porIndiceLi.get(i) ?? null}
                       legenda={post.legenda}
                       cta={post.cta}
                       hashtags={post.hashtags}
@@ -241,7 +281,7 @@ export default async function Lote({ params }: PageProps<"/painel/lote/[loteId]"
                     tecnicamente e ninguém conseguia ler nada -- e o assinante
                     acabava aprovando um carrossel tendo visto só a capa. */}
                 {post.imagens && post.imagens.length > 1 && (
-                  <div className="sm:col-span-2">
+                  <div className="md:col-span-2">
                     <SlidesCarrossel
                       loteId={loteId}
                       arquivos={post.imagens}

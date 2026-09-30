@@ -16,6 +16,7 @@ Conhecimento condensado também em [`CONHECIMENTO.md`](CONHECIMENTO.md).
 | A | `@` | `217.196.61.190` | amconsultoria.tech |
 | CNAME | `www` | `amconsultoria.tech` | www |
 | A | `postei` | `217.196.61.190` | **postei.amconsultoria.tech** |
+| A | `hermes` | `217.196.61.190` | **hermes.amconsultoria.tech** (painel do agente, 19/08) |
 
 Conferir:
 
@@ -31,7 +32,8 @@ Na compra: pular “criar site” e “e-mail” da Hostinger se o app roda na V
 
 ## 2. Traefik (servidor)
 
-Arquivo: `/docker/n8n/dinamico/postei.yml`
+Arquivos: `/docker/n8n/dinamico/postei.yml` (Postei) e `hermes.yml` (Hermes → `http://172.16.1.1:9119`).  
+Não publicar `9119` em `0.0.0.0`. Sem o A `hermes`, o Traefik fica com certificado default; depois do DNS, `docker restart n8n-traefik-1`.
 
 ```yaml
 http:

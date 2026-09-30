@@ -1,0 +1,49 @@
+{
+  "id": "am-consultoria",
+  "nome": "AM Consultoria — marca própria",
+  "interno": true,
+  "semFoto": true,
+  "publico": "Donos e gestores de empresas de serviços e operações intensas, incluindo telecom, que precisam organizar dados, processos e execução.",
+  "tomDeVoz": "Consultivo, direto e concreto. Estratégia com implementação. Falar com líderes sobre decisões, retrabalho, responsabilidades e capacidade operacional. Sem hype, sem depreciar consultoria ou prometer baixo preço.",
+  "temas": [
+    "dependência da liderança para decisões recorrentes",
+    "indicadores divergentes na reunião de gestão",
+    "dados que orientam uma próxima ação",
+    "crescimento com processos e responsabilidades definidos",
+    "diagnóstico antes de investir em tecnologia",
+    "automação de rotinas com critérios de validação",
+    "integração entre sistemas e contexto do negócio",
+    "governança de dados e definições de indicadores",
+    "IA aplicada com supervisão humana",
+    "revisão de retrabalho e capacidade da equipe",
+    "implementação acompanhada por indicadores",
+    "prioridades para operações intensas"
+  ],
+  "formatosCriativo": [
+    "destaque"
+  ],
+  "produtoFim": "Converse com Alan sobre o desafio da sua operação.",
+  "paleta": {
+    "fundo": "#080c10",
+    "texto": "#F1F4F5",
+    "destaque": "#6CE5E8"
+  },
+  "hashtags": {
+    "nicho": [
+      "gestaoempresarial",
+      "dadosparaempresas",
+      "paineldegestao",
+      "biparapme",
+      "operacaoempresarial",
+      "donodeempresa",
+      "gestaonapratica",
+      "clarezaoperacional"
+    ],
+    "comunidade": [
+      "pequenosnegocios",
+      "gestaopme"
+    ]
+  },
+  "observacoes": "AM Consultoria conecta estratégia, dados, processos, engenharia e IA. Atua do diagnóstico à implementação e evolução. Cada post apresenta uma dor concreta e uma chamada coerente: comentar o problema, salvar um critério útil ou conversar com Alan. Título de até 7 palavras; subtítulo de até 12 palavras. Não inventar clientes, números, depoimentos, faturamento, garantias, formação ou resultados. Não prometer diagnóstico gratuito, preço ou prazo. Não vender Postei, não citar teste grátis. As artes são conceituais em grafite, prata, vidro, metal e ciano. Não inventar @.",
+  "direcaoVisual": "editorial-am"
+}

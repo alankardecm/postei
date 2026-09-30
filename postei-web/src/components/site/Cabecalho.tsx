@@ -11,27 +11,30 @@ export function Cabecalho({ venda = false }: { venda?: boolean }) {
 
         {venda ? (
           <nav className="hidden items-center gap-7 text-sm text-cinza md:flex">
-            <a href="#como" className="transition-colors hover:text-tinta">
+            <Link href="#demo" className="transition-colors hover:text-tinta">
+              Demo
+            </Link>
+            <Link href="#como" className="transition-colors hover:text-tinta">
               Como funciona
-            </a>
-            <a href="#nichos" className="transition-colors hover:text-tinta">
+            </Link>
+            <Link href="#nichos" className="transition-colors hover:text-tinta">
               Exemplos
-            </a>
-            <a href="#planos" className="transition-colors hover:text-tinta">
+            </Link>
+            <Link href="#planos" className="transition-colors hover:text-tinta">
               Preços
-            </a>
+            </Link>
           </nav>
         ) : (
           <nav className="hidden items-center gap-7 text-sm text-cinza md:flex">
-            <a href="/#nichos" className="transition-colors hover:text-tinta">
+            <Link href="/#nichos" className="transition-colors hover:text-tinta">
               Nichos
-            </a>
-            <a href="/#como" className="transition-colors hover:text-tinta">
+            </Link>
+            <Link href="/#como" className="transition-colors hover:text-tinta">
               Como funciona
-            </a>
-            <a href="/#planos" className="transition-colors hover:text-tinta">
+            </Link>
+            <Link href="/#planos" className="transition-colors hover:text-tinta">
               Planos
-            </a>
+            </Link>
           </nav>
         )}
 

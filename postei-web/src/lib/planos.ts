@@ -89,6 +89,8 @@ export function ehAcessoMarcaPropria(email: string | null | undefined) {
 }
 
 export const NICHO_MARCA_PROPRIA = "postei-marca";
+export const NICHO_AM_CONSULTORIA = "am-consultoria";
+export const NICHOS_MARCA_INTERNA = [NICHO_MARCA_PROPRIA, NICHO_AM_CONSULTORIA] as const;
 export const INSTAGRAM_MARCA = "cliqueipostei.app";
 export const MENCAO_INSTAGRAM_MARCA = `Siga o Postei: @${INSTAGRAM_MARCA}`;
 
@@ -98,6 +100,12 @@ export function jaMencionaMarca(texto: string) {
 
 export function ehNichoMarcaPropria(nichoId: string | null | undefined) {
   return nichoId === NICHO_MARCA_PROPRIA;
+}
+
+export function ehNichoMarcaInterna(nichoId: string | null | undefined) {
+  return Boolean(
+    nichoId && (NICHOS_MARCA_INTERNA as readonly string[]).includes(nichoId),
+  );
 }
 
 /** Sem username, não dá para cravar que é o feed oficial — trata como outro. */

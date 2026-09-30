@@ -48,6 +48,24 @@ export function montarLegenda(post: Post, opts?: { mencionarMarca?: boolean }) {
     .join("\n\n");
 }
 
+export async function registroAtivoInstagram(
+  usuarioId: string,
+  loteId: string,
+  indice: number,
+) {
+  const admin = criarClienteAdmin();
+  const { data } = await admin
+    .from("publicacoes")
+    .select("id, situacao, ig_media_id")
+    .eq("usuario_id", usuarioId)
+    .eq("lote_id", loteId)
+    .eq("indice", indice)
+    .in("situacao", ["publicada", "publicando", "agendada"])
+    .order("atualizado_em", { ascending: false })
+    .limit(1);
+  return data?.[0] ?? null;
+}
+
 export async function contaConectada(usuarioId: string) {
   const admin = criarClienteAdmin();
   const { data } = await admin

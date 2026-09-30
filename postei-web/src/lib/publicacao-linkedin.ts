@@ -39,6 +39,24 @@ export function montarLegendaLinkedin(post: Post) {
     .join("\n\n");
 }
 
+export async function registroAtivoLinkedin(
+  usuarioId: string,
+  loteId: string,
+  indice: number,
+) {
+  const admin = criarClienteAdmin();
+  const { data } = await admin
+    .from("publicacoes_linkedin")
+    .select("id, situacao, li_post_urn")
+    .eq("usuario_id", usuarioId)
+    .eq("lote_id", loteId)
+    .eq("indice", indice)
+    .in("situacao", ["publicada", "publicando", "agendada"])
+    .order("atualizado_em", { ascending: false })
+    .limit(1);
+  return data?.[0] ?? null;
+}
+
 export async function contaLinkedin(usuarioId: string) {
   const admin = criarClienteAdmin();
   const { data } = await admin
