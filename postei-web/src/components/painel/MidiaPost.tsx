@@ -4,24 +4,33 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 /**
- * Troca de foto (Pexels / upload) e anexo de vídeo para Reels.
- * Ver docs/MIDIA-FOTO-VIDEO.md — o motor grava backup antes de sobrescrever.
+ * Troca de foto (Pexels / upload) e Reel (Ken Burns do cliente ou Imagine da marca).
+ * A prévia não sobe no Instagram até o assinante aceitar.
  */
 export function MidiaPost({
   loteId,
   indice,
   temVideo,
+  videoPreview = null,
   permiteFoto = true,
+  podeGerarReel = false,
+  marcaReel = null,
 }: {
   loteId: string;
   indice: number;
   temVideo: boolean;
+  videoPreview?: string | null;
   permiteFoto?: boolean;
+  podeGerarReel?: boolean;
+  marcaReel?: "postei" | "am" | "cliente" | null;
 }) {
   const router = useRouter();
   const inputFoto = useRef<HTMLInputElement>(null);
   const inputVideo = useRef<HTMLInputElement>(null);
-  const [ocupado, setOcupado] = useState<"pexels" | "foto" | "video" | null>(null);
+  const [ocupado, setOcupado] = useState<
+    "pexels" | "foto" | "video" | "reel" | "aceitar" | "recusar" | null
+  >(null);
+  const [segundosReel, setSegundosReel] = useState(0);
   const [erro, setErro] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
 
@@ -103,7 +112,67 @@ export function MidiaPost({
     }
   }
 
+  async function gerarReel() {
+    setOcupado("reel");
+    setSegundosReel(0);
+    setErro(null);
+    setOk(null);
+    const tick = setInterval(() => setSegundosReel((s) => s + 1), 1000);
+    try {
+      const r = await fetch(
+        `/api/lotes/${encodeURIComponent(loteId)}/posts/${indice}/reel`,
+        { method: "POST" },
+      );
+      const dados = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setErro(dados.erro || "Não consegui gerar o Reel.");
+        return;
+      }
+      setOk("Prévia pronta. Assista e decida se sobe.");
+      router.refresh();
+    } catch {
+      setErro("Falha de rede ao gerar o Reel.");
+    } finally {
+      clearInterval(tick);
+      setOcupado(null);
+    }
+  }
+
+  async function decidir(acao: "aceitar" | "recusar") {
+    setOcupado(acao);
+    setErro(null);
+    setOk(null);
+    try {
+      const r = await fetch(
+        `/api/lotes/${encodeURIComponent(loteId)}/posts/${indice}/reel/decisao`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ acao }),
+        },
+      );
+      const dados = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setErro(dados.erro || "Não consegui guardar a decisão.");
+        return;
+      }
+      setOk(acao === "aceitar" ? "Reel aceito. Pode publicar." : "Prévia descartada.");
+      router.refresh();
+    } catch {
+      setErro("Falha de rede ao guardar a decisão.");
+    } finally {
+      setOcupado(null);
+    }
+  }
+
   const busy = ocupado !== null;
+  const temPreview = Boolean(videoPreview);
+  const dicaReel =
+    marcaReel === "am"
+      ? "O apresentador da AM fala o texto deste post (~10 s)."
+      : marcaReel === "postei"
+        ? "Anima o anúncio com câmera lenta. Texto e logo ficam parados (~6 s)."
+        : "Anima o post com câmera lenta (~8 s). Você assiste e só sobe se gostar.";
 
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-linha bg-papel px-3 py-3">
@@ -139,6 +208,23 @@ export function MidiaPost({
         >
           {ocupado === "video" ? "Enviando…" : temVideo ? "Trocar vídeo (MP4)" : "Anexar vídeo (MP4)"}
         </button>
+
+        {podeGerarReel && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void gerarReel()}
+            className="rounded-full border border-limao bg-limao px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:border-limao disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+          >
+            {ocupado === "reel"
+              ? `Gerando prévia… ${segundosReel}s`
+              : temPreview
+                ? "Gerar outra prévia"
+                : temVideo
+                  ? "Gerar outro Reel"
+                  : "Gerar Reel"}
+          </button>
+        )}
       </div>
 
       <input
@@ -162,8 +248,42 @@ export function MidiaPost({
         }}
       />
 
-      {temVideo && (
-        <p className="text-xs text-folha">Vídeo anexado — use “Publicar como Reel”.</p>
+      {temPreview && videoPreview && (
+        <div className="mt-1 flex flex-col gap-2 rounded-lg border border-limao/40 bg-branco px-2 py-2">
+          <p className="text-xs font-medium text-tinta">
+            Prévia — ainda não vai para o Instagram. Assista e escolha.
+          </p>
+          <video
+            key={videoPreview}
+            src={`/api/lotes/${encodeURIComponent(loteId)}/video/${encodeURIComponent(videoPreview)}`}
+            controls
+            playsInline
+            className="w-full rounded-md border border-linha"
+            preload="metadata"
+          />
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void decidir("aceitar")}
+              className="rounded-full bg-limao px-3 py-1.5 text-xs font-medium text-ink disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            >
+              {ocupado === "aceitar" ? "Guardando…" : "Usar este Reel"}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void decidir("recusar")}
+              className="rounded-full border border-linha px-3 py-1.5 text-xs font-medium hover:border-tinta/50 disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-folha"
+            >
+              {ocupado === "recusar" ? "Descartando…" : "Não usar"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {temVideo && !temPreview && (
+        <p className="text-xs text-folha">Reel aceito — use “Publicar como Reel”.</p>
       )}
       {ok && <p className="text-xs text-folha">{ok}</p>}
       {erro && (
@@ -172,9 +292,11 @@ export function MidiaPost({
         </p>
       )}
       <p className="text-[0.65rem] leading-snug text-cinza">
-        {permiteFoto
-          ? "A arte antiga fica em backup no servidor. Foto até 8 MB · vídeo MP4 até 80 MB."
-          : "Anúncio de produto não troca foto. Você pode anexar um MP4 para Reel."}
+        {podeGerarReel
+          ? `${dicaReel} Nada sobe sem você aceitar.`
+          : permiteFoto
+            ? "A arte antiga fica em backup no servidor. Foto até 8 MB · vídeo MP4 até 80 MB."
+            : "Anúncio de produto não troca foto. Você pode anexar um MP4 para Reel."}
       </p>
     </div>
   );

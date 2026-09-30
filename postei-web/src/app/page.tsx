@@ -1,5 +1,6 @@
 import { Venda } from "@/components/site/Venda";
 import { Heroi } from "@/components/site/Heroi";
+import { DemoAoVivo } from "@/components/demo/DemoAoVivo";
 import {
   Problema,
   Nichos,
@@ -15,6 +16,7 @@ export default function Home() {
     <Venda barra>
       <main className="flex-1">
         <Heroi />
+        <DemoAoVivo />
         <Problema />
         <ComoFunciona />
         <Nichos />

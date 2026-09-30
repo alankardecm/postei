@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import type { SituacaoCard } from "@/lib/situacao-publicacao";
 
-type Situacao = "parado" | "publicando" | "publicado" | "agendado" | "erro";
 type Modo = "feed" | "reels";
 
 export function Publicar({
@@ -10,19 +11,27 @@ export function Publicar({
   indice,
   conectado,
   temVideo = false,
+  situacaoInicial = "parado",
+  agendadaPara = null,
+  erroInicial = null,
 }: {
   loteId: string;
   indice: number;
   conectado: boolean;
   /** Se true, mostra a opção de publicar como Reel (MP4 anexado). */
   temVideo?: boolean;
+  situacaoInicial?: SituacaoCard;
+  agendadaPara?: string | null;
+  erroInicial?: string | null;
 }) {
-  const [situacao, setSituacao] = useState<Situacao>("parado");
-  const [erro, setErro] = useState<string | null>(null);
+  const router = useRouter();
+  const [situacao, setSituacao] = useState<SituacaoCard>(situacaoInicial);
+  const [erro, setErro] = useState<string | null>(erroInicial);
   const [confirmando, setConfirmando] = useState(false);
   const [modoConfirm, setModoConfirm] = useState<Modo>("feed");
   const [agendando, setAgendando] = useState(false);
   const [quando, setQuando] = useState(sugestaoDeHorario());
+  const [quandoIso, setQuandoIso] = useState<string | null>(agendadaPara);
 
   async function publicar(modo: Modo = "feed") {
     setSituacao("publicando");
@@ -42,6 +51,7 @@ export function Publicar({
       return;
     }
     setSituacao("publicado");
+    router.refresh();
   }
 
   if (!conectado) {
@@ -69,14 +79,25 @@ export function Publicar({
       setErro(dados.erro || "Não consegui agendar.");
       return;
     }
+    setQuandoIso(dados.quando || new Date(quando).toISOString());
     setSituacao("agendado");
     setAgendando(false);
+    router.refresh();
   }
 
   if (situacao === "agendado") {
+    const marca = quandoIso || new Date(quando).toISOString();
     return (
       <p className="rounded-full bg-areia px-4 py-2 text-center text-sm font-medium text-ink">
-        Agendado para {new Date(quando).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+        Agendado para {new Date(marca).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+      </p>
+    );
+  }
+
+  if (situacaoInicial === "publicando" && situacao === "publicando" && !confirmando && !agendando) {
+    return (
+      <p className="rounded-full bg-areia px-4 py-2 text-center text-sm font-medium text-ink">
+        Saindo agora…
       </p>
     );
   }

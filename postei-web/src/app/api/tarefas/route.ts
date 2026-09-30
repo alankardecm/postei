@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { motor, usuarioAtual, ErroMotor } from "@/lib/motor";
 import { reservar, devolver, SemCota, assinaturaDe } from "@/lib/cota";
-import { ehAcessoMarcaPropria } from "@/lib/planos";
+import { ehAcessoMarcaPropria, ehNichoMarcaInterna } from "@/lib/planos";
 
 /** Enfileira uma geração para o usuário da sessão. */
 export async function POST(request: Request) {
@@ -25,7 +25,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "O nome do perfil está muito longo." }, { status: 400 });
   }
   const podeInterno = ehAcessoMarcaPropria(user.email);
-  if (nicho === "postei-marca" && !podeInterno) {
+  if (nicho === "am-consultoria" && (!Number.isInteger(quantidade) || quantidade < 1 || quantidade > 5)) {
+    return NextResponse.json({ erro: "A direção editorial AM aceita de 1 a 5 posts por lote." }, { status: 400 });
+  }
+  if (ehNichoMarcaInterna(nicho) && !podeInterno) {
     return NextResponse.json({ erro: "Este ramo é interno da Postei." }, { status: 403 });
   }
 

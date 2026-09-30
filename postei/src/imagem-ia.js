@@ -1,6 +1,7 @@
 import { config } from './config.js';
 import { TELAS } from './rede.js';
 import { textoBotao } from './anuncio.js';
+import { promptEditorialAm } from './direcao-am.js';
 
 /**
  * Anúncio da marca Postei via Imagine (xAI).
@@ -91,13 +92,13 @@ function extrairDaResposta(dados) {
   return { tipo: 'vazio' };
 }
 
-async function paraTela(bytes, tela) {
+async function paraTela(bytes, tela, fundo = '#F4F1EA') {
   const t = tela?.largura && tela?.altura ? tela : TELAS.instagram;
   const sharp = (await import('sharp')).default;
   return sharp(bytes)
     .resize(t.largura, t.altura, {
       fit: 'contain',
-      background: { r: 244, g: 241, b: 234 },
+      background: fundo,
     })
     .jpeg({ quality: 90, mozjpeg: true, chromaSubsampling: '4:4:4' })
     .toBuffer();
@@ -107,7 +108,7 @@ export function imagineConfigurado() {
   return Boolean(config.xai.apiKey);
 }
 
-export async function gerarAnuncioIa({ post, tela = null }) {
+export async function gerarAnuncioIa({ post, tela = null, editorialAm = false }) {
   if (!config.xai.apiKey) {
     throw new Error('XAI_API_KEY ausente — anúncio IA precisa da chave da xAI.');
   }
@@ -115,7 +116,7 @@ export async function gerarAnuncioIa({ post, tela = null }) {
   const retrato = !tela || tela.id !== 'linkedin';
   const corpo = {
     model: config.xai.modeloImagem,
-    prompt: promptDoAnuncio(post, tela),
+    prompt: editorialAm ? promptEditorialAm(post, tela) : promptDoAnuncio(post, tela),
     n: 1,
     aspect_ratio: retrato ? '3:4' : '1:1',
     resolution: '1k',
@@ -167,5 +168,5 @@ export async function gerarAnuncioIa({ post, tela = null }) {
     throw new Error('Imagine devolveu resposta sem bytes utilizaveis.');
   }
 
-  return paraTela(bruto, tela);
+  return paraTela(bruto, tela, editorialAm ? '#080c10' : '#F4F1EA');
 }

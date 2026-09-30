@@ -14,7 +14,7 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
   const [rede, setRede] = useState<"instagram" | "linkedin" | "ambos">("instagram");
   const [nicho, setNicho] = useState(nichos[0]?.id ?? "");
   const [marca, setMarca] = useState("");
-  const [quantidade, setQuantidade] = useState(volumes[volumes.length - 1] ?? 2);
+  const [quantidade, setQuantidade] = useState(volumes[0] ?? 2);
   const [situacao, setSituacao] = useState<Situacao>("parado");
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [segundos, setSegundos] = useState(0);
@@ -89,7 +89,8 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
 
   return (
     <form onSubmit={gerar} className="rounded-2xl border border-linha bg-branco p-6 sm:p-7">
-      <h2 className="fonte-display text-lg font-bold tracking-tight">Gerar um pacote</h2>
+      <p className="rotulo mb-2">Criação com IA</p>
+      <h2 className="fonte-display text-2xl font-bold tracking-tight">Uma nova direção para o seu conteúdo.</h2>
       <p className="mt-1 text-sm text-cinza">
         Primeiro a rede. Depois o ramo e o nome do perfil.
       </p>
@@ -129,16 +130,34 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
           <span className="rotulo">Ramo</span>
           <select
             value={nicho}
-            onChange={(e) => setNicho(e.target.value)}
+            onChange={(e) => {
+              const id = e.target.value;
+              setNicho(id);
+              if (id === "postei-marca") {
+                setMarca((m) => m.trim() || "Postei");
+                setQuantidade((q) => (q > 5 ? 2 : q));
+              }
+              if (id === "am-consultoria") {
+                setMarca((m) => m.trim() || "AM Consultoria");
+                setQuantidade((q) => (q > 5 ? 2 : q));
+              }
+            }}
             disabled={ocupado}
             className="rounded-xl border border-linha bg-papel px-4 py-3 outline-none focus:border-folha focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-folha disabled:opacity-60"
           >
             {nichos.map((n) => (
               <option key={n.id} value={n.id}>
-                {n.nome}
+                {n.interno ? `${n.nome} · marca` : n.nome}
               </option>
             ))}
           </select>
+          {(nicho === "postei-marca" || nicho === "am-consultoria") && (
+            <span className="mt-1 text-xs text-cinza">
+              {nicho === "am-consultoria"
+                ? "Direção editorial AM: grafite, prata, ciano e imagens conceituais. Até 5 posts por lote; revise texto e arte antes de publicar."
+                : "Depois do pacote, use Gerar Reel no anúncio — câmera lenta, texto parado."}
+            </span>
+          )}
         </label>
 
         <label className="flex flex-col gap-1.5">
@@ -158,7 +177,7 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
       <fieldset className="mt-5" disabled={ocupado}>
         <legend className="rotulo mb-2">Quantos posts</legend>
         <div className="flex flex-wrap gap-2">
-          {volumes.map((v) => (
+          {volumes.filter(v => nicho !== "am-consultoria" || v <= 5).map((v) => (
             <button
               key={v}
               type="button"
@@ -174,7 +193,7 @@ export function Gerador({ nichos, volumes }: { nichos: Nicho[]; volumes: number[
             </button>
           ))}
           <span className="self-center text-sm text-cinza">
-            {quantidade >= 30
+            {nicho === "am-consultoria" ? "a criação das imagens pode levar alguns minutos" : quantidade >= 30
               ? "um mês inteiro — leva uns 3 minutos"
               : volumes.length === 1
                 ? "é o que o teste inclui"

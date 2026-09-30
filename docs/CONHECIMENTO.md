@@ -3,7 +3,7 @@
 > **Este arquivo é a “memória” do projeto.**  
 > Tudo que formos descobrindo, decidindo e operando deve ser registrado aqui (e, se for
 > procedimento longo, em um doc dedicado com link neste índice).  
-> Data de criação: 2026-08-11 · Última atualização: 2026-08-15
+> Data de criação: 2026-08-11 · Última atualização: 2026-08-19
 
 Leia também:
 
@@ -13,6 +13,7 @@ Leia também:
 | [`APRENDIZAGEM.md`](APRENDIZAGEM.md) | **Caderno de aprendizagem** — decisões e o que não esquecer |
 | [`MIDIA-FOTO-VIDEO.md`](MIDIA-FOTO-VIDEO.md) | Upload de foto, re-render, Reels |
 | [`DOMINIO-PRODUCAO.md`](DOMINIO-PRODUCAO.md) | DNS, Traefik, domínio novo, MP, Instagram (passo a passo) |
+| Hermes (pasta irmã) | `Documents/00 - 2026/35.1 PROJETOS PARTICULARES/HERMES/` — `README.md` + `DIA-2026-08-18.md` |
 | [`PLANO.md`](../PLANO.md) | Rascunho de negócio (pode divergir do business plan) |
 | `business-plan.html` / PDF | Posicionamento comercial oficial |
 
@@ -27,6 +28,7 @@ Leia também:
 | **Não há sociedade** | Comercial comissionado sobre venda (Junior, etc.) |
 | **Repo** | `github.com/alankardecm/postei` (privado) |
 | **VPS** | Hostinger `217.196.61.190` — **nada da NetTurbo** |
+| **Hermes** | Isolado em Docker: `/opt/hermes`. Painel **https://hermes.amconsultoria.tech** (Traefik + senha). Sem docker.sock. `9119` não escuta em `0.0.0.0` |
 | **URL oficial (2026-08-11)** | **https://postei.amconsultoria.tech** |
 | **URL legada** | https://postei.srv1121163.hstgr.cloud (manter um tempo como backup) |
 | **Supabase (API)** | https://api.postei.srv1121163.hstgr.cloud |
@@ -235,6 +237,9 @@ diferentes.
 | Quem vê no painel | só Alan e Junior (`DONOS_MARCA`) |
 | Perfil oficial | [@cliqueipostei.app](https://www.instagram.com/cliqueipostei.app) |
 | Preview sem LLM | `node scripts/preview-anuncio.mjs` → `postei/validacao/anuncio/` |
+| Reel | botão **Gerar Reel** no post: Imagine 6 s, câmera no anúncio, 9:16 |
+
+Nicho irmão, mesma lista de donos: **`am-consultoria`** (AM Consultoria). Feed em template escuro; Reel usa o apresentador de `postei/assets/am/canonico.jpg` falando o texto do post (10 s, PT-BR). Não é o nicho público `ia-para-empresas`.
 
 ### Ligar e gerar
 
@@ -250,6 +255,8 @@ Custo: US$ 0,02/imagem × 30 ≈ US$ 0,60/mês da marca. Texto do cliente contin
 LiteLLM/Gemini. Chave só no `/opt/postei/.env` (`XAI_API_KEY`).
 
 Não colocar esse nicho na landing. Cliente pagante não deve gerar anúncio da Postei.
+
+Reel do **cliente**: Ken Burns (`ffmpeg`, 8 s, 9:16) na arte do post. Sempre prévia — só vira Reel depois de **Usar este Reel**. VPS precisa de `ffmpeg` no PATH.
 
 Se o Instagram conectado **não** for `@cliqueipostei.app`, a publicação (e o
 agendador) acrescentam `Siga o Postei: @cliqueipostei.app` na legenda — sem
@@ -296,7 +303,9 @@ fica em `pacote.marcaDagua` — trocar foto no teste reaplica o selo.
 |---|---|
 | `/opt/postei` | motor · pm2 `postei` · :4710 |
 | `/opt/postei-web` | painel · pm2 `postei-web` · :4720 |
-| `/docker/n8n/dinamico/postei.yml` | Traefik |
+| `/docker/n8n/dinamico/postei.yml` | Traefik do Postei |
+| `/opt/hermes` | Hermes · container `hermes` · painel `hermes.amconsultoria.tech` |
+| `/docker/n8n/dinamico/hermes.yml` | Traefik do Hermes → `172.16.1.1:9119` |
 | Segredos | `/opt/postei-web/.env.production`, `/opt/postei/.env` · mode 600 |
 
 Deploy envia **só o que o git rastreia**. Arquivo novo sem `git add` não sobe.
@@ -311,6 +320,8 @@ Deploy envia **só o que o git rastreia**. Arquivo novo sem `git add` não sobe.
 4. **Instagram App ID ≠ Meta App ID**.  
 5. **`notification_url` no preapproval** pode ser ignorado pelo MP.  
 6. Landing com **poucos itens na esteira** = cards “repetidos” (a esteira duplica a lista no CSS).  
+7. **Fila do painel era só Instagram.** Agendamento LinkedIn sumia no F5. Desde 18/08 o **Na fila** lista as duas redes. Selo no *card* do lote ainda não está no ar.  
+8. **`./deploy.sh` com untracked** (Reel, `situacao-publicacao.ts`, etc.) aborta. Correção da fila LinkedIn subiu na mão (`scp` + `npm run build` + `pm2 restart postei-web`).  
 
 ---
 
@@ -331,6 +342,13 @@ Deploy envia **só o que o git rastreia**. Arquivo novo sem `git add` não sobe.
 ---
 
 ## 13. Diário de evolução (append-only)
+
+### 2026-08-18 / 19
+
+- Hermes isolado na mesma VPS (`/opt/hermes`). Painel público com senha: `https://hermes.amconsultoria.tech`. DNS A `hermes` → VPS. Traefik `hermes.yml`. Sem túnel no dia a dia.  
+- Odysseus / Open WebUI / Langfuse / hub-gateway removidos. LiteLLM e Postei ficaram.  
+- Lote LinkedIn `ia-para-empresas_alan-moreira_1787083817957`: 1 publicado + 4 na fila. F5 não apagou — a UI é que esquecia. Fila do painel passou a mostrar LinkedIn. API recusa republicar o mesmo card.  
+- Perfis Hermes (AM comercial / Postei / default) **combinados, ainda não criados**. Detalhe: pasta `HERMES/DIA-2026-08-18.md`.
 
 ### 2026-08-11
 

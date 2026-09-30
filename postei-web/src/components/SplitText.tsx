@@ -48,13 +48,9 @@ const SplitText: React.FC<SplitTextProps> = ({
   }, [onLetterAnimationComplete]);
 
   useEffect(() => {
-    if (document.fonts.status === 'loaded') {
-      setFontsLoaded(true);
-    } else {
-      document.fonts.ready.then(() => {
-        setFontsLoaded(true);
-      });
-    }
+    let active = true;
+    document.fonts.ready.then(() => { if (active) setFontsLoaded(true); });
+    return () => { active = false; };
   }, []);
 
   useGSAP(
@@ -69,7 +65,7 @@ const SplitText: React.FC<SplitTextProps> = ({
       if (el._rbsplitInstance) {
         try {
           el._rbsplitInstance.revert();
-        } catch (_) {}
+        } catch {}
         el._rbsplitInstance = undefined;
       }
 
@@ -134,7 +130,7 @@ const SplitText: React.FC<SplitTextProps> = ({
         });
         try {
           splitInstance.revert();
-        } catch (_) {}
+        } catch {}
         el._rbsplitInstance = undefined;
       };
     },

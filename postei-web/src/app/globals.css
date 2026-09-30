@@ -150,6 +150,7 @@
 
 @theme inline {
   --color-tinta:  var(--tinta);
+  --color-branco: var(--branco);
   --color-papel:  var(--papel);
   --color-limao:  var(--limao);
   --color-folha:  var(--folha);
@@ -197,7 +198,7 @@ body {
   overflow: hidden;
   border-radius: 18px;
   border: 1px solid var(--linha);
-  background: #fff;
+  background: var(--branco);
   box-shadow: 0 18px 40px rgb(20 21 17 / 10%);
 }
 
@@ -360,3 +361,43 @@ body {
   .esteira-trilha { animation: none; }
   .esteira { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
 }
+/* Identidade AM — interface; a paleta de cada cliente continua no DNA da marca. */
+:root, .venda {
+  --tinta: #f1f4f5;
+  --papel: #080c10;
+  --branco: #111a21;
+  --limao: #6ce5e8;
+  --folha: #6ce5e8;
+  --ink: #080c10;
+  --areia: #c6d3da;
+  --cinza: #a4b3bd;
+  --linha: #2b3944;
+  --background: #080c10;
+  --foreground: #f1f4f5;
+  --card: #111a21;
+  --card-foreground: #f1f4f5;
+  --border: #2b3944;
+  --ring: #6ce5e8;
+  color-scheme: dark;
+}
+html { scroll-padding-top: 6rem; }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid #6ce5e8; outline-offset: 4px; }
+.studio-hero { position: relative; padding: 5rem 0 3rem; overflow: hidden; background: radial-gradient(ellipse at 80% 35%, #1b35404d, transparent 55%); }
+.studio-hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: center; gap: 3rem; }
+.studio-hero h1 { font-size: clamp(3rem, 5.5vw, 5.25rem); letter-spacing: -.055em; line-height: 1.02; font-weight: 650; max-width: 700px; }
+.studio-hero h1 em { color: var(--limao); font-style: normal; }
+.studio-wall { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem 0 2rem; }
+.studio-wall img { width: 100%; height: auto; border: 1px solid #42515a; border-radius: 8px; box-shadow: 0 25px 70px #0008; }
+.studio-wall img:first-child { transform: translateY(2rem); }
+.studio-wall img:last-child { transform: translateY(-1rem); }
+.studio-baseline { display: flex; flex-wrap: wrap; gap: 1rem 2rem; border-top: 1px solid var(--linha); margin-top: 4rem; padding-top: 1.5rem; color: var(--cinza); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
+.studio-panel { background: linear-gradient(135deg, #111d26, #0d1319); border: 1px solid var(--linha); border-radius: 20px; padding: clamp(1.25rem, 4vw, 2.5rem); }
+.studio-badge { border: 1px solid #6ce5e84d; background: #6ce5e80d; color: var(--limao); padding: .5rem .7rem; font: .65rem ui-monospace, monospace; letter-spacing: .1em; border-radius: 4px; }
+.studio-example { overflow: hidden; border: 1px solid var(--linha); border-radius: 10px; background: var(--papel); transition: border-color .2s, transform .2s; }
+.studio-example:hover { border-color: var(--limao); transform: translateY(-3px); }
+.studio-label { display: flex; flex-direction: column; gap: .5rem; font-size: .85rem; }
+.studio-input { background: #080c10; border: 1px solid var(--linha); border-radius: 8px; padding: .8rem 1rem; width: 100%; color: var(--tinta); }
+.studio-input:focus { border-color: var(--limao); }
+@media(max-width: 850px) { .studio-hero { padding-top: 3rem; } .studio-hero-grid { grid-template-columns: 1fr; } .studio-wall { max-width: 570px; margin-inline: auto; } }
+@media(prefers-reduced-motion: reduce) { .studio-example:hover { transform: none; } html { scroll-behavior: auto; } }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { usuarioAtual } from "@/lib/motor";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { publicarAgora, contaConectada } from "@/lib/publicacao";
+import { publicarAgora, contaConectada, registroAtivoInstagram } from "@/lib/publicacao";
 
 /** Publica um post do lote na hora. A lógica em si vive em lib/publicacao. */
 export async function POST(request: Request) {
@@ -19,6 +19,17 @@ export async function POST(request: Request) {
 
   const conta = await contaConectada(user.id);
   if (!conta) return NextResponse.json({ erro: "Conecte seu Instagram antes." }, { status: 400 });
+
+  const ja = await registroAtivoInstagram(user.id, loteId, indice);
+  if (ja?.situacao === "publicada") {
+    return NextResponse.json({ ok: true, mediaId: ja.ig_media_id, ja: true, modo });
+  }
+  if (ja?.situacao === "agendada") {
+    return NextResponse.json({ erro: "Esse post já está agendado." }, { status: 409 });
+  }
+  if (ja?.situacao === "publicando") {
+    return NextResponse.json({ erro: "Esse post já está saindo." }, { status: 409 });
+  }
 
   const admin = criarClienteAdmin();
   const { data: registro } = await admin
